@@ -1,8 +1,7 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send } from "lucide-react";
+import { Send, Image, Clock } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
 
 const ChatInput: React.FC = () => {

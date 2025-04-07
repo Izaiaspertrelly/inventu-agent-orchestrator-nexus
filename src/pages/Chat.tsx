@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
-import ChatInput from "@/components/ChatInput";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatCategories from "@/components/ChatCategories";
 import { useChat } from "@/contexts/ChatContext";
@@ -10,9 +9,10 @@ import { Image, Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const Chat: React.FC = () => {
-  const { activeChat, createNewChat } = useChat();
+  const { activeChat, createNewChat, sendMessage } = useChat();
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
+  const [message, setMessage] = useState("");
   
   // Create an initial chat if none exists
   useEffect(() => {
@@ -30,6 +30,20 @@ const Chat: React.FC = () => {
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
   }, [activeChat, createNewChat]);
+  
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    sendMessage(message);
+    setMessage("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e as unknown as React.FormEvent);
+    }
+  };
   
   return (
     <div className="flex h-screen bg-background dark">
@@ -55,57 +69,52 @@ const Chat: React.FC = () => {
                   O que posso fazer por você?
                 </p>
                 
-                <div className="relative max-w-lg mx-auto mb-8">
-                  <Input 
-                    className="w-full py-6 pl-12 pr-4 rounded-full text-lg shadow-sm" 
-                    placeholder="Digite uma tarefa para Inventu trabalhar..."
-                    readOnly
-                    onClick={(e) => {
-                      const chatInputElement = document.querySelector('#chat-input');
-                      if (chatInputElement) {
-                        (chatInputElement as HTMLElement).focus();
-                      }
-                    }}
-                  />
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                </div>
+                <form onSubmit={handleSendMessage} className="relative max-w-lg mx-auto mb-8">
+                  <div className="flex items-center">
+                    <Input 
+                      className="w-full py-7 pl-12 pr-4 rounded-full text-lg shadow-sm"
+                      placeholder="Digite uma tarefa para Inventu trabalhar..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      autoFocus
+                    />
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  </div>
+                  
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
+                    <button 
+                      type="button"
+                      className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors"
+                      title="Análise de imagens"
+                    >
+                      <Image className="h-5 w-5" />
+                    </button>
+                    
+                    <button 
+                      type="button"
+                      className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors"
+                      title="Pesquisas em tempo real"
+                    >
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </button>
+                  </div>
+                </form>
                 
-                <div className="grid grid-cols-2 gap-6 mt-12">
-                  <div className="col-span-2">
+                <div className="grid grid-cols-1 gap-6 mt-12">
+                  <div className="col-span-1">
                     <h3 className="text-lg font-medium text-left mb-3 flex items-center">
                       <Sparkles className="h-5 w-5 mr-2 text-primary" />
                       Destaques
                     </h3>
                   </div>
-                  
-                  <div className="glass-panel p-6 text-left hover:scale-[1.02] transition-transform cursor-pointer">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 mb-4 flex items-center justify-center dark:bg-blue-900/30">
-                      <Image className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">Análise de imagens</h3>
-                    <p className="text-sm text-muted-foreground">
-                      A Inventu integra recursos de visão computacional para analisar imagens e extrair informações detalhadas.
-                    </p>
-                  </div>
-                  
-                  <div className="glass-panel p-6 text-left hover:scale-[1.02] transition-transform cursor-pointer">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 mb-4 flex items-center justify-center dark:bg-blue-900/30">
-                      <svg className="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 6v6l4 2" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">Pesquisas em tempo real</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Acesso instantâneo a informações atualizadas de múltiplas fontes para respostas precisas.
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
           )}
-
-          <ChatInput />
         </div>
         
         <div>
