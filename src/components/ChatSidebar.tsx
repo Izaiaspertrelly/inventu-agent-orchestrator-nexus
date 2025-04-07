@@ -58,11 +58,10 @@ const ChatSidebar: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col w-72 h-full bg-sidebar border-r dark">
-      <div className="flex items-center justify-between p-4 border-b">
+    <div className="flex flex-col w-72 h-full bg-sidebar border-r border-border/50">
+      <div className="flex items-center justify-between p-4 border-b border-border/50">
         <div className="flex items-center">
-          <Menu className="h-5 w-5 mr-3 text-sidebar-foreground" />
-          <InventuLogo size={28} />
+          <InventuLogo size={32} />
         </div>
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -74,7 +73,7 @@ const ChatSidebar: React.FC = () => {
       <div className="p-4">
         <Button
           onClick={createNewChat}
-          className="w-full bg-sidebar-accent hover:bg-sidebar-accent/80 text-sidebar-accent-foreground flex items-center justify-center py-5"
+          className="w-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center py-5 rounded-full shadow-md"
         >
           <Plus className="mr-2 h-4 w-4" />
           Nova tarefa
@@ -84,12 +83,12 @@ const ChatSidebar: React.FC = () => {
       <div className="px-4 mb-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-sidebar-foreground/60" />
-          <Input className="bg-sidebar-accent/30 pl-10 h-9 text-sidebar-foreground" placeholder="Pesquisar..." />
+          <Input className="bg-sidebar-accent/30 pl-10 h-9 text-sidebar-foreground rounded-full" placeholder="Pesquisar..." />
         </div>
       </div>
       
       <ScrollArea className="flex-1 px-2">
-        <div className="space-y-1 py-2">
+        <div className="space-y-2 py-2">
           {chats.map((chat) => {
             // Find a sample chat to use its icon (for demo only)
             const sampleChat = sampleChats[Math.floor(Math.random() * sampleChats.length)];
@@ -98,7 +97,7 @@ const ChatSidebar: React.FC = () => {
               <button
                 key={chat.id}
                 className={cn(
-                  "w-full text-left rounded-lg p-3 text-sm transition-colors hover:bg-sidebar-accent/50",
+                  "w-full text-left rounded-xl p-3 text-sm transition-colors hover:bg-sidebar-accent/50",
                   activeChat?.id === chat.id
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground"
@@ -106,7 +105,7 @@ const ChatSidebar: React.FC = () => {
                 onClick={() => setActiveChat(chat.id)}
               >
                 <div className="flex items-start">
-                  <div className="h-8 w-8 rounded-lg bg-primary/20 mr-3 flex items-center justify-center text-primary">
+                  <div className="h-8 w-8 rounded-xl bg-primary/10 mr-3 flex items-center justify-center text-primary">
                     {sampleChat.icon || <MessageSquare className="h-4 w-4" />}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -133,7 +132,7 @@ const ChatSidebar: React.FC = () => {
         {isAdmin && (
           <Button
             variant="outline"
-            className="w-full justify-start mb-3"
+            className="w-full justify-start mb-3 rounded-xl"
             onClick={() => navigate("/admin")}
           >
             <Settings className="mr-2 h-4 w-4" />
@@ -142,7 +141,7 @@ const ChatSidebar: React.FC = () => {
         )}
         
         <div className="flex items-center gap-3 py-2">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <User className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">

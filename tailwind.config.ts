@@ -65,13 +65,13 @@ export default {
 				},
 				// Custom colors for Inventu Super Agent
 				inventu: {
-					primary: '#3b82f6', // Blue
-					secondary: '#8b5cf6', // Purple
-					accent: '#6366f1', // Indigo
-					background: '#1e1e2e', // Dark background
-					foreground: '#e2e8f0', // Light text
-					muted: '#64748b', // Muted text
-					border: '#334155', // Border color
+					primary: '#007AFF', // Apple blue
+					secondary: '#5AC8FA', // Apple light blue
+					accent: '#30B0C7', // Blue-teal
+					background: '#000000', // Dark background
+					foreground: '#FFFFFF', // White text
+					muted: '#86868B', // Apple gray
+					border: '#1D1D1F', // Apple dark gray
 				}
 			},
 			borderRadius: {
@@ -99,12 +99,17 @@ export default {
 				'pulse-light': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'pulse-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+				'pulse-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'float': 'float 3s ease-in-out infinite'
 			}
 		}
 	},

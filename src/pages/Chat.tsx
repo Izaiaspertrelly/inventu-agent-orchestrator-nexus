@@ -6,7 +6,7 @@ import ChatInput from "@/components/ChatInput";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatCategories from "@/components/ChatCategories";
 import { useChat } from "@/contexts/ChatContext";
-import { Image, Search } from "lucide-react";
+import { Image, Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const Chat: React.FC = () => {
@@ -48,7 +48,7 @@ const Chat: React.FC = () => {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-4">
               <div className="text-center max-w-2xl">
-                <h1 className="text-4xl font-bold mb-2">
+                <h1 className="text-4xl font-bold mb-2 tracking-tight">
                   <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"} 
                 </h1>
                 <p className="text-2xl text-muted-foreground mb-10">
@@ -57,7 +57,7 @@ const Chat: React.FC = () => {
                 
                 <div className="relative max-w-lg mx-auto mb-8">
                   <Input 
-                    className="w-full py-6 pl-12 pr-4 rounded-xl text-lg" 
+                    className="w-full py-6 pl-12 pr-4 rounded-full text-lg shadow-sm" 
                     placeholder="Digite uma tarefa para Inventu trabalhar..."
                     readOnly
                     onClick={(e) => {
@@ -72,12 +72,15 @@ const Chat: React.FC = () => {
                 
                 <div className="grid grid-cols-2 gap-6 mt-12">
                   <div className="col-span-2">
-                    <h3 className="text-lg font-medium text-left mb-3">Destaques</h3>
+                    <h3 className="text-lg font-medium text-left mb-3 flex items-center">
+                      <Sparkles className="h-5 w-5 mr-2 text-primary" />
+                      Destaques
+                    </h3>
                   </div>
                   
-                  <div className="glass-panel p-6 text-left">
-                    <div className="w-10 h-10 rounded-md bg-gray-200 mb-4 flex items-center justify-center">
-                      <Image className="h-6 w-6 text-gray-500" />
+                  <div className="glass-panel p-6 text-left hover:scale-[1.02] transition-transform cursor-pointer">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 mb-4 flex items-center justify-center dark:bg-blue-900/30">
+                      <Image className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="text-lg font-medium mb-2">Análise de imagens</h3>
                     <p className="text-sm text-muted-foreground">
@@ -85,9 +88,9 @@ const Chat: React.FC = () => {
                     </p>
                   </div>
                   
-                  <div className="glass-panel p-6 text-left">
-                    <div className="w-10 h-10 rounded-md bg-gray-200 mb-4 flex items-center justify-center">
-                      <svg className="h-6 w-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div className="glass-panel p-6 text-left hover:scale-[1.02] transition-transform cursor-pointer">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 mb-4 flex items-center justify-center dark:bg-blue-900/30">
+                      <svg className="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10" />
                         <path d="M12 6v6l4 2" />
                       </svg>
@@ -105,7 +108,7 @@ const Chat: React.FC = () => {
           <ChatInput />
         </div>
         
-        <div className="border-t">
+        <div>
           <ChatCategories />
         </div>
       </div>

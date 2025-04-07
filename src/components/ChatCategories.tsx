@@ -15,15 +15,15 @@ const ChatCategories = () => {
   const [activeCategory, setActiveCategory] = React.useState("Destaques");
 
   return (
-    <div className="p-4 flex items-center justify-center overflow-x-auto">
-      <div className="flex gap-2">
+    <div className="py-4 px-6 flex items-center justify-center overflow-x-auto apple-blur">
+      <div className="flex gap-3">
         {categories.map((category) => (
           <button
             key={category}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               activeCategory === category
-                ? "bg-primary/10 text-primary"
-                : "hover:bg-secondary/20"
+                ? "bg-primary text-white shadow-md"
+                : "bg-secondary/50 hover:bg-secondary text-foreground"
             }`}
             onClick={() => setActiveCategory(category)}
           >
