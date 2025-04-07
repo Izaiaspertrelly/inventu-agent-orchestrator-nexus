@@ -5,7 +5,7 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatCategories from "@/components/ChatCategories";
 import { useChat } from "@/contexts/ChatContext";
-import { Image, Search, Sparkles } from "lucide-react";
+import { Paperclip, Search, Sparkles, X, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const Chat: React.FC = () => {
@@ -69,40 +69,68 @@ const Chat: React.FC = () => {
                   O que posso fazer por você?
                 </p>
                 
-                <form onSubmit={handleSendMessage} className="relative max-w-lg mx-auto mb-8">
-                  <div className="flex items-center">
-                    <Input 
-                      className="w-full py-7 pl-12 pr-4 rounded-full text-lg shadow-sm"
-                      placeholder="Digite uma tarefa para Inventu trabalhar..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      autoFocus
-                    />
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  </div>
-                  
-                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
-                    <button 
-                      type="button"
-                      className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors"
-                      title="Análise de imagens"
-                    >
-                      <Image className="h-5 w-5" />
-                    </button>
+                <div className="relative max-w-2xl w-full mx-auto mb-8">
+                  <div className="flex flex-col gap-4">
+                    {/* Input principal com botões alinhados */}
+                    <div className="relative">
+                      <Input 
+                        className="w-full py-7 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
+                        placeholder="Dê uma tarefa para Manus trabalhar..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        autoFocus
+                      />
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+                      
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                        <button 
+                          type="button"
+                          className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2.5 rounded-full transition-colors"
+                          title="Anexar arquivo"
+                        >
+                          <Paperclip className="h-5 w-5" />
+                        </button>
+                        <button 
+                          type="submit"
+                          onClick={handleSendMessage}
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground p-2.5 rounded-full transition-colors"
+                        >
+                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                     
-                    <button 
-                      type="button"
-                      className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-full transition-colors"
-                      title="Pesquisas em tempo real"
-                    >
-                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 6v6l4 2" />
-                      </svg>
-                    </button>
+                    {/* Opção com botões "recusar" e "aceitar" */}
+                    <div className="w-full p-6 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
+                      <div className="rounded-xl bg-secondary/70 p-2.5 mr-4">
+                        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></path>
+                          <path d="M8 7h6"></path>
+                          <path d="M8 11h8"></path>
+                          <path d="M8 15h5"></path>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-base">
+                          Faça com que Manus confirme planos no início das tarefas e nos marcos principais
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 ml-4">
+                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/70 hover:bg-secondary/90 text-foreground transition-colors">
+                          <X className="h-5 w-5" />
+                          <span>Recusar</span>
+                        </button>
+                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
+                          <Check className="h-5 w-5" />
+                          <span>Aceitar</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </form>
+                </div>
                 
                 <div className="grid grid-cols-1 gap-6 mt-12">
                   <div className="col-span-1">

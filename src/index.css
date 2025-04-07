@@ -140,6 +140,23 @@
   .apple-blur {
     @apply backdrop-blur-xl bg-white/20 border border-white/10;
   }
+  
+  /* Novos estilos para melhorar a aparência da interface */
+  .chat-input {
+    @apply bg-secondary/30 backdrop-blur-sm border border-white/10 rounded-full py-3.5 px-4 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all;
+  }
+  
+  .action-button {
+    @apply flex items-center justify-center bg-secondary/50 hover:bg-secondary/70 p-2.5 rounded-full text-foreground transition-all;
+  }
+  
+  .action-button.primary {
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground;
+  }
+  
+  .suggestion-card {
+    @apply bg-secondary/30 backdrop-blur-sm border border-white/10 rounded-2xl p-4 transition-all hover:bg-secondary/40;
+  }
 }
 
 #root {
