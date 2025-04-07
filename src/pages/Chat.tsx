@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -14,17 +13,14 @@ const Chat: React.FC = () => {
   const [userName, setUserName] = useState("");
   const [message, setMessage] = useState("");
   
-  // Create an initial chat if none exists
   useEffect(() => {
     if (!activeChat) {
       createNewChat();
     }
     
-    // Get user information
     const user = JSON.parse(localStorage.getItem("inventu_user") || "{}");
     setUserName(user.name || "");
     
-    // Set greeting based on time of day
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Bom dia");
     else if (hour < 18) setGreeting("Boa tarde");
@@ -71,7 +67,6 @@ const Chat: React.FC = () => {
                 
                 <div className="relative max-w-2xl w-full mx-auto mb-8">
                   <div className="flex flex-col gap-4">
-                    {/* Input principal com botões alinhados */}
                     <div className="relative">
                       <Input 
                         className="w-full py-7 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
@@ -103,7 +98,6 @@ const Chat: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Opção com botões "recusar" e "aceitar" */}
                     <div className="w-full p-6 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
                       <div className="rounded-xl bg-secondary/70 p-2.5 mr-4">
                         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
@@ -115,7 +109,7 @@ const Chat: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-base">
-                          Faça com que Manus confirme planos no início das tarefas e nos marcos principais
+                          Autorize o Inventor a confirmar alguns de seus planos nos principais marcos
                         </p>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
