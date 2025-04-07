@@ -1,32 +1,33 @@
 
-import React, { useState } from "react";
-import { cn } from "@/lib/utils";
+import React from "react";
 
-const CATEGORIES = [
-  { id: "destaques", name: "Destaques" },
-  { id: "pesquisa", name: "Pesquisa" },
-  { id: "vida", name: "Vida" },
-  { id: "analise", name: "Análise de Dados" },
-  { id: "educacao", name: "Educação" },
-  { id: "produtividade", name: "Produtividade" },
+const categories = [
+  "Destaques",
+  "Pesquisa",
+  "Vida",
+  "Análise de Dados",
+  "Educação",
+  "Produtividade",
+  "Que diabos"
 ];
 
-const ChatCategories: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState("destaques");
+const ChatCategories = () => {
+  const [activeCategory, setActiveCategory] = React.useState("Destaques");
 
   return (
-    <div className="overflow-x-auto py-4 px-2">
-      <div className="flex space-x-2">
-        {CATEGORIES.map((category) => (
+    <div className="p-4 flex items-center justify-center overflow-x-auto">
+      <div className="flex gap-2">
+        {categories.map((category) => (
           <button
-            key={category.id}
-            className={cn(
-              "category-pill whitespace-nowrap",
-              activeCategory === category.id ? "active" : ""
-            )}
-            onClick={() => setActiveCategory(category.id)}
+            key={category}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeCategory === category
+                ? "bg-primary/10 text-primary"
+                : "hover:bg-secondary/20"
+            }`}
+            onClick={() => setActiveCategory(category)}
           >
-            {category.name}
+            {category}
           </button>
         ))}
       </div>
