@@ -1,18 +1,17 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
-import { v4 as uuidv4 } from "uuid";
 import OrchestratorBasicInfo from "./OrchestratorBasicInfo";
 import ModelSelection from "./ModelSelection";
 import OrchestratorCapabilities from "./OrchestratorCapabilities";
 import ConfigDisplay from "./ConfigDisplay";
+import { useConfigGenerator } from "./form/useConfigGenerator";
+import { useFormSubmit } from "./form/useFormSubmit";
 
 const OrchestratorForm: React.FC = () => {
-  const { toast } = useToast();
-  const { models, agents, addAgent } = useAgent();
+  const { models } = useAgent();
   
   // Basic info state
   const [name, setName] = useState("");
@@ -30,117 +29,36 @@ const OrchestratorForm: React.FC = () => {
   const [memoryType, setMemoryType] = useState("buffer");
   const [reasoningDepth, setReasoningDepth] = useState("2");
   
-  // Config state
-  const [orchestratorConfig, setOrchestratorConfig] = useState(JSON.stringify({
-    memory: {
-      type: "buffer",
-      capacity: 10
-    },
-    reasoning: {
-      depth: 2,
-      strategy: "chain-of-thought"
-    },
-    planning: {
-      enabled: false,
-      horizon: 5
-    }
-  }, null, 2));
-  
-  // Form state
-  const [isFormLoading, setIsFormLoading] = useState(false);
+  // Custom hooks for form functionality
+  const { orchestratorConfig, setOrchestratorConfig, handleUpdateConfig } = useConfigGenerator();
+  const { handleSaveOrchestrator, isFormLoading } = useFormSubmit();
 
-  const handleUpdateConfig = () => {
-    try {
-      const memoryConfig = {
-        type: memoryType,
-        capacity: memoryType === "buffer" ? 10 : 50,
-        enabled: memoryEnabled
-      };
-      
-      const reasoningConfig = {
-        depth: parseInt(reasoningDepth),
-        strategy: "chain-of-thought",
-        enabled: reasoningEnabled
-      };
-      
-      const planningConfig = {
-        enabled: planningEnabled,
-        horizon: 5
-      };
-      
-      const newConfig = JSON.stringify({
-        memory: memoryConfig,
-        reasoning: reasoningConfig,
-        planning: planningConfig
-      }, null, 2);
-      
-      setOrchestratorConfig(newConfig);
-    } catch (e) {
-      toast({
-        title: "Erro na configuração",
-        description: "Não foi possível atualizar a configuração do orquestrador.",
-        variant: "destructive"
-      });
-    }
+  // Handle config update
+  const onUpdateConfig = () => {
+    handleUpdateConfig({
+      memoryEnabled,
+      memoryType,
+      reasoningEnabled,
+      reasoningDepth,
+      planningEnabled
+    });
   };
 
-  const handleSaveOrchestrator = () => {
-    if (!name) {
-      toast({
-        title: "Nome obrigatório",
-        description: "Por favor, forneça um nome para o agente.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!selectedModel) {
-      toast({
-        title: "Modelo obrigatório",
-        description: "Por favor, selecione um modelo de IA.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsFormLoading(true);
+  // Handle form submission
+  const onSubmitForm = () => {
+    const result = handleSaveOrchestrator({
+      name,
+      description,
+      selectedModel,
+      orchestratorConfig
+    });
     
-    try {
-      const configObj = JSON.parse(orchestratorConfig);
-      
-      const newAgent = {
-        id: uuidv4(),
-        name,
-        description,
-        modelId: selectedModel,
-        configJson: JSON.stringify({
-          orchestrator: configObj
-        }),
-        toolIds: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      addAgent(newAgent);
-      
-      toast({
-        title: "Agente criado",
-        description: "Configuração do orquestrador salva com sucesso.",
-      });
-      
-      // Reset form
+    // Reset form if submission was successful
+    if (result) {
       setName("");
       setDescription("");
       setSelectedProvider("");
       setSelectedModel("");
-    } catch (e) {
-      toast({
-        title: "Erro na configuração",
-        description: "O JSON de configuração é inválido.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsFormLoading(false);
     }
   };
 
@@ -182,7 +100,7 @@ const OrchestratorForm: React.FC = () => {
             setReasoningDepth={setReasoningDepth}
             planningEnabled={planningEnabled}
             setPlanningEnabled={setPlanningEnabled}
-            onUpdateConfig={handleUpdateConfig}
+            onUpdateConfig={onUpdateConfig}
           />
           
           <ConfigDisplay 
@@ -191,7 +109,7 @@ const OrchestratorForm: React.FC = () => {
           />
           
           <Button 
-            onClick={handleSaveOrchestrator} 
+            onClick={onSubmitForm} 
             disabled={isFormLoading || !selectedModel || !name}
             className="w-full"
           >
