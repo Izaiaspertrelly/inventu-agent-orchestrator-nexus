@@ -14,6 +14,8 @@ import ProfileTab from "./ProfileTab";
 import OrchestratorTab from "./OrchestratorTab";
 import ModelsTab from "./ModelsTab";
 import ToolsTab from "./ToolsTab";
+import AgentsTab from "./AgentsTab";
+import MCPTab from "./MCPTab";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -93,7 +95,7 @@ const SettingsTabs = () => {
               </TabsTrigger>
               <TabsTrigger value="mcp" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                MCP
+                Servidor MCP
               </TabsTrigger>
             </>
           )}
