@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/contexts/ChatContext";
@@ -15,19 +16,43 @@ import {
   Code,
   BarChart,
   Book,
-  User
+  User,
+  LogOut,
+  ChevronDown
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import ProfileDialog from "@/components/ProfileDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const ChatSidebar: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { chats, activeChat, setActiveChat, createNewChat } = useChat();
+  const { toast } = useToast();
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   const isAdmin = user?.role === "admin";
   
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Sessão encerrada",
+      description: "Você foi desconectado com sucesso.",
+    });
+    navigate("/login");
+  };
+
   const sampleChats = [
     { 
       icon: <File className="h-4 w-4" />, 
@@ -137,15 +162,44 @@ const ChatSidebar: React.FC = () => {
           </Button>
         )}
         
-        <div className="flex items-center gap-3 py-2">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium leading-none truncate">{user?.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-          </div>
-        </div>
+        <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-sidebar-accent/50 cursor-pointer transition-colors">
+                <Avatar className="w-10 h-10">
+                  {user?.profileImage ? (
+                    <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+                  ) : (
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-medium leading-none truncate">{user?.name || "Usuário"}</p>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                </div>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DialogTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ProfileDialog />
+        </Dialog>
       </div>
     </div>
   );

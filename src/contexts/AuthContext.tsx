@@ -2,9 +2,15 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { AuthState, User } from "../types";
 
+interface UpdateProfileData {
+  name?: string;
+  profileImage?: string | null;
+}
+
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (data: UpdateProfileData) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,6 +23,7 @@ const MOCK_USERS = [
     email: "admin@inventu.com",
     password: "admin123",
     role: "admin" as const,
+    profileImage: null,
   },
   {
     id: "2",
@@ -24,6 +31,7 @@ const MOCK_USERS = [
     email: "user@inventu.com",
     password: "user123",
     role: "user" as const,
+    profileImage: null,
   },
 ];
 
@@ -94,12 +102,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const updateProfile = (data: UpdateProfileData) => {
+    if (!authState.user) return;
+
+    const updatedUser = {
+      ...authState.user,
+      ...data
+    };
+
+    // Update local storage
+    localStorage.setItem("inventu_user", JSON.stringify(updatedUser));
+
+    // Update state
+    setAuthState({
+      ...authState,
+      user: updatedUser
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
         ...authState,
         login,
         logout,
+        updateProfile,
       }}
     >
       {children}

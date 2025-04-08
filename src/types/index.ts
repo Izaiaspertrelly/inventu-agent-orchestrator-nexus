@@ -1,11 +1,10 @@
-
 // User related types
 export interface User {
   id: string;
   name: string;
   email: string;
   role: "admin" | "user";
-  avatarUrl?: string;
+  profileImage?: string | null;
 }
 
 // Authentication related types
