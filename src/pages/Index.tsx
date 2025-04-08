@@ -13,7 +13,6 @@ import SearchForm from "@/components/home/SearchForm";
 import HomeLogo from "@/components/home/HomeLogo";
 import SidebarToggleButton from "@/components/home/SidebarToggleButton";
 import UserHeaderActions from "@/components/home/UserHeaderActions";
-import KnowledgeDialog from "@/components/memory/KnowledgeDialog";
 
 const Index = () => {
   const { isProcessing } = useChat();
@@ -21,7 +20,6 @@ const Index = () => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
-  const [knowledgeDialogOpen, setKnowledgeDialogOpen] = useState(false);
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -39,15 +37,11 @@ const Index = () => {
         <HomeAppSidebar 
           sidebarOpen={sidebarOpen} 
           onSidebarToggle={toggleSidebar} 
-          onProfileDialogOpen={() => setProfileDialogOpen(true)}
-          onKnowledgeDialogOpen={() => setKnowledgeDialogOpen(true)}
+          onProfileDialogOpen={() => setProfileDialogOpen(true)} 
         />
         
         <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
-          <UserHeaderActions 
-            onOpenProfileDialog={() => setProfileDialogOpen(true)} 
-            onOpenKnowledgeDialog={() => setKnowledgeDialogOpen(true)}
-          />
+          <UserHeaderActions onOpenProfileDialog={() => setProfileDialogOpen(true)} />
           <SidebarToggleButton onClick={toggleSidebar} />
 
           <div className="text-center max-w-2xl">            
@@ -64,11 +58,6 @@ const Index = () => {
       <ProfileDialog 
         open={profileDialogOpen} 
         onOpenChange={setProfileDialogOpen} 
-      />
-      
-      <KnowledgeDialog
-        open={knowledgeDialogOpen}
-        onOpenChange={setKnowledgeDialogOpen}
       />
     </SidebarProvider>
   );

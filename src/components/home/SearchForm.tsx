@@ -83,28 +83,24 @@ const SearchForm: React.FC<SearchFormProps> = ({ isProcessing }) => {
       <div className="flex flex-col gap-4">
         <form onSubmit={handleSendMessage}>
           <div className={`relative border border-border/50 rounded-full ${isVibrating ? 'animate-vibrate' : ''}`}>
-            <div className="flex items-center">
-              <div className="flex-1 min-w-0">
-                <SearchBarInput 
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  isSuperAgentEnabled={superAgentEnabled}
-                  placeholder="Dê uma tarefa para Inventor trabalhar..."
-                  disabled={isProcessing}
-                />
-              </div>
-              
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                <SearchBarActions 
-                  isSuperAgentEnabled={superAgentEnabled}
-                  onToggleSuperAgent={toggleSuperAgent}
-                  onSubmit={handleSendMessage}
-                  onAttachmentClick={handleAttachmentClick}
-                  fileInputRef={fileInputRef}
-                  isProcessing={isProcessing}
-                />
-              </div>
+            <SearchBarInput 
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              isSuperAgentEnabled={superAgentEnabled}
+              placeholder="Dê uma tarefa para Inventor trabalhar..."
+              disabled={isProcessing}
+            />
+            
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+              <SearchBarActions 
+                isSuperAgentEnabled={superAgentEnabled}
+                onToggleSuperAgent={toggleSuperAgent}
+                onSubmit={handleSendMessage}
+                onAttachmentClick={handleAttachmentClick}
+                fileInputRef={fileInputRef}
+                isProcessing={isProcessing}
+              />
             </div>
           </div>
         </form>
