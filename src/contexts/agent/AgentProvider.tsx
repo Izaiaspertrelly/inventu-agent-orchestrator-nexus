@@ -3,7 +3,7 @@ import React, { createContext, useContext } from "react";
 import { useModels } from "./useModels";
 import { useMCPConfig } from "./useMCPConfig";
 import { useAgents } from "./useAgents";
-import { useOrchestrator } from "./useOrchestrator"; // Novo hook para o orquestrador
+import { useOrchestrator } from "./useOrchestrator";
 import { AIModel, MCPServerConfig, MCPTool, Agent } from "@/types";
 import { selectModelForTask, executeMCPTool } from "./agentUtils";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +12,8 @@ interface AgentContextType {
   models: AIModel[];
   mcpConfig: MCPServerConfig;
   agents: Agent[];
-  orchestratorConfig: any; // Configuração do orquestrador
+  orchestratorConfig: any;
+  orchestratorState: any;
   addModel: (model: AIModel) => void;
   updateModel: (id: string, model: Partial<AIModel>) => void;
   removeModel: (id: string) => void;
@@ -24,7 +25,12 @@ interface AgentContextType {
   addAgent: (agent: Agent) => void;
   updateAgent: (id: string, agent: Partial<Agent>) => void;
   removeAgent: (id: string) => void;
-  updateOrchestratorConfig: (config: any) => void; // Adicionar método para atualizar configuração do orquestrador
+  updateOrchestratorConfig: (config: any) => void;
+  updateOrchestratorState: (state: any) => void;
+  addToConversationHistory: (message: { role: string; content: string; timestamp: Date }) => void;
+  decomposeTask: (taskId: string, task: string, subtasks: string[]) => void;
+  recordPerformanceMetric: (metric: "responseTime" | "tokenUsage", value: number) => void;
+  optimizeResources: () => number;
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
@@ -56,7 +62,13 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const {
     orchestratorConfig,
-    updateOrchestratorConfig
+    orchestratorState,
+    updateOrchestratorConfig,
+    updateOrchestratorState,
+    addToConversationHistory,
+    decomposeTask,
+    recordPerformanceMetric,
+    optimizeResources
   } = useOrchestrator();
 
   const handleSelectModelForTask = async (taskDescription: string): Promise<string> => {
@@ -105,6 +117,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         mcpConfig,
         agents,
         orchestratorConfig,
+        orchestratorState,
         addModel,
         updateModel,
         removeModel,
@@ -116,7 +129,12 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         addAgent,
         updateAgent,
         removeAgent,
-        updateOrchestratorConfig
+        updateOrchestratorConfig,
+        updateOrchestratorState,
+        addToConversationHistory,
+        decomposeTask,
+        recordPerformanceMetric,
+        optimizeResources
       }}
     >
       {children}

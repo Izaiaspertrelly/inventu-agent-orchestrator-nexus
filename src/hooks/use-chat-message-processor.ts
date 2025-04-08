@@ -10,13 +10,13 @@ import { useModelResponse } from "./messaging/use-model-response";
 
 export const useChatMessageProcessor = () => {
   const { toast } = useToast();
-  const { selectModelForTask } = useAgent();
+  const { selectModelForTask, optimizeResources } = useAgent();
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Importar hooks específicos para cada funcionalidade
   const { findAgentByModel, getOrchestratorAgent, orchestrateAgentResponse } = useOrchestratorResponse();
   const { executeToolsFromMessage, processFileUpload } = useToolExecutor();
-  const { generateModelBasedResponse, getModelInfo } = useModelResponse();
+  const { generateModelBasedResponse } = useModelResponse();
   
   // Process the bot's response
   const generateBotResponse = async (userMessage: string, selectedModelId: string, file?: File | null): Promise<Message> => {
@@ -24,6 +24,10 @@ export const useChatMessageProcessor = () => {
     
     try {
       console.log(`Gerando resposta usando modelo: ${selectedModelId}`);
+      
+      // Otimizar recursos se necessário
+      const optimizedTokenLimit = optimizeResources ? optimizeResources() : 4000;
+      console.log(`Limite otimizado de tokens: ${optimizedTokenLimit}`);
       
       // Verificar se temos um orquestrador configurado
       const orchestratorAgent = getOrchestratorAgent();
@@ -38,12 +42,18 @@ export const useChatMessageProcessor = () => {
           console.log("Usando orquestrador para processar a mensagem");
           const orchestratedResponse = await orchestrateAgentResponse(userMessage, orchestratorAgent);
           
-          // Completar a resposta do orquestrador com detalhes do modelo
-          const completeResponse = orchestratedResponse + 
+          // Executar ferramentas se necessário
+          const { toolsUsed, responseContent: toolsResponse } = await executeToolsFromMessage(userMessage);
+          
+          // Processar arquivo se enviado
+          const fileResponse = processFileUpload(file);
+          
+          // Completar a resposta do orquestrador com detalhes do modelo e outras informações
+          const completeResponse = toolsResponse + fileResponse + orchestratedResponse + 
             generateModelBasedResponse(userMessage, orchestratorAgent.modelId, orchestratorAgent);
           
           setIsProcessing(false);
-          return createBotMessage(completeResponse, orchestratorAgent.modelId);
+          return createBotMessage(completeResponse, orchestratorAgent.modelId, toolsUsed.length > 0 ? toolsUsed : undefined);
         }
       }
       
