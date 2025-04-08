@@ -9,6 +9,8 @@ import SearchBarActions from "@/components/search/SearchBarActions";
 import FilePreview from "@/components/search/FilePreview";
 import { useFileAttachment } from "@/hooks/use-file-attachment";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import SidebarIcon from "@/components/icons/SidebarIcon";
 
 const Index = () => {
   const { createNewChat, sendMessage } = useChat();
@@ -19,6 +21,7 @@ const Index = () => {
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Use the shared file attachment hook
   const {
@@ -50,6 +53,14 @@ const Index = () => {
       description: superAgentEnabled 
         ? "Voltando ao modelo padrão" 
         : "Usando o modelo avançado para respostas melhores",
+    });
+  };
+  
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+    toast({
+      title: sidebarOpen ? "Menu lateral fechado" : "Menu lateral aberto",
+      description: "Funcionalidade em desenvolvimento",
     });
   };
   
@@ -90,6 +101,18 @@ const Index = () => {
   
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-screen bg-background">
+      {/* Add sidebar toggle button */}
+      <div className="absolute top-4 left-4">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full hover:bg-accent/50"
+          onClick={toggleSidebar}
+        >
+          <SidebarIcon className="h-5 w-5" />
+        </Button>
+      </div>
+
       <div className="text-center max-w-2xl">
         <div className="flex justify-center mb-2">
           <div className="relative w-32 h-32">

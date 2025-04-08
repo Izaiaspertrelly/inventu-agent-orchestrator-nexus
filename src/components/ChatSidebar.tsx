@@ -9,9 +9,7 @@ import {
   MessageSquare, 
   Settings, 
   Search, 
-  Bell, 
-  ChevronLeft,
-  ChevronRight,
+  Bell,
   File,
   Briefcase,
   Code,
@@ -35,6 +33,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProfileDialog from "@/components/ProfileDialog";
 import { useToast } from "@/hooks/use-toast";
+import SidebarIcon from "@/components/icons/SidebarIcon";
 
 const ChatSidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -131,11 +130,7 @@ const ChatSidebar: React.FC = () => {
             )}
             onClick={toggleSidebar}
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4 text-sidebar-foreground" />
-            ) : (
-              <ChevronLeft className="h-4 w-4 text-sidebar-foreground" />
-            )}
+            <SidebarIcon className="h-5 w-5 text-sidebar-foreground" />
           </Button>
         </div>
       </div>
