@@ -31,9 +31,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         const barHeight = floatingBarRef.current.offsetHeight;
         
         const centerX = (windowWidth - barWidth) / 2;
-        
-        const fiveInCm = 5 * 37.8;
-        const bottomY = windowHeight - barHeight - fiveInCm;
+        const bottomY = windowHeight - barHeight - 20;
         
         setPosition({
           x: centerX,
