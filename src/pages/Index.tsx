@@ -14,9 +14,8 @@ const Index: React.FC = () => {
     e.preventDefault();
     if (!prompt.trim()) return;
     
-    // In a real application, you might want to pass the prompt to the chat page
-    // For now, we'll just navigate to the chat page
-    navigate("/");
+    // Navigate to the chat page when search is submitted
+    navigate("/chat");
   };
   
   return (
