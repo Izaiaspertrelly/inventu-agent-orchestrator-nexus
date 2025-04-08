@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Search, X, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
+import { Search, Minimize, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 interface FloatingSearchBarProps {
   onSend: (message: string) => void;
-  onClose: () => void;
+  onMinimize: () => void;
   initialMessage?: string;
 }
 
 const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ 
   onSend, 
-  onClose, 
+  onMinimize, 
   initialMessage = "" 
 }) => {
   const [message, setMessage] = useState(initialMessage);
@@ -185,11 +185,11 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
             
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onClose(); }}
+              onClick={(e) => { e.stopPropagation(); onMinimize(); }}
               className="bg-secondary/50 hover:bg-secondary/90 text-foreground p-1.5 rounded-full transition-colors"
-              title="Fechar barra de pesquisa"
+              title="Minimizar barra de pesquisa"
             >
-              <X className="h-4 w-4" />
+              <Minimize className="h-4 w-4" />
             </button>
           </div>
         </form>
