@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
@@ -69,10 +68,6 @@ const Index = () => {
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
-    toast({
-      title: sidebarOpen ? "Menu lateral fechado" : "Menu lateral aberto",
-      description: "Funcionalidade em desenvolvimento",
-    });
   };
   
   const handleSendMessage = async (e: React.FormEvent) => {
