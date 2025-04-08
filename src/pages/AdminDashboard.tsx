@@ -1,16 +1,33 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import SettingsTabs from "@/components/settings/SettingsTabs";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import ProfileDialog from "@/components/ProfileDialog";
+import AdminSystemSettings from "@/components/admin/AdminSystemSettings";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { toast } = useToast();
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   // Handle logout
   const handleLogout = () => {
@@ -36,21 +53,61 @@ const AdminDashboard = () => {
             <h1 className="text-xl font-bold">Painel Administrativo</h1>
           </div>
           
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2 pr-2">
+                <Avatar className="h-8 w-8">
+                  {user?.profileImage ? (
+                    <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+                  ) : (
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <span className="text-sm font-medium">{user?.name || "Usuário"}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
+                Meu Perfil
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/")}>
+                Ir para Aplicação
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
       {/* Main content */}
       <div className="container mx-auto py-6 px-4">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-card p-6 rounded-lg shadow-sm border border-border/50">
-            <h2 className="text-2xl font-semibold mb-6">Configurações do Sistema</h2>
-            <SettingsTabs />
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Configurações do Sistema</CardTitle>
+              <CardDescription>
+                Gerencie todos os aspectos do sistema através dos módulos abaixo
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AdminSystemSettings />
+            </CardContent>
+          </Card>
         </div>
       </div>
+      
+      {/* Profile Dialog */}
+      <ProfileDialog 
+        open={profileDialogOpen} 
+        onOpenChange={setProfileDialogOpen} 
+      />
     </div>
   );
 };

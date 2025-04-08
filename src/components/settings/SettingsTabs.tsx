@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ProfileTab from "./ProfileTab";
 import OrchestratorTab from "./OrchestratorTab";
 import ModelsTab from "./ModelsTab";
 import ToolsTab from "./ToolsTab";
@@ -11,9 +10,8 @@ import ApiConfigTab from "./ApiConfigTab";
 
 const SettingsTabs = () => {
   return (
-    <Tabs defaultValue="profile" className="space-y-6">
+    <Tabs defaultValue="orchestrator" className="space-y-6">
       <TabsList>
-        <TabsTrigger value="profile">Perfil</TabsTrigger>
         <TabsTrigger value="orchestrator">Orquestrador</TabsTrigger>
         <TabsTrigger value="models">Modelos</TabsTrigger>
         <TabsTrigger value="tools">Ferramentas</TabsTrigger>
@@ -21,10 +19,6 @@ const SettingsTabs = () => {
         <TabsTrigger value="mcp">MCP</TabsTrigger>
         <TabsTrigger value="api">API</TabsTrigger>
       </TabsList>
-      
-      <TabsContent value="profile">
-        <ProfileTab />
-      </TabsContent>
       
       <TabsContent value="orchestrator">
         <OrchestratorTab />
