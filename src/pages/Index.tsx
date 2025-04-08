@@ -116,13 +116,21 @@ const Index = () => {
         {/* Sidebar */}
         <Sidebar side="left">
           <SidebarHeader className="px-4 py-6">
-            <div className="flex items-center gap-2">
-              <img 
-                src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
-                alt="Logo" 
-                className="w-8 h-8 object-contain"
-              />
-              <h3 className="font-semibold text-lg">Inventor</h3>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img 
+                  src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
+                  alt="Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+                <h3 className="font-semibold text-lg">Inventor</h3>
+              </div>
+              <div>
+                <SidebarIcon 
+                  className="h-5 w-5 text-sidebar-foreground" 
+                  onClick={toggleSidebar}
+                />
+              </div>
             </div>
           </SidebarHeader>
           
