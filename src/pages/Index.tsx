@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
@@ -21,13 +22,15 @@ import {
   SidebarFooter
 } from "@/components/ui/sidebar";
 import { Home, MessageSquare, Settings, User } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { createNewChat, sendMessage } = useChat();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth(); // Get user from AuthContext
   const [greeting, setGreeting] = useState("");
-  const [userName, setUserName] = useState("");
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
@@ -168,7 +171,23 @@ const Index = () => {
         </Sidebar>
         
         {/* Main content */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4">
+        <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
+          {/* Profile avatar in top right corner */}
+          <div className="absolute top-4 right-4">
+            <Avatar>
+              {user?.profileImage ? (
+                <AvatarImage 
+                  src={user.profileImage} 
+                  alt={user.name || "User Profile"} 
+                />
+              ) : (
+                <AvatarFallback>
+                  <User className="h-5 w-5" />
+                </AvatarFallback>
+              )}
+            </Avatar>
+          </div>
+
           {/* Sidebar toggle button */}
           <div className="absolute top-4 left-4">
             <Button 
@@ -264,3 +283,4 @@ const Index = () => {
 };
 
 export default Index;
+
