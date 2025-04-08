@@ -37,7 +37,6 @@ const Chat: React.FC = () => {
       {showFloatingBar && (
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
-          onClose={() => setShowFloatingBar(false)}
           initialMessage=""
         />
       )}

@@ -5,8 +5,8 @@ import { Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 interface SearchBarActionsProps {
   isSuperAgentEnabled: boolean;
   onToggleSuperAgent: (e: React.MouseEvent) => void;
-  onClose: (e: React.MouseEvent) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onClose?: (e: React.MouseEvent) => void;
 }
 
 const SearchBarActions: React.FC<SearchBarActionsProps> = ({
