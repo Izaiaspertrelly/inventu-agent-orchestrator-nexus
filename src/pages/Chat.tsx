@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -70,7 +69,7 @@ const Chat: React.FC = () => {
                   <div className="flex flex-col gap-4">
                     <div className="relative">
                       <Input 
-                        className="w-full py-9 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
+                        className="w-full py-11 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
                         placeholder="Dê uma tarefa para Inventor trabalhar..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
