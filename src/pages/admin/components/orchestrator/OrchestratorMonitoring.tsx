@@ -36,17 +36,24 @@ const OrchestratorMonitoring: React.FC = () => {
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
   };
-
-  // Helper function to safely extract and format task ID dates
-  const formatTaskDate = (taskId: string | undefined): React.ReactNode => {
-    if (!taskId) return 'Data desconhecida';
+  
+  // Renderiza as informações da data da tarefa de forma segura
+  const renderTaskDate = (task: any): JSX.Element => {
+    if (!task || !task.id) {
+      return <span>Data desconhecida</span>;
+    }
     
     try {
-      const datePart = taskId.split('-')[1];
-      if (!datePart) return 'Data desconhecida';
-      return formatDate(datePart);
+      const taskIdParts = task.id.split('-');
+      if (taskIdParts.length > 1) {
+        const datePart = taskIdParts[1];
+        if (datePart) {
+          return <span>{formatDate(datePart)}</span>;
+        }
+      }
+      return <span>Data desconhecida</span>;
     } catch (error) {
-      return 'Data desconhecida';
+      return <span>Data desconhecida</span>;
     }
   };
   
@@ -155,11 +162,7 @@ const OrchestratorMonitoring: React.FC = () => {
                           'Tarefa sem descrição'}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Subtasks: {task && task.subtasks ? task.subtasks.length : 0} • {
-                          task && task.id ? 
-                            formatTaskDate(task.id) : 
-                            'Data desconhecida'
-                        }
+                        Subtasks: {task && task.subtasks ? task.subtasks.length : 0} • {renderTaskDate(task)}
                       </div>
                     </div>
                   ))}
@@ -174,4 +177,3 @@ const OrchestratorMonitoring: React.FC = () => {
 };
 
 export default OrchestratorMonitoring;
-
