@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -119,15 +118,15 @@ export default {
 						'background-position': '0% 0%'
 					},
 					'25%': { 
-						'box-shadow': '0 0 20px 5px rgba(133, 104, 250, 0.6)',
+						'box-shadow': '0 0 20px 5px rgba(33, 150, 243, 0.6)',
 						'background-position': '100% 0%'
 					},
 					'50%': { 
-						'box-shadow': '0 0 25px 5px rgba(217, 70, 239, 0.7)',
+						'box-shadow': '0 0 25px 5px rgba(41, 128, 255, 0.7)',
 						'background-position': '100% 100%'
 					},
 					'75%': { 
-						'box-shadow': '0 0 20px 5px rgba(62, 207, 142, 0.6)',
+						'box-shadow': '0 0 20px 5px rgba(63, 131, 255, 0.6)',
 						'background-position': '0% 100%'
 					},
 					'100%': {
