@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,9 +56,13 @@ const Login = () => {
         
         <div className="relative bg-black/80 backdrop-blur-xl p-8 rounded-2xl z-10">
           <div className="text-center mb-10">
-            <h2 className="text-4xl font-apple-bold text-white mb-2 font-apple-neue">
-              Inventor
-            </h2>
+            <div className="flex justify-center mb-2">
+              <img 
+                src="/lovable-uploads/bf93da3a-d818-497c-9071-b99f24e499f2.png" 
+                alt="Inventu Logo" 
+                className="h-16 w-auto"
+              />
+            </div>
             <p className="text-white/80 text-apple-lg font-apple-sf">
               Super Agent
             </p>
