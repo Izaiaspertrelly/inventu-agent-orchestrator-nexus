@@ -16,6 +16,7 @@ const OrchestratorSection: React.FC = () => {
   const { toast } = useToast();
   const { models, agents, updateOrchestratorConfig, orchestratorConfig, orchestratorState } = useAgent();
   
+  // Configurações do orquestrador
   const [mainAgent, setMainAgent] = useState(orchestratorConfig?.mainAgentId || "");
   const [memoryEnabled, setMemoryEnabled] = useState(orchestratorConfig?.memory?.enabled || true);
   const [memoryType, setMemoryType] = useState(orchestratorConfig?.memory?.type || "buffer");
@@ -102,6 +103,8 @@ const OrchestratorSection: React.FC = () => {
       
       const newConfig = {
         mainAgentId: mainAgent,
+        name: "Orquestrador Neural", // Nome fixo
+        description: "Centro de controle do sistema de IA", // Descrição fixa
         memory: memoryConfig,
         reasoning: reasoningConfig,
         planning: planningConfig,
@@ -127,6 +130,11 @@ const OrchestratorSection: React.FC = () => {
   const handleSaveOrchestrator = () => {
     try {
       let config = JSON.parse(configJson);
+      
+      // Garantindo que o nome e descrição estejam fixos
+      config.name = "Orquestrador Neural";
+      config.description = "Centro de controle do sistema de IA";
+      
       updateOrchestratorConfig(config);
       
       toast({

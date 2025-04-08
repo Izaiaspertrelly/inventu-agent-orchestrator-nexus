@@ -1,45 +1,27 @@
 
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Brain } from "lucide-react";
 
-interface OrchestratorBasicInfoProps {
-  name: string;
-  setName: (name: string) => void;
-  description: string;
-  setDescription: (description: string) => void;
-}
-
-const OrchestratorBasicInfo: React.FC<OrchestratorBasicInfoProps> = ({
-  name,
-  setName,
-  description,
-  setDescription,
-}) => {
+const OrchestratorBasicInfo: React.FC = () => {
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Nome do Agente</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nome do agente"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="description">Descrição</Label>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descrição do propósito do agente"
-          rows={2}
-        />
-      </div>
-    </div>
+    <Card className="border border-primary/20 bg-primary/5">
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 rounded-lg bg-primary/20">
+            <Brain className="h-6 w-6 text-primary" />
+          </div>
+          <Label className="text-xl font-semibold">Orquestrador Neural</Label>
+        </div>
+        <p className="text-muted-foreground text-sm">
+          O Orquestrador Neural é o centro de controle que gerencia a memória, o estado, 
+          o raciocínio e o planejamento do sistema. Ele coordena o fluxo de informações entre 
+          modelos e ferramentas, mantém o histórico de interações, decompõe tarefas complexas, 
+          monitora o desempenho e gerencia recursos computacionais.
+        </p>
+      </CardContent>
+    </Card>
   );
 };
 

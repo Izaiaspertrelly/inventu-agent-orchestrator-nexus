@@ -13,10 +13,6 @@ import { useFormSubmit } from "./form/useFormSubmit";
 const OrchestratorForm: React.FC = () => {
   const { models } = useAgent();
   
-  // Basic info state
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  
   // Model selection state
   const [selectedProvider, setSelectedProvider] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
@@ -47,16 +43,14 @@ const OrchestratorForm: React.FC = () => {
   // Handle form submission
   const onSubmitForm = () => {
     const success = handleSaveOrchestrator({
-      name,
-      description,
+      name: "Orquestrador Neural", // Nome fixo
+      description: "Centro de controle do sistema de IA", // Descrição fixa
       selectedModel,
       orchestratorConfig
     });
     
     // Reset form if submission was successful
     if (success) {
-      setName("");
-      setDescription("");
       setSelectedProvider("");
       setSelectedModel("");
     }
@@ -72,12 +66,7 @@ const OrchestratorForm: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <OrchestratorBasicInfo 
-            name={name}
-            setName={setName}
-            description={description}
-            setDescription={setDescription}
-          />
+          <OrchestratorBasicInfo />
           
           <ModelSelection 
             models={models}
@@ -110,7 +99,7 @@ const OrchestratorForm: React.FC = () => {
           
           <Button 
             onClick={onSubmitForm} 
-            disabled={isFormLoading || !selectedModel || !name}
+            disabled={isFormLoading || !selectedModel}
             className="w-full"
           >
             {isFormLoading ? "Salvando..." : "Salvar Configuração do Orquestrador"}

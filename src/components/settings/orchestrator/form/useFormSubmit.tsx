@@ -19,9 +19,10 @@ export const useFormSubmit = () => {
   const [isFormLoading, setIsFormLoading] = useState(false);
   
   const handleSaveOrchestrator = (formData: FormData): boolean => {
-    const { name, description, selectedModel, orchestratorConfig } = formData;
+    const { selectedModel, orchestratorConfig } = formData;
     
-    if (!validateForm({ name, selectedModel })) {
+    // Utiliza nome e descrição fixos, validando apenas o modelo
+    if (!validateForm({ name: "Orquestrador Neural", selectedModel })) {
       return false;
     }
 
@@ -32,8 +33,8 @@ export const useFormSubmit = () => {
       
       const newAgent = {
         id: uuidv4(),
-        name,
-        description,
+        name: "Orquestrador Neural", // Nome fixo
+        description: "Centro de controle do sistema de IA", // Descrição fixa
         modelId: selectedModel,
         configJson: JSON.stringify({
           orchestrator: configObj
