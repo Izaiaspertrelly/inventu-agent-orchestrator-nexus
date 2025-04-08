@@ -23,7 +23,7 @@ const Settings = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-3xl font-bold">
-            {isAdmin ? "Configurações do Sistema" : "Configurações do Usuário"}
+            Configurações do Sistema
           </h1>
         </div>
       </div>

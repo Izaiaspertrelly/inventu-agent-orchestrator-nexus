@@ -20,7 +20,7 @@ import {
   SidebarMenuButton,
   SidebarFooter
 } from "@/components/ui/sidebar";
-import { Home, MessageSquare, Settings, User, LogOut, ChevronDown } from "lucide-react";
+import { Home, MessageSquare, Settings, User, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -159,7 +159,7 @@ const Index = () => {
               </SidebarMenuItem>
               
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Configurações">
+                <SidebarMenuButton onClick={() => navigate("/settings")} tooltip="Configurações">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configurações</span>
                 </SidebarMenuButton>
@@ -168,71 +168,76 @@ const Index = () => {
           </SidebarContent>
           
           <SidebarFooter className="px-4 py-6">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">{user?.name || "Usuário"}</p>
-                <p className="text-xs text-muted-foreground">Plano Básico</p>
-              </div>
-            </div>
+            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+              <DialogTrigger asChild>
+                <div className="flex items-center gap-2 hover:bg-sidebar-accent/50 p-2 rounded-lg cursor-pointer">
+                  <Avatar className="h-8 w-8">
+                    {user?.profileImage ? (
+                      <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+                    ) : (
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">{user?.name || "Usuário"}</p>
+                    <p className="text-xs text-muted-foreground">Plano Básico</p>
+                  </div>
+                </div>
+              </DialogTrigger>
+              <ProfileDialog />
+            </Dialog>
           </SidebarFooter>
         </Sidebar>
         
         <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
           <div className="absolute top-4 right-4">
-            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="h-10 w-10 rounded-full p-0"
-                  >
-                    <Avatar className="h-8 w-8">
-                      {user?.profileImage ? (
-                        <AvatarImage 
-                          src={user.profileImage} 
-                          alt={user?.name || "User Profile"} 
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <AvatarFallback className="h-8 w-8">
-                          <User className="h-5 w-5" />
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="flex items-center justify-start p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.name || "Usuário"}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user?.email || ""}
-                      </p>
-                    </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="h-10 w-10 rounded-full p-0"
+                >
+                  <Avatar className="h-8 w-8">
+                    {user?.profileImage ? (
+                      <AvatarImage 
+                        src={user.profileImage} 
+                        alt={user?.name || "User Profile"} 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="h-8 w-8">
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center justify-start p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user?.name || "Usuário"}</p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {user?.email || ""}
+                    </p>
                   </div>
-                  <DropdownMenuSeparator />
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Perfil</span>
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DropdownMenuItem onClick={() => navigate("/settings")}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Configurações</span>
+                </div>
+                <DropdownMenuSeparator />
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Perfil</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ProfileDialog />
-            </Dialog>
+                </DialogTrigger>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ProfileDialog />
           </div>
 
           <div className="absolute top-4 left-4">

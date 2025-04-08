@@ -1,7 +1,7 @@
+
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserCog, Layers, Code, SlidersHorizontal, Menu, Database, FileJson } from "lucide-react";
-import ProfileTab from "./ProfileTab";
+import { Layers, Code, SlidersHorizontal, Database, UserCog } from "lucide-react";
 import OrchestratorTab from "./OrchestratorTab";
 import ModelsTab from "./ModelsTab";
 import ToolsTab from "./ToolsTab";
@@ -10,22 +10,19 @@ import MCPTab from "./MCPTab";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+
 const SettingsTabs = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  return <Tabs defaultValue="profile" className="w-full">
+  
+  return (
+    <Tabs defaultValue="orchestrator" className="w-full">
       <div className="flex items-center justify-between mb-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            
+            <Button variant="outline" className="lg:hidden">Selecionar Configuração</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="profile"]') as HTMLElement)?.click()}>
-              <UserCog className="mr-2 h-4 w-4" />
-              Perfil
-            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="orchestrator"]') as HTMLElement)?.click()}>
               <SlidersHorizontal className="mr-2 h-4 w-4" />
               Orquestrador
@@ -38,7 +35,8 @@ const SettingsTabs = () => {
               <Code className="mr-2 h-4 w-4" />
               Ferramentas
             </DropdownMenuItem>
-            {isAdmin && <>
+            {isAdmin && (
+              <>
                 <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="agents"]') as HTMLElement)?.click()}>
                   <UserCog className="mr-2 h-4 w-4" />
                   Agentes
@@ -47,15 +45,12 @@ const SettingsTabs = () => {
                   <Database className="mr-2 h-4 w-4" />
                   Servidor MCP
                 </DropdownMenuItem>
-              </>}
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <TabsList className="ml-4">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <UserCog className="h-4 w-4" />
-            Perfil
-          </TabsTrigger>
+        <TabsList className="hidden lg:flex">
           <TabsTrigger value="orchestrator" className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4" />
             Orquestrador
@@ -68,19 +63,20 @@ const SettingsTabs = () => {
             <Code className="h-4 w-4" />
             Ferramentas
           </TabsTrigger>
-          {isAdmin && <>
+          {isAdmin && (
+            <>
               <TabsTrigger value="agents" className="flex items-center gap-2">
                 <UserCog className="h-4 w-4" />
                 Agentes
               </TabsTrigger>
-              
-            </>}
+              <TabsTrigger value="mcp" className="flex items-center gap-2">
+                <Database className="h-4 w-4" />
+                Servidor MCP
+              </TabsTrigger>
+            </>
+          )}
         </TabsList>
       </div>
-
-      <TabsContent value="profile" className="space-y-6">
-        <ProfileTab />
-      </TabsContent>
 
       <TabsContent value="orchestrator" className="space-y-6">
         <OrchestratorTab />
@@ -94,14 +90,18 @@ const SettingsTabs = () => {
         <ToolsTab />
       </TabsContent>
       
-      {isAdmin && <>
+      {isAdmin && (
+        <>
           <TabsContent value="agents" className="space-y-6">
             <AgentsTab />
           </TabsContent>
           <TabsContent value="mcp" className="space-y-6">
             <MCPTab />
           </TabsContent>
-        </>}
-    </Tabs>;
+        </>
+      )}
+    </Tabs>
+  );
 };
+
 export default SettingsTabs;

@@ -74,6 +74,10 @@ const ChatSidebar: React.FC = () => {
     navigate("/");
   };
 
+  const handleNavigateToSettings = () => {
+    navigate("/settings");
+  };
+
   const sampleChats = [
     { 
       icon: <File className="h-4 w-4" />, 
@@ -196,16 +200,23 @@ const ChatSidebar: React.FC = () => {
           </ScrollArea>
           
           <div className="p-4 border-t border-border/50">
-            {isAdmin && (
-              <Button
-                variant="outline"
-                className="w-full justify-start mb-3 rounded-xl"
-                onClick={() => navigate("/admin")}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Configurações Admin
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              className="w-full justify-start mb-3 rounded-xl"
+              onClick={() => navigate("/chat")}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Conversas
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start mb-3 rounded-xl"
+              onClick={handleNavigateToSettings}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Configurações
+            </Button>
             
             <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
               <DropdownMenu>
@@ -294,17 +305,25 @@ const ChatSidebar: React.FC = () => {
           </ScrollArea>
           
           <div className="flex flex-col items-center gap-2 p-4 border-t border-border/50">
-            {isAdmin && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-xl"
-                onClick={() => navigate("/admin")}
-                title="Configurações Admin"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              onClick={() => navigate("/chat")}
+              title="Conversas"
+            >
+              <MessageSquare className="h-4 w-4" />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              onClick={handleNavigateToSettings}
+              title="Configurações"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
             
             <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
               <DialogTrigger asChild>
