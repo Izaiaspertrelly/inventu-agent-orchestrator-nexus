@@ -90,7 +90,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         </div>
 
         <div 
-          className={`flex flex-col w-full transition-all duration-300 px-0`}
+          className={`flex flex-col w-full transition-all duration-300`}
           style={{ 
             opacity: isMinimized ? 0 : 1,
             width: isMinimized ? '0' : 'auto',
@@ -99,9 +99,9 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         >
           <form 
             onSubmit={handleSendMessage} 
-            className="flex items-center justify-between flex-1 gap-2 px-1"
+            className="flex items-center justify-between w-full gap-2"
           >
-            <div className="flex-1 mr-auto">
+            <div className="flex-1 min-w-0">
               <SearchBarInput 
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -113,13 +113,15 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
               />
             </div>
             
-            <SearchBarActions 
-              isSuperAgentEnabled={superAgentEnabled}
-              onToggleSuperAgent={toggleSuperAgent}
-              onSubmit={handleSendMessage}
-              onAttachmentClick={handleAttachmentClick}
-              fileInputRef={fileInputRef}
-            />
+            <div className="flex-shrink-0">
+              <SearchBarActions 
+                isSuperAgentEnabled={superAgentEnabled}
+                onToggleSuperAgent={toggleSuperAgent}
+                onSubmit={handleSendMessage}
+                onAttachmentClick={handleAttachmentClick}
+                fileInputRef={fileInputRef}
+              />
+            </div>
           </form>
           
           {selectedFile && (

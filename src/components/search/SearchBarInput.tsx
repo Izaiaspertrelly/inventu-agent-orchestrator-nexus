@@ -25,7 +25,7 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
   inputClassName = ""
 }) => {
   return (
-    <div className={`flex-1 relative ${containerClassName}`}>
+    <div className={`relative flex-1 ${containerClassName}`}>
       <Input 
         className={`w-full pl-10 pr-3 py-3 rounded-full text-base backdrop-blur-sm border-0 
           ${isSuperAgentEnabled 
