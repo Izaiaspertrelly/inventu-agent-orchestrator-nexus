@@ -1,97 +1,95 @@
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AIModel } from "@/types";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { AIModel, Agent } from "@/types";
 
 interface ModelSelectionProps {
-  providerId: string;
-  modelId: string | undefined;
-  models: AIModel[];
-  availableProviderModels: any[];
-  isLoadingModels: boolean;
-  onProviderChange: (providerId: string) => void;
+  agent: Partial<Agent>;
   onModelChange: (modelId: string) => void;
+  models: AIModel[];
+  isLoadingModels: Record<string, boolean>;
+  availableProviderModels: any[];
+  loadModelsForProvider: (providerId: string) => Promise<void>;
 }
 
 const ModelSelection: React.FC<ModelSelectionProps> = ({
-  providerId,
-  modelId,
+  agent,
+  onModelChange,
   models,
-  availableProviderModels,
   isLoadingModels,
-  onProviderChange,
-  onModelChange
+  availableProviderModels,
+  loadModelsForProvider
 }) => {
-  // Agrupar modelos por provedor para o selector de provedor
-  const providers = Array.from(new Set(models.map(model => model.providerId)))
-    .map(providerId => {
-      const provider = models.find(m => m.providerId === providerId);
-      return {
-        id: providerId,
-        name: provider?.provider || providerId
-      };
-    });
-
-  // Carregar modelos automaticamente quando o componente montar
-  // se já houver um provider selecionado
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
+  
+  // Find the current model's provider
   useEffect(() => {
-    if (providerId && availableProviderModels.length === 0 && !isLoadingModels) {
-      onProviderChange(providerId);
+    if (agent.modelId) {
+      const modelProvider = models.find(m => m.id === agent.modelId)?.providerId;
+      if (modelProvider) {
+        setSelectedProviderId(modelProvider);
+        loadModelsForProvider(modelProvider);
+      }
     }
-  }, [providerId]);
+  }, [agent.modelId, models, loadModelsForProvider]);
 
+  const handleProviderChange = async (value: string) => {
+    setSelectedProviderId(value);
+    // Reset agent model when provider changes
+    onModelChange("");
+    // Load models for selected provider
+    await loadModelsForProvider(value);
+  };
+  
+  // Get unique providers from models
+  const availableProviders = [...new Set(models.map(model => model.providerId))];
+  
+  // Check if we're loading models for the selected provider
+  const isLoading = isLoadingModels[selectedProviderId] || false;
+  
   return (
-    <>
-      {/* Seletor de Provedor */}
+    <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="providerSelect">Provedor de IA</Label>
-        <Select 
-          value={providerId}
-          onValueChange={onProviderChange}
+        <Label htmlFor="modelProvider">Provedor de IA</Label>
+        <Select
+          value={selectedProviderId}
+          onValueChange={handleProviderChange}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione um provedor" />
+          <SelectTrigger id="modelProvider">
+            <SelectValue placeholder="Selecione o provedor" />
           </SelectTrigger>
           <SelectContent>
-            {providers.map((provider) => (
-              <SelectItem key={provider.id} value={provider.id}>
-                {provider.name}
+            {availableProviders.map((provider) => (
+              <SelectItem key={provider} value={provider}>
+                {provider}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       
-      {/* Seletor de Modelo */}
       <div className="space-y-2">
-        <Label htmlFor="agentModel">Modelo de IA</Label>
-        {isLoadingModels ? (
-          <div className="flex items-center justify-center p-4">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Carregando modelos...</span>
-          </div>
-        ) : (
-          <Select 
-            value={modelId} 
-            onValueChange={onModelChange}
-            disabled={availableProviderModels.length === 0}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um modelo" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableProviderModels.map((model) => (
-                <SelectItem key={model.id} value={model.id}>
-                  {model.name} {model.description && `(${model.description})`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        <Label htmlFor="modelId">Modelo de IA {isLoading && <Spinner className="inline ml-2" />}</Label>
+        <Select
+          value={agent.modelId || ""}
+          onValueChange={onModelChange}
+          disabled={!selectedProviderId || isLoading}
+        >
+          <SelectTrigger id="modelId">
+            <SelectValue placeholder="Selecione o modelo" />
+          </SelectTrigger>
+          <SelectContent>
+            {!isLoading && availableProviderModels.map((model) => (
+              <SelectItem key={model.id} value={model.id}>
+                {model.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-    </>
+    </div>
   );
 };
 
