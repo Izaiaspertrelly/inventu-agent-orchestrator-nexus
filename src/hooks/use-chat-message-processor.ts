@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Message } from "../types";
 import { createBotMessage } from "../utils/chatUtils";
@@ -104,7 +105,8 @@ export const useChatMessageProcessor = () => {
           responseContent += "Orquestrador não configurado corretamente. ";
           
           // Fallback to basic model response
-          const modelResponse = generateModelBasedResponse(userMessage, selectedModelId);
+          // Fix: Passing the missing third argument (agent) as null
+          const modelResponse = generateModelBasedResponse(userMessage, selectedModelId, null);
           responseContent += modelResponse;
         }
       } else {
@@ -123,6 +125,7 @@ export const useChatMessageProcessor = () => {
         
         // Find agent for model and generate response
         const agent = findAgentByModel(selectedModelId);
+        // This line is correctly passing all three required arguments
         responseContent += generateModelBasedResponse(userMessage, selectedModelId, agent);
       }
       
