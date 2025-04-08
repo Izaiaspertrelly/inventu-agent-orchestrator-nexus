@@ -16,12 +16,17 @@ app.use(bodyParser.json());
 const authenticateApiKey = (req, res, next) => {
   const requestApiKey = req.headers['x-api-key'];
   
+  // Skip authentication if no API key is configured or it's empty
   if (!apiKey || apiKey === '') {
-    // If no API key is configured, skip authentication
+    console.log('API key authentication is disabled');
     return next();
   }
   
-  if (!requestApiKey || requestApiKey !== apiKey) {
+  if (!requestApiKey) {
+    return res.status(401).json({ error: 'Unauthorized: Missing API key' });
+  }
+  
+  if (requestApiKey !== apiKey) {
     return res.status(401).json({ error: 'Unauthorized: Invalid API key' });
   }
   
