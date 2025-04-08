@@ -5,9 +5,10 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
 import FloatingSearchBar from "@/components/FloatingSearchBar";
+import { Loader2 } from "lucide-react";
 
 const Chat: React.FC = () => {
-  const { activeChat, createNewChat, sendMessage } = useChat();
+  const { activeChat, createNewChat, sendMessage, isProcessing } = useChat();
   const [showFloatingBar, setShowFloatingBar] = useState(false);
   
   useEffect(() => {
@@ -39,6 +40,7 @@ const Chat: React.FC = () => {
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
           initialMessage=""
+          isProcessing={isProcessing}
         />
       )}
       
@@ -61,6 +63,15 @@ const Chat: React.FC = () => {
                   <p className="text-muted-foreground max-w-sm">
                     Use a barra de pesquisa flutuante para enviar uma mensagem e começar a conversar
                   </p>
+                </div>
+              )}
+              
+              {isProcessing && (
+                <div className="flex items-center justify-center p-4">
+                  <div className="flex items-center space-x-2 bg-secondary/50 rounded-full px-4 py-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <p className="text-sm">Processando mensagem...</p>
+                  </div>
                 </div>
               )}
             </div>

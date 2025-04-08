@@ -12,7 +12,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { toast } = useToast();
-  const { generateBotResponse, selectModelForTask } = useChatMessageProcessor();
+  const { generateBotResponse, selectModelForTask, isProcessing } = useChatMessageProcessor();
   
   const [chats, setChats] = useState<Chat[]>(() => {
     const savedChats = localStorage.getItem("inventu_chats");
@@ -35,6 +35,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     const newChat = createChat();
     setChats((prev) => [newChat, ...prev]);
     setActiveChatState(newChat);
+    return newChat;
   };
 
   const setActiveChat = (chatId: string) => {
@@ -60,13 +61,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     setChats((prev) => prev.filter((chat) => chat.id !== chatId));
     
     if (activeChat?.id === chatId) {
-      setActiveChatState(chats.length > 1 ? chats[0] : null);
+      setActiveChatState(chats.length > 1 ? chats.filter(c => c.id !== chatId)[0] : null);
     }
   };
 
   const sendMessage = async (content: string, file?: File | null) => {
-    if (!activeChat) return;
+    // If no active chat, create one
+    if (!activeChat) {
+      const newChat = createNewChat();
+      await new Promise(resolve => setTimeout(resolve, 50)); // Small delay to ensure chat is created
+      sendMessageToChat(newChat.id, content, file);
+      return;
+    }
     
+    sendMessageToChat(activeChat.id, content, file);
+  };
+  
+  const sendMessageToChat = async (chatId: string, content: string, file?: File | null) => {
     if (!content.trim() && !file) {
       toast({
         description: "Por favor, digite uma mensagem ou anexe um arquivo",
@@ -86,8 +97,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     const userMessage = createUserMessage(messageContent);
     
     // Update chat with user message
-    const updatedMessages = [...activeChat.messages, userMessage];
-    updateChat(activeChat.id, {
+    const chat = chats.find(c => c.id === chatId);
+    if (!chat) return;
+    
+    const updatedMessages = [...chat.messages, userMessage];
+    updateChat(chatId, {
       messages: updatedMessages,
       updatedAt: new Date(),
     });
@@ -97,17 +111,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       const selectedModelId = await selectModelForTask(content);
       
       // Generate AI response
-      const botMessage = await generateBotResponse(content, selectedModelId);
+      const botMessage = await generateBotResponse(content, selectedModelId, file);
       
       // Update chat with AI response
       const finalMessages = [...updatedMessages, botMessage];
-      updateChat(activeChat.id, {
+      updateChat(chatId, {
         messages: finalMessages,
         updatedAt: new Date(),
         // Update title for new chats after first exchange
-        title: activeChat.messages.length === 0 
+        title: chat.messages.length === 0 
           ? createChatTitle(content)
-          : activeChat.title,
+          : chat.title,
       });
     } catch (error) {
       console.error("Failed to process message:", error);
@@ -124,6 +138,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         chats,
         activeChat,
+        isProcessing,
         setActiveChat,
         createNewChat,
         sendMessage,

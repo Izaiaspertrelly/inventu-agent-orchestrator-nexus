@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
@@ -33,7 +34,7 @@ import {
 import ProfileDialog from "@/components/ProfileDialog";
 
 const Index = () => {
-  const { createNewChat, sendMessage } = useChat();
+  const { createNewChat, sendMessage, isProcessing } = useChat();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -89,6 +90,7 @@ const Index = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && !selectedFile) return;
+    if (isProcessing) return;
     
     if (superAgentEnabled) {
       toast({
@@ -103,9 +105,11 @@ const Index = () => {
     const tempFile = selectedFile;
     clearSelectedFile();
     
-    createNewChat();
+    // Cria um novo chat e navega para a página de chat
+    const chat = createNewChat();
     navigate("/chat");
     
+    // Dá um pequeno atraso para garantir que a navegação ocorreu
     setTimeout(() => {
       sendMessage(tempMessage, tempFile);
     }, 100);
@@ -273,6 +277,7 @@ const Index = () => {
                       onKeyDown={handleKeyDown}
                       isSuperAgentEnabled={superAgentEnabled}
                       placeholder="Dê uma tarefa para Inventor trabalhar..."
+                      disabled={isProcessing}
                     />
                     
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
@@ -282,6 +287,7 @@ const Index = () => {
                         onSubmit={handleSendMessage}
                         onAttachmentClick={handleAttachmentClick}
                         fileInputRef={fileInputRef}
+                        isProcessing={isProcessing}
                       />
                     </div>
                   </div>

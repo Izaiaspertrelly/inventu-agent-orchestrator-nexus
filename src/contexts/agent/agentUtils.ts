@@ -6,12 +6,17 @@ export const selectModelForTask = async (taskDescription: string): Promise<strin
   
   if (lowerCaseTask.includes("image") || 
       lowerCaseTask.includes("picture") || 
-      lowerCaseTask.includes("photo")) {
+      lowerCaseTask.includes("photo") ||
+      lowerCaseTask.includes("imagem") ||
+      lowerCaseTask.includes("foto")) {
     return "ideogram";
   } else if (lowerCaseTask.includes("analyze") || 
              lowerCaseTask.includes("reason") ||
              lowerCaseTask.includes("research") ||
-             lowerCaseTask.includes("deep dive")) {
+             lowerCaseTask.includes("deep dive") ||
+             lowerCaseTask.includes("análise") ||
+             lowerCaseTask.includes("pesquisa") ||
+             lowerCaseTask.includes("analisar")) {
     return "deepseek-r1";
   } else {
     return "minimax";
@@ -28,24 +33,50 @@ const normalizeUrl = (baseUrl: string, endpoint: string): string => {
   return `${cleanBaseUrl}${cleanEndpoint}`;
 };
 
+// Função para testar a conexão com o servidor MCP
+export const testMCPConnection = async (serverUrl: string, apiKey: string): Promise<boolean> => {
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (apiKey) {
+      headers['X-API-Key'] = apiKey;
+    }
+    
+    const response = await fetch(serverUrl, {
+      method: 'GET',
+      headers,
+      mode: 'cors'
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.error("Erro ao testar conexão MCP:", error);
+    return false;
+  }
+};
+
 export const executeMCPTool = async (tool: MCPTool, params: Record<string, any>) => {
-  console.log(`Executing tool ${tool.name} with method ${tool.method} to endpoint ${tool.endpoint}`);
-  console.log(`Parameters:`, params);
+  console.log(`Executando ferramenta ${tool.name} com método ${tool.method} no endpoint ${tool.endpoint}`);
+  console.log(`Parâmetros:`, params);
   
   try {
     // Prepare the full URL - if the endpoint starts with http, use it as is, otherwise prepend the server URL
     let url = tool.endpoint;
     if (!url.startsWith('http')) {
-      const baseUrl = window.localStorage.getItem('mcpServerUrl');
+      const baseUrl = localStorage.getItem('inventu_mcp_config');
+      const mcpConfig = baseUrl ? JSON.parse(baseUrl) : null;
+      const serverUrl = mcpConfig?.serverUrl || localStorage.getItem('mcpServerUrl');
       
-      if (!baseUrl) {
-        throw new Error("MCP Server URL not configured");
+      if (!serverUrl) {
+        throw new Error("URL do servidor MCP não configurada");
       }
       
-      url = normalizeUrl(baseUrl, tool.endpoint);
+      url = normalizeUrl(serverUrl, tool.endpoint);
     }
     
-    console.log(`Executing request to: ${url}`);
+    console.log(`Executando requisição para: ${url}`);
     
     // Prepare headers
     const headers: Record<string, string> = {
@@ -58,12 +89,15 @@ export const executeMCPTool = async (tool: MCPTool, params: Record<string, any>)
     }
     
     // Add MCP API key if present
-    const mcpApiKey = window.localStorage.getItem('mcpApiKey');
+    const mcpConfig = localStorage.getItem('inventu_mcp_config');
+    const parsedConfig = mcpConfig ? JSON.parse(mcpConfig) : null;
+    const mcpApiKey = parsedConfig?.apiKey || localStorage.getItem('mcpApiKey');
+    
     if (mcpApiKey) {
       headers['X-API-Key'] = mcpApiKey;
     }
     
-    console.log(`Request headers:`, Object.keys(headers).join(', '));
+    console.log(`Cabeçalhos da requisição:`, Object.keys(headers).join(', '));
     
     // Prepare the request options
     const options: RequestInit = {
@@ -90,19 +124,19 @@ export const executeMCPTool = async (tool: MCPTool, params: Record<string, any>)
     await new Promise(resolve => setTimeout(resolve, 500));
     
     // Make the actual request
-    console.log(`Making ${tool.method} request to ${url}`);
+    console.log(`Fazendo requisição ${tool.method} para ${url}`);
     const response = await fetch(url, options);
     
     // Handle non-OK responses
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`HTTP Error ${response.status}: ${errorText}`);
-      throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+      console.error(`Erro HTTP ${response.status}: ${errorText}`);
+      throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
     }
     
     // Parse and return the response
     const data = await response.json();
-    console.log(`Response data:`, data);
+    console.log(`Dados de resposta:`, data);
     
     return {
       success: true,
@@ -115,7 +149,7 @@ export const executeMCPTool = async (tool: MCPTool, params: Record<string, any>)
     };
     
   } catch (error) {
-    console.error("Error executing MCP tool:", error);
+    console.error("Erro ao executar ferramenta MCP:", error);
     return {
       success: false,
       toolName: tool.name,

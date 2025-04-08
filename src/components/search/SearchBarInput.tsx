@@ -12,6 +12,7 @@ interface SearchBarInputProps {
   placeholder?: string;
   containerClassName?: string;
   inputClassName?: string;
+  disabled?: boolean;
 }
 
 const SearchBarInput: React.FC<SearchBarInputProps> = ({
@@ -22,7 +23,8 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
   onClick,
   placeholder = "Dê uma tarefa para o Inventor trabalhar...",
   containerClassName = "",
-  inputClassName = ""
+  inputClassName = "",
+  disabled = false
 }) => {
   return (
     <div className={`relative flex-1 ${containerClassName}`}>
@@ -31,16 +33,18 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
           ${isSuperAgentEnabled 
             ? 'bg-primary text-primary-foreground placeholder:text-primary-foreground/70' 
             : 'bg-transparent placeholder:text-foreground/50'} 
-          text-ellipsis overflow-hidden ${inputClassName}`}
+          text-ellipsis overflow-hidden ${disabled ? 'opacity-70' : ''} ${inputClassName}`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         onKeyDown={onKeyDown}
         onClick={onClick}
+        disabled={disabled}
       />
       <Search 
         className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 
-          ${isSuperAgentEnabled ? 'text-primary-foreground/70' : 'text-foreground/50'}`} 
+          ${isSuperAgentEnabled ? 'text-primary-foreground/70' : 'text-foreground/50'}
+          ${disabled ? 'opacity-50' : ''}`} 
       />
     </div>
   );
