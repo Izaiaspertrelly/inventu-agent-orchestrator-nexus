@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DraggableContainer from "./draggable/DraggableContainer";
@@ -22,7 +21,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   const { toast } = useToast();
   const logoRef = useRef<HTMLImageElement>(null);
   
-  // Use the shared file attachment hook
   const {
     selectedFile,
     fileInputRef,
@@ -42,7 +40,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       });
     }
     
-    // Pass both message and file to the onSend callback
     onSend(message, selectedFile);
     setMessage("");
     clearSelectedFile();
@@ -79,7 +76,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
           overflow: 'hidden'
         }}
       >
-        {/* Logo for minimized state */}
         <div 
           className="min-w-[40px] h-[40px] flex items-center justify-center cursor-pointer"
           onClick={toggleMinimize}
@@ -92,7 +88,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
           />
         </div>
 
-        {/* Search bar content - visible when not minimized */}
         <div 
           className={`flex flex-col w-full transition-all duration-300`}
           style={{ 
@@ -103,9 +98,9 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         >
           <form 
             onSubmit={handleSendMessage} 
-            className="flex items-center flex-1 px-2"
+            className="flex items-center justify-between flex-1 px-2 gap-2"
           >
-            <div className="flex-1 pr-2">
+            <div className="flex-1">
               <SearchBarInput 
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -115,18 +110,15 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
               />
             </div>
             
-            <div className="flex-shrink-0">
-              <SearchBarActions 
-                isSuperAgentEnabled={superAgentEnabled}
-                onToggleSuperAgent={toggleSuperAgent}
-                onSubmit={handleSendMessage}
-                onAttachmentClick={handleAttachmentClick}
-                fileInputRef={fileInputRef}
-              />
-            </div>
+            <SearchBarActions 
+              isSuperAgentEnabled={superAgentEnabled}
+              onToggleSuperAgent={toggleSuperAgent}
+              onSubmit={handleSendMessage}
+              onAttachmentClick={handleAttachmentClick}
+              fileInputRef={fileInputRef}
+            />
           </form>
           
-          {/* File preview display when a file is selected */}
           {selectedFile && (
             <div className="px-2 pb-1">
               <FilePreview file={selectedFile} onClear={clearSelectedFile} />
