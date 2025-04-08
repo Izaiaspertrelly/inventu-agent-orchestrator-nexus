@@ -99,7 +99,7 @@ const Chat: React.FC = () => {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-4">
               <div className="text-center max-w-2xl">
-                <div className="flex justify-center mb-2"> {/* Reduced margin-bottom from mb-4 to mb-2 */}
+                <div className="flex justify-center mb-2">
                   <img 
                     src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
                     alt="Super Agent Logo" 
@@ -158,4 +158,3 @@ const Chat: React.FC = () => {
 };
 
 export default Chat;
-
