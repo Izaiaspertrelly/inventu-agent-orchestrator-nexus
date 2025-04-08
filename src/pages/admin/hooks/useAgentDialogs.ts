@@ -8,7 +8,7 @@ import { useAgent } from "@/contexts/AgentContext";
 
 export const useAgentDialogs = () => {
   const { toast } = useToast();
-  const { addAgent, updateAgent } = useAgent();
+  const { agents, models, addAgent, updateAgent } = useAgent();
   const { fetchProviderModels } = useModelApi();
   
   // Dialog states
@@ -131,7 +131,8 @@ export const useAgentDialogs = () => {
 
   // Open edit agent dialog
   const openEditDialog = (agentId: string) => {
-    const agent = window.agents?.find((a: Agent) => a.id === agentId);
+    // Use agents from the context instead of window.agents
+    const agent = agents.find(a => a.id === agentId);
     if (agent) {
       setSelectedAgentId(agentId);
       setNewAgent({
@@ -144,7 +145,8 @@ export const useAgentDialogs = () => {
       
       // If the agent has a model provider, load its models
       if (agent.modelId) {
-        const model = window.models?.find((m: any) => m.id === agent.modelId);
+        // Use models from the context instead of window.models
+        const model = models.find(m => m.id === agent.modelId);
         if (model) {
           loadModelsForProvider(model.providerId);
         }
