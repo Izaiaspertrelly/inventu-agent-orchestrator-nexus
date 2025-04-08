@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Search, X, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 interface FloatingSearchBarProps {
   onSend: (message: string) => void;
   onClose: () => void;
-  initialMessage?: string;  // New prop to pass initial message
+  initialMessage?: string;
 }
 
 const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ 
@@ -18,12 +17,37 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   const [message, setMessage] = useState(initialMessage);
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: window.innerWidth / 2 - 250, y: 80 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const { toast } = useToast();
   const floatingBarRef = useRef<HTMLDivElement>(null);
   
-  // Handle drag start
+  useEffect(() => {
+    const centerPosition = () => {
+      if (floatingBarRef.current) {
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const barWidth = floatingBarRef.current.offsetWidth;
+        const barHeight = floatingBarRef.current.offsetHeight;
+        
+        const centerX = (windowWidth - barWidth) / 2;
+        const bottomY = windowHeight - barHeight - 20;
+        
+        setPosition({
+          x: centerX,
+          y: bottomY
+        });
+      }
+    };
+    
+    centerPosition();
+    
+    window.addEventListener('resize', centerPosition);
+    return () => {
+      window.removeEventListener('resize', centerPosition);
+    };
+  }, []);
+  
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (floatingBarRef.current) {
       const rect = floatingBarRef.current.getBoundingClientRect();
@@ -35,12 +59,10 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
     }
   };
   
-  // Handle dragging
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
     
-    // Calculate new position with boundaries to keep on screen
-    const newX = Math.max(0, Math.min(window.innerWidth - 500, e.clientX - offset.x));
+    const newX = Math.max(0, Math.min(window.innerWidth - 600, e.clientX - offset.x));
     const newY = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - offset.y));
     
     setPosition({
@@ -49,12 +71,10 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
     });
   };
   
-  // Handle drag end
   const handleMouseUp = () => {
     setIsDragging(false);
   };
   
-  // Set up and remove event listeners
   useEffect(() => {
     if (isDragging) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -66,12 +86,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging]);
-  
-  useEffect(() => {
-    // Ensure the floating bar is visible initially
-    const centerX = window.innerWidth / 2 - 250;
-    setPosition({ x: centerX, y: 80 });
-  }, []);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +126,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
-        width: "600px",  // Increased width to ensure text fits
+        width: "600px",
       }}
     >
       <div 
@@ -183,4 +197,3 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
 };
 
 export default FloatingSearchBar;
-
