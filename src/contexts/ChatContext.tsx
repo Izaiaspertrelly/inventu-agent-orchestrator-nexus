@@ -1,18 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Chat, Message } from "../types";
-import { v4 as uuidv4 } from "uuid";
-import { useAgent } from "./AgentContext";
+import { ChatContextType } from "../types/chat";
+import { createChat, createUserMessage, createChatTitle } from "../utils/chatUtils";
+import { useChatMessageProcessor } from "../hooks/use-chat-message-processor";
 import { useToast } from "@/hooks/use-toast";
-
-interface ChatContextType {
-  chats: Chat[];
-  activeChat: Chat | null;
-  setActiveChat: (chatId: string) => void;
-  createNewChat: () => void;
-  sendMessage: (content: string) => Promise<void>;
-  removeChat: (chatId: string) => void;
-}
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
@@ -20,11 +12,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { toast } = useToast();
-  const { selectModelForTask, executeMCPTool, models } = useAgent();
+  const { generateBotResponse, selectModelForTask } = useChatMessageProcessor();
+  
   const [chats, setChats] = useState<Chat[]>(() => {
     const savedChats = localStorage.getItem("inventu_chats");
     return savedChats ? JSON.parse(savedChats) : [];
   });
+  
   const [activeChat, setActiveChatState] = useState<Chat | null>(null);
 
   useEffect(() => {
@@ -38,14 +32,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [chats, activeChat]);
 
   const createNewChat = () => {
-    const newChat: Chat = {
-      id: uuidv4(),
-      title: "Nova conversa",
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
+    const newChat = createChat();
     setChats((prev) => [newChat, ...prev]);
     setActiveChatState(newChat);
   };
@@ -77,82 +64,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Extract potential tool calls from the message
-  const extractToolCalls = (message: string): { toolId: string; params: any }[] => {
-    // This would be much more sophisticated in a real implementation
-    // Here we're just doing basic pattern matching for demo purposes
-    const toolCalls = [];
-    
-    // Very simple detection (in real implementation this would be more robust)
-    if (message.toLowerCase().includes("search") || message.toLowerCase().includes("buscar")) {
-      toolCalls.push({
-        toolId: "web-search",
-        params: { query: message }
-      });
-    }
-    
-    if (message.toLowerCase().includes("weather") || message.toLowerCase().includes("clima")) {
-      toolCalls.push({
-        toolId: "weather-api",
-        params: { location: "current" }
-      });
-    }
-    
-    return toolCalls;
-  };
-
-  // Process the bot's response
-  const generateBotResponse = async (userMessage: string, selectedModelId: string): Promise<Message> => {
-    // In a real implementation, this would call the actual AI model API
-    const model = models.find(m => m.id === selectedModelId);
-    
-    // Detect if tool execution is required
-    const toolCalls = extractToolCalls(userMessage);
-    const toolsUsed: string[] = [];
-    let responseContent = "";
-    
-    // Execute any required tools
-    if (toolCalls.length > 0) {
-      for (const call of toolCalls) {
-        try {
-          const result = await executeMCPTool(call.toolId, call.params);
-          toolsUsed.push(call.toolId);
-          responseContent += `[Tool: ${result.toolName}] ${result.result}\n\n`;
-        } catch (error) {
-          console.error("Tool execution failed:", error);
-          responseContent += `Failed to execute tool: ${call.toolId}. `;
-        }
-      }
-    }
-    
-    // Add AI response based on model
-    switch(selectedModelId) {
-      case "minimax":
-        responseContent += `Usando MiniMax para processar seu pedido completo: "${userMessage}"`;
-        break;
-      case "deepseek-r1":
-        responseContent += `Analisando profundamente com DeepSeek R1: "${userMessage}"`;
-        break;
-      case "ideogram":
-        responseContent += `Gerando visualização com Ideogram baseado em: "${userMessage}"`;
-        break;
-      default:
-        responseContent += `Processando sua solicitação: "${userMessage}"`;
-    }
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    return {
-      id: uuidv4(),
-      content: responseContent,
-      role: "assistant",
-      createdAt: new Date(),
-      modelUsed: selectedModelId,
-      toolsUsed: toolsUsed.length > 0 ? toolsUsed : undefined,
-    };
-  };
-
   const sendMessage = async (content: string) => {
     if (!activeChat) return;
     
@@ -165,12 +76,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     
     // Create user message
-    const userMessage: Message = {
-      id: uuidv4(),
-      content,
-      role: "user",
-      createdAt: new Date(),
-    };
+    const userMessage = createUserMessage(content);
     
     // Update chat with user message
     const updatedMessages = [...activeChat.messages, userMessage];
@@ -193,7 +99,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         updatedAt: new Date(),
         // Update title for new chats after first exchange
         title: activeChat.messages.length === 0 
-          ? content.slice(0, 30) + (content.length > 30 ? "..." : "")
+          ? createChatTitle(content)
           : activeChat.title,
       });
     } catch (error) {
