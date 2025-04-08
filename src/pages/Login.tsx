@@ -52,53 +52,57 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen bg-black">
-      <div className="relative w-full max-w-md m-auto neo-blur p-8 rounded-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-inventu-primary/20 to-inventu-secondary/20 rounded-2xl backdrop-blur-3xl -z-10"></div>
+      <div className="relative w-full max-w-md m-auto p-0.5 rounded-2xl">
+        {/* Animated border glow effect */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-400 opacity-90 animate-border-glow"></div>
         
-        <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold text-white mb-2">
-            Inventor
-          </h2>
-          <p className="text-white/80 text-lg">
-            Super Agent
-          </p>
+        {/* Inner content container */}
+        <div className="relative bg-black/80 backdrop-blur-xl p-8 rounded-2xl z-10">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-white mb-2">
+              Inventor
+            </h2>
+            <p className="text-white/80 text-lg">
+              Super Agent
+            </p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-white/90">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="bg-black/80 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-white/90">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                className="bg-black/80 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500"
+              />
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/10 py-6 rounded-xl backdrop-blur-sm mt-6 font-medium transition-all"
+              disabled={isLoading}
+            >
+              {isLoading ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-white/90">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-inventu-primary"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-white/90">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-inventu-primary"
-            />
-          </div>
-          
-          <Button
-            type="submit"
-            className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 py-6 rounded-xl backdrop-blur-sm mt-6 font-medium transition-all"
-            disabled={isLoading}
-          >
-            {isLoading ? "Entrando..." : "Entrar"}
-          </Button>
-        </form>
       </div>
     </div>
   );
