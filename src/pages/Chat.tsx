@@ -144,7 +144,7 @@ const Chat: React.FC = () => {
       {showFloatingBar && (
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
-          onMinimize={() => {}} // Empty function since minimizing is now handled internally
+          onMinimize={() => {}} 
           initialMessage={message}
         />
       )}
