@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,28 +51,26 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen bg-black">
-      <div className="relative w-full max-w-md m-auto p-0.5 rounded-3xl">
-        {/* Animated border gradient effect */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#E0E0E0] via-[#F0F0F0] to-[#FFFFFF] opacity-80 animate-border-glow"></div>
+      <div className="relative w-full max-w-md m-auto p-0.5 rounded-2xl">
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-400 opacity-90 animate-border-glow"></div>
         
-        {/* Frosted glass container - neutral white with 45% transparency */}
-        <div className="relative bg-white/45 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/10">
+        <div className="relative bg-black/80 backdrop-blur-xl p-8 rounded-2xl z-10">
           <div className="text-center mb-10">
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-2">
               <img 
                 src="/lovable-uploads/bf93da3a-d818-497c-9071-b99f24e499f2.png" 
                 alt="Inventu Logo" 
                 className="h-16 w-auto"
               />
             </div>
-            <p className="text-gray-800 font-semibold text-apple-lg font-apple-sf">
+            <p className="text-white/80 text-apple-lg font-apple-sf">
               Super Agent
             </p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-800 font-apple-sf text-apple-sm">Email</Label>
+              <Label htmlFor="email" className="text-white/90 font-apple-sf text-apple-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -79,12 +78,12 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="bg-white/50 backdrop-blur-sm border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 rounded-xl h-12 font-apple-sf text-apple-base"
+                className="bg-black/80 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500 font-apple-sf text-apple-base"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-800 font-apple-sf text-apple-sm">Senha</Label>
+              <Label htmlFor="password" className="text-white/90 font-apple-sf text-apple-sm">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -92,13 +91,13 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="bg-white/50 backdrop-blur-sm border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 rounded-xl h-12 font-apple-sf text-apple-base"
+                className="bg-black/80 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500 font-apple-sf text-apple-base"
               />
             </div>
             
             <Button
               type="submit"
-              className="w-full bg-white/40 border-none text-gray-700 hover:bg-white/70 py-3 rounded-xl backdrop-blur-sm font-apple-medium text-apple-sm transition-all shadow-sm mt-4"
+              className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/10 py-6 rounded-xl backdrop-blur-sm mt-6 font-apple-medium text-apple-base transition-all"
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
