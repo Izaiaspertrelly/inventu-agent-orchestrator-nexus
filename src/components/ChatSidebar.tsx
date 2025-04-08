@@ -39,7 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 const ChatSidebar: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { chats, activeChat, setActiveChat, createNewChat } = useChat();
+  const { chats, activeChat, setActiveChat } = useChat();
   const { toast } = useToast();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -57,6 +57,10 @@ const ChatSidebar: React.FC = () => {
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
+  };
+
+  const handleNewTask = () => {
+    navigate("/");
   };
 
   const sampleChats = [
@@ -128,7 +132,7 @@ const ChatSidebar: React.FC = () => {
         <>
           <div className="p-4">
             <Button
-              onClick={createNewChat}
+              onClick={handleNewTask}
               className="w-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center py-5 rounded-full shadow-md"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -240,7 +244,7 @@ const ChatSidebar: React.FC = () => {
         <>
           <div className="flex flex-col items-center gap-4 py-4">
             <Button
-              onClick={createNewChat}
+              onClick={handleNewTask}
               className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center w-10 h-10 rounded-full shadow-md"
               title="Nova tarefa"
             >
