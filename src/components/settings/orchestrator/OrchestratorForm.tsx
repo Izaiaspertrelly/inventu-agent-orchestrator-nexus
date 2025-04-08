@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Brain, Check, AlertCircle } from "lucide-react";
+import { Brain, Check, AlertCircle, Loader2 } from "lucide-react";
 import { useAgent } from "@/contexts/AgentContext";
 import OrchestratorBasicInfo from "./OrchestratorBasicInfo";
 import ModelSelection from "./ModelSelection";
@@ -11,6 +11,7 @@ import OrchestratorCapabilities from "./OrchestratorCapabilities";
 import ConfigDisplay from "./ConfigDisplay";
 import { useConfigGenerator } from "./form/useConfigGenerator";
 import { useFormSubmit } from "./form/useFormSubmit";
+import { useModelConnectionTest } from "@/hooks/use-model-connection-test";
 
 const OrchestratorForm: React.FC = () => {
   const { models, orchestratorConfig } = useAgent();
@@ -27,6 +28,9 @@ const OrchestratorForm: React.FC = () => {
   const [memoryType, setMemoryType] = useState("buffer");
   const [reasoningDepth, setReasoningDepth] = useState("2");
   
+  // Connection test state
+  const { testModelConnection, connectionStatus, connectionMessage } = useModelConnectionTest();
+  
   // Custom hooks for form functionality
   const { orchestratorConfig: configJson, setOrchestratorConfig, handleUpdateConfig } = useConfigGenerator();
   const { handleSaveOrchestrator, isFormLoading, isFormSubmitted } = useFormSubmit();
@@ -36,6 +40,12 @@ const OrchestratorForm: React.FC = () => {
     if (orchestratorConfig) {
       if (orchestratorConfig.selectedModel) {
         setSelectedModel(orchestratorConfig.selectedModel);
+        
+        // Find the provider for this model
+        const modelInfo = models.find(m => m.id === orchestratorConfig.selectedModel);
+        if (modelInfo) {
+          setSelectedProvider(modelInfo.providerId);
+        }
       }
       
       if (orchestratorConfig.memory) {
@@ -56,7 +66,7 @@ const OrchestratorForm: React.FC = () => {
         setPlanningEnabled(orchestratorConfig.planning.enabled === true);
       }
     }
-  }, [orchestratorConfig]);
+  }, [orchestratorConfig, models]);
 
   // Handle config update
   const onUpdateConfig = () => {
@@ -71,12 +81,24 @@ const OrchestratorForm: React.FC = () => {
 
   // Handle form submission
   const onSubmitForm = () => {
-    const success = handleSaveOrchestrator({
+    handleSaveOrchestrator({
       name: "Orquestrador Neural", // Nome fixo
       description: "Centro de controle do sistema de IA", // Descrição fixa
       selectedModel,
       orchestratorConfig: configJson
     });
+  };
+  
+  // Handle connection test
+  const handleTestConnection = async () => {
+    if (!selectedModel || !selectedProvider) {
+      return;
+    }
+    
+    const provider = models.find(m => m.providerId === selectedProvider);
+    if (!provider) return;
+    
+    await testModelConnection(selectedProvider, selectedModel, provider.apiKey);
   };
 
   return (
@@ -121,6 +143,26 @@ const OrchestratorForm: React.FC = () => {
             </Alert>
           )}
           
+          {connectionStatus && (
+            <Alert className={`${
+              connectionStatus === "success" ? "bg-green-50 border-green-200" : 
+              connectionStatus === "error" ? "bg-red-50 border-red-200" : 
+              "bg-blue-50 border-blue-200"
+            }`}>
+              {connectionStatus === "success" ? <Check className="h-4 w-4 text-green-500" /> : 
+               connectionStatus === "error" ? <AlertCircle className="h-4 w-4 text-red-500" /> :
+               <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />}
+              <AlertTitle>
+                {connectionStatus === "success" ? "Conexão estabelecida com sucesso" : 
+                 connectionStatus === "error" ? "Erro na conexão" : 
+                 "Testando conexão..."}
+              </AlertTitle>
+              <AlertDescription>
+                {connectionMessage}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <OrchestratorBasicInfo />
           
           <ModelSelection 
@@ -132,6 +174,18 @@ const OrchestratorForm: React.FC = () => {
             availableModels={availableModels}
             setAvailableModels={setAvailableModels}
           />
+          
+          <div className="flex justify-end">
+            <Button 
+              variant="outline" 
+              onClick={handleTestConnection}
+              disabled={!selectedModel || !selectedProvider || connectionStatus === "loading"}
+              className="mb-2"
+            >
+              {connectionStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Testar Conexão com o Modelo
+            </Button>
+          </div>
           
           <OrchestratorCapabilities 
             memoryEnabled={memoryEnabled}
