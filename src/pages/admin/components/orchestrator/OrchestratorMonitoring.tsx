@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 interface Task {
   id: string;
   task?: string;
-  subtasks?: any[];
+  subtasks?: Array<any>;
 }
 
 const OrchestratorMonitoring: React.FC = () => {
@@ -45,7 +45,7 @@ const OrchestratorMonitoring: React.FC = () => {
   };
   
   // Renderiza as informações da data da tarefa de forma segura
-  const renderTaskDate = (task: Task | null | undefined): JSX.Element => {
+  const renderTaskDate = (task: Task | null | undefined): React.ReactNode => {
     if (!task || typeof task !== 'object' || !task.id) {
       return <span>Data desconhecida</span>;
     }
@@ -65,7 +65,7 @@ const OrchestratorMonitoring: React.FC = () => {
   };
   
   // Ensure tasks is an array or provide fallback
-  const recentTasks = Array.isArray(orchestratorState?.tasks) 
+  const recentTasks: Task[] = Array.isArray(orchestratorState?.tasks) 
     ? orchestratorState.tasks.slice(-3).reverse() 
     : [];
   
