@@ -7,7 +7,7 @@ import { useAgent } from "../contexts/AgentContext";
 
 export const useChatMessageProcessor = () => {
   const { toast } = useToast();
-  const { selectModelForTask, executeMCPTool, mcpConfig, models, agents } = useAgent();
+  const { selectModelForTask, executeMCPTool, mcpConfig, models, agents, orchestratorConfig } = useAgent();
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Função para encontrar o agente correto baseado no modelo selecionado
@@ -15,9 +15,19 @@ export const useChatMessageProcessor = () => {
     return agents.find(agent => agent.modelId === modelId);
   };
   
+  // Encontrar o agente orquestrador baseado no ID configurado
+  const getOrchestratorAgent = () => {
+    if (!orchestratorConfig || !orchestratorConfig.mainAgentId) {
+      return null;
+    }
+    return agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
+  };
+  
   // Processo de orquestração de agentes
   const orchestrateAgentResponse = async (userMessage: string, agent: any) => {
     try {
+      console.log("Orquestrando resposta usando agente:", agent?.name);
+      
       // Tentar analisar a configuração do agente
       let agentConfig: any = {};
       try {
@@ -27,16 +37,27 @@ export const useChatMessageProcessor = () => {
         console.error("Erro ao analisar configuração do agente:", e);
       }
       
+      // Usar configurações do orquestrador se este agente for o orquestrador principal
+      let useOrchestratorConfig = false;
+      if (orchestratorConfig && orchestratorConfig.mainAgentId === agent.id) {
+        console.log("Este agente é o orquestrador principal, usando configurações centrais");
+        useOrchestratorConfig = true;
+      }
+      
       // Verificar capacidades do orquestrador - com validação para evitar o erro
-      const orchestrator = agentConfig.orchestrator || {};
-      const memory = orchestrator.memory || { enabled: false };
-      const reasoning = orchestrator.reasoning || { enabled: false };
-      const planning = orchestrator.planning || { enabled: false };
+      const orchestratorSettings = useOrchestratorConfig ? orchestratorConfig : (agentConfig.orchestrator || {});
+      const memory = orchestratorSettings.memory || { enabled: false };
+      const reasoning = orchestratorSettings.reasoning || { enabled: false };
+      const planning = orchestratorSettings.planning || { enabled: false };
       
       let responseContent = "";
       
-      // Adicionar informações sobre o agente e suas capacidades na resposta
-      responseContent += `[Agente: ${agent.name}] `;
+      // Indicar se este é o orquestrador principal
+      if (useOrchestratorConfig) {
+        responseContent += `[Orquestrador Neural] `;
+      } else {
+        responseContent += `[Agente: ${agent.name}] `;
+      }
       
       // Processar com memória se habilitado
       if (memory.enabled) {
@@ -72,9 +93,28 @@ export const useChatMessageProcessor = () => {
     try {
       console.log(`Gerando resposta usando modelo: ${selectedModelId}`);
       
+      // Verificar se temos um orquestrador configurado
+      const orchestratorAgent = getOrchestratorAgent();
+      
+      if (orchestratorAgent) {
+        console.log("Orquestrador encontrado:", orchestratorAgent.name);
+        
+        // Se temos um orquestrador, verificamos se devemos usar o modelo dele ou o modelo selecionado
+        const useOrchestrator = orchestratorConfig && orchestratorConfig.memory?.enabled;
+        
+        if (useOrchestrator) {
+          console.log("Usando orquestrador para processar a mensagem");
+          const orchestratedResponse = await orchestrateAgentResponse(userMessage, orchestratorAgent);
+          setIsProcessing(false);
+          return createBotMessage(orchestratedResponse, orchestratorAgent.modelId);
+        }
+      }
+      
+      // Se não usamos o orquestrador ou ele não está configurado, usamos o fluxo normal
+      
       // Encontrar o agente associado ao modelo selecionado
       const agent = findAgentByModel(selectedModelId);
-      console.log("Agente encontrado:", agent);
+      console.log("Agente encontrado para o modelo selecionado:", agent?.name);
       
       // Detect if tool execution is required
       const toolCalls = extractToolCalls(userMessage);

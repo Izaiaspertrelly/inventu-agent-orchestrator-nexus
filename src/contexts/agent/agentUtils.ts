@@ -2,9 +2,19 @@
 import { MCPTool, Agent } from "@/types";
 
 // Função para selecionar o modelo com base em agentes configurados
-export const selectModelForTask = async (taskDescription: string, agents?: Agent[]): Promise<string> => {
+export const selectModelForTask = async (taskDescription: string, agents?: Agent[], orchestratorConfig?: any): Promise<string> => {
   console.log("Selecionando modelo para tarefa:", taskDescription);
   console.log("Agentes disponíveis:", agents?.length || 0);
+  console.log("Configuração do orquestrador:", orchestratorConfig);
+  
+  // Se temos um orquestrador configurado, tente usar o agente principal dele
+  if (orchestratorConfig && orchestratorConfig.mainAgentId && agents) {
+    const orchestratorAgent = agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
+    if (orchestratorAgent && orchestratorAgent.modelId) {
+      console.log("Usando modelo do agente orquestrador:", orchestratorAgent.name);
+      return orchestratorAgent.modelId;
+    }
+  }
   
   // Se temos agentes configurados, tente usar o mais adequado
   if (agents && agents.length > 0) {

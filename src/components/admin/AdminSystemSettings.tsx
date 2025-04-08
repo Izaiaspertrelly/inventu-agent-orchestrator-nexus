@@ -14,7 +14,7 @@ import ModelsTab from "../settings/ModelsTab";
 import AgentsTab from "../settings/AgentsTab";
 import MCPTab from "../settings/MCPTab";
 import ApiConfigTab from "../settings/ApiConfigTab";
-import { Database, Code, Users, BarChart, Server } from "lucide-react";
+import { Database, Code, Users, BarChart, Server, Brain } from "lucide-react";
 
 interface SettingModuleProps {
   title: string;
@@ -22,6 +22,7 @@ interface SettingModuleProps {
   icon: React.ReactNode;
   onClick: () => void;
   active: boolean;
+  isPrimary?: boolean;
 }
 
 const SettingModule: React.FC<SettingModuleProps> = ({
@@ -30,20 +31,26 @@ const SettingModule: React.FC<SettingModuleProps> = ({
   icon,
   onClick,
   active,
+  isPrimary = false,
 }) => {
   return (
     <Card 
       className={`cursor-pointer transition-all hover:shadow-md ${
         active ? 'ring-2 ring-primary border-primary' : ''
-      }`}
+      } ${isPrimary ? 'border-2 border-primary bg-primary/5' : ''}`}
       onClick={onClick}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${active ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+          <div className={`p-2 rounded-lg ${active ? 'bg-primary text-primary-foreground' : isPrimary ? 'bg-primary/20' : 'bg-muted'}`}>
             {icon}
           </div>
           <CardTitle className="text-lg">{title}</CardTitle>
+          {isPrimary && (
+            <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+              Principal
+            </span>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -59,29 +66,30 @@ const AdminSystemSettings: React.FC = () => {
   const modules = [
     {
       id: "orchestrator",
-      title: "Orquestrador",
-      description: "Configure como os diferentes componentes do sistema interagem entre si.",
-      icon: <Database className="h-5 w-5" />,
-      component: <OrchestratorTab />
-    },
-    {
-      id: "models",
-      title: "Modelos",
-      description: "Gerencie modelos de inteligência artificial e suas configurações.",
-      icon: <BarChart className="h-5 w-5" />,
-      component: <ModelsTab />
+      title: "Orquestrador Neural",
+      description: "Configure o cérebro central que governa todo o sistema e integra suas capacidades.",
+      icon: <Brain className="h-5 w-5" />,
+      component: <OrchestratorTab />,
+      isPrimary: true
     },
     {
       id: "agents",
       title: "Agentes",
-      description: "Administre os agentes inteligentes e seus comportamentos.",
+      description: "Administre os agentes especialistas que são coordenados pelo orquestrador.",
       icon: <Users className="h-5 w-5" />,
       component: <AgentsTab />
     },
     {
+      id: "models",
+      title: "Modelos",
+      description: "Gerencie modelos de inteligência artificial usados pelos agentes.",
+      icon: <BarChart className="h-5 w-5" />,
+      component: <ModelsTab />
+    },
+    {
       id: "mcp",
       title: "MCP",
-      description: "Configure o Processador Central de Mensagens.",
+      description: "Configure o Processador Central de Mensagens para ferramentas externas.",
       icon: <Code className="h-5 w-5" />,
       component: <MCPTab />
     },
@@ -105,6 +113,7 @@ const AdminSystemSettings: React.FC = () => {
             icon={module.icon}
             onClick={() => setActiveTab(module.id)}
             active={activeTab === module.id}
+            isPrimary={module.isPrimary}
           />
         ))}
       </div>

@@ -2,11 +2,12 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, UserCog, Layers, Code } from "lucide-react";
+import { ArrowLeft, UserCog, Layers, Code, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AgentsSection from "./components/AgentsSection";
 import ModelsSection from "./components/ModelsSection";
 import MCPSection from "./components/MCPSection";
+import OrchestratorSection from "./components/OrchestratorSection";
 
 const AdminSettings = () => {
   const navigate = useNavigate();
@@ -26,8 +27,12 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="agents" className="w-full">
+      <Tabs defaultValue="orchestrator" className="w-full">
         <TabsList className="mb-6">
+          <TabsTrigger value="orchestrator" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            Orquestrador
+          </TabsTrigger>
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <UserCog className="h-4 w-4" />
             Agentes
@@ -41,6 +46,10 @@ const AdminSettings = () => {
             Servidor MCP
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="orchestrator" className="space-y-6">
+          <OrchestratorSection />
+        </TabsContent>
 
         <TabsContent value="agents" className="space-y-6">
           <AgentsSection />
