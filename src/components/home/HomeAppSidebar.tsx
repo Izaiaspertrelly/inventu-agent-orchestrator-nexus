@@ -13,6 +13,7 @@ import {
   SidebarMenuButton,
   SidebarFooter
 } from "@/components/ui/sidebar";
+import SidebarIcon from "@/components/icons/SidebarIcon";
 
 interface HomeAppSidebarProps {
   sidebarOpen: boolean;
