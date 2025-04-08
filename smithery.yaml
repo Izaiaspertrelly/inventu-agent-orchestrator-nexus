@@ -10,6 +10,7 @@ startCommand:
       apiKey:
         type: string
         description: "API key for authentication"
+        sensitive: true  # Mark as a sensitive configuration
   commandFunction: |
     (config) => {
       return {
