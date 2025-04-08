@@ -85,15 +85,15 @@ const Chat: React.FC = () => {
       
       <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
         <div 
-          className="flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs" 
+          className={`flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs ${superAgentEnabled ? 'text-primary' : ''}`}
           onClick={toggleSuperAgent} 
           title="Ativar/Desativar Super Agent"
         >
           {superAgentEnabled ? 
-            <ToggleRight className="h-3 w-3 text-primary" /> : 
+            <ToggleRight className="h-3 w-3" /> : 
             <ToggleLeft className="h-3 w-3" />
           }
-          <span className="font-medium ml-1">Super</span>
+          <span className="font-medium ml-1">S</span>
         </div>
         
         <button 
