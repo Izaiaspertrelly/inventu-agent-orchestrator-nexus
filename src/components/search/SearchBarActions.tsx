@@ -21,7 +21,9 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
   return (
     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
       <div 
-        className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors cursor-pointer text-xs bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md ${isSuperAgentEnabled ? 'text-primary font-semibold' : ''}`}
+        className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md 
+          ${isSuperAgentEnabled ? 'text-primary font-semibold' : 'text-foreground'}
+        `}
         onClick={(e) => { e.stopPropagation(); onToggleSuperAgent(e); }}
         title="Ativar/Desativar God Mode"
       >
@@ -29,7 +31,7 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
           <ToggleRight className="h-3.5 w-3.5" /> : 
           <ToggleLeft className="h-3.5 w-3.5" />
         }
-        <span className="font-medium">God Mode</span>
+        <span className="font-medium text-xs">God Mode</span>
       </div>
       
       <button 
