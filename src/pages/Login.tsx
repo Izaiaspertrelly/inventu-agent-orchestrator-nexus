@@ -54,8 +54,8 @@ const Login = () => {
         {/* Animated border gradient effect */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#E0E0E0] via-[#F0F0F0] to-[#FFFFFF] opacity-80 animate-border-glow"></div>
         
-        {/* Frosted glass container - neutral white with transparency */}
-        <div className="relative bg-white/40 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/10">
+        {/* Frosted glass container - neutral white with 45% transparency */}
+        <div className="relative bg-white/45 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/10">
           <div className="text-center mb-10">
             <div className="flex justify-center mb-4">
               <img 
