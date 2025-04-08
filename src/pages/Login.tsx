@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,9 +54,6 @@ const Login = () => {
     <div className="flex min-h-screen bg-inventu-background dark">
       <div className="w-full max-w-md m-auto glass-panel p-8">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <InventuLogo size={48} />
-          </div>
           <h2 className="text-3xl font-bold inventu-gradient-text mb-2">
             Inventu Super Agent
           </h2>

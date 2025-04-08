@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,7 +19,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import InventuLogo from "@/components/InventuLogo";
 import { Input } from "@/components/ui/input";
 
 const ChatSidebar: React.FC = () => {
@@ -61,7 +59,6 @@ const ChatSidebar: React.FC = () => {
     <div className="flex flex-col w-72 h-full bg-sidebar border-r border-border/50">
       <div className="flex items-center justify-between p-4 border-b border-border/50">
         <div className="flex items-center">
-          <InventuLogo size={32} />
         </div>
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
