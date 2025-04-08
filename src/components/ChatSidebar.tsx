@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/contexts/ChatContext";
@@ -22,7 +22,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { 
   DropdownMenu, 
@@ -38,13 +38,25 @@ import { useToast } from "@/hooks/use-toast";
 
 const ChatSidebar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
   const { chats, activeChat, setActiveChat } = useChat();
   const { toast } = useToast();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  
+  // Start collapsed if on the chat page, expanded otherwise
+  const [collapsed, setCollapsed] = useState(() => {
+    return location.pathname === "/chat";
+  });
 
   const isAdmin = user?.role === "admin";
+  
+  // Effect to update collapsed state when route changes
+  useEffect(() => {
+    if (location.pathname === "/chat") {
+      setCollapsed(true);
+    }
+  }, [location.pathname]);
   
   const handleLogout = () => {
     logout();
