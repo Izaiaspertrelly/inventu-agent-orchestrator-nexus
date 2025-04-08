@@ -1,9 +1,8 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AgentProvider } from "@/contexts/AgentContext";
 import { ChatProvider } from "@/contexts/ChatContext";
@@ -14,7 +13,6 @@ import { api } from "@/services/api";
 import Login from "@/pages/Login";
 import Index from "@/pages/Index";
 import Chat from "@/pages/Chat";
-import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 import AdminDashboard from "@/pages/AdminDashboard";
 
@@ -86,16 +84,6 @@ const App = () => {
                     element={
                       <ProtectedRoute allowedRoles={["admin"]}>
                         <AdminDashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  
-                  {/* Redirect /settings to /admin for admin users */}
-                  <Route
-                    path="/settings"
-                    element={
-                      <ProtectedRoute allowedRoles={["admin"]}>
-                        <Navigate to="/admin" replace />
                       </ProtectedRoute>
                     }
                   />
