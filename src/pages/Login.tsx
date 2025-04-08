@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,11 +49,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-cover bg-center" 
-         style={{ 
-           backgroundImage: "url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=2400&q=80')", 
-           backgroundSize: "cover" 
-         }}>
+    <div className="flex min-h-screen bg-black">
       <div className="relative w-full max-w-md m-auto p-0.5 rounded-3xl">
         {/* Animated border gradient effect */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#0EA5E9] via-[#33C3F0] to-[#1EAEDB] opacity-80 animate-border-glow"></div>
