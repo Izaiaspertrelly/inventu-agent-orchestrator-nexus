@@ -19,15 +19,15 @@ export const useChatMessageProcessor = () => {
   const orchestrateAgentResponse = async (userMessage: string, agent: any) => {
     try {
       // Tentar analisar a configuração do agente
-      let agentConfig = {};
+      let agentConfig: any = {};
       try {
-        agentConfig = JSON.parse(agent.configJson);
+        agentConfig = JSON.parse(agent.configJson || "{}");
         console.log("Configuração do agente carregada:", agentConfig);
       } catch (e) {
         console.error("Erro ao analisar configuração do agente:", e);
       }
       
-      // Verificar capacidades do orquestrador
+      // Verificar capacidades do orquestrador - com validação para evitar o erro
       const orchestrator = agentConfig.orchestrator || {};
       const memory = orchestrator.memory || { enabled: false };
       const reasoning = orchestrator.reasoning || { enabled: false };
