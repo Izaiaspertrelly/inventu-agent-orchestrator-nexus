@@ -5,16 +5,19 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
 import FloatingSearchBar from "@/components/FloatingSearchBar";
-import { Loader2, Brain } from "lucide-react";
+import { Loader2, Brain, Plus } from "lucide-react";
 import MemoryConfirmationDialog from "@/components/orchestrator/MemoryConfirmationDialog";
 import { useOrchestratorResponse } from "@/hooks/messaging/use-orchestrator-response";
 import { useAgent } from "@/contexts/AgentContext";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage, isProcessing } = useChat();
   const { orchestratorConfig } = useAgent();
   const [showFloatingBar, setShowFloatingBar] = useState(false);
+  const navigate = useNavigate();
   
   // Get orchestrator memory confirmation state
   const { pendingMemoryConfirmation, setPendingMemoryConfirmation } = useOrchestratorResponse();
@@ -48,6 +51,12 @@ const Chat: React.FC = () => {
   const handleFloatingSearch = (searchText: string, file: File | null) => {
     // Now we also pass any selected file
     sendMessage(searchText, file);
+  };
+  
+  const handleNewChat = () => {
+    createNewChat();
+    // Navigate to the chat page (stay on the same page, but with a fresh chat)
+    navigate("/chat");
   };
   
   const isOrchestratorActive = orchestratorConfig && 
@@ -96,10 +105,19 @@ const Chat: React.FC = () => {
                     </svg>
                   </div>
                   <h3 className="text-xl font-medium text-foreground mb-2">Iniciar nova conversa</h3>
-                  <p className="text-muted-foreground max-w-sm">
+                  <p className="text-muted-foreground max-w-sm mb-6">
                     Use a barra de pesquisa flutuante para enviar uma mensagem e começar a conversar
                     {isOrchestratorActive ? " com o Orquestrador Neural" : ""}
                   </p>
+                  
+                  <Button 
+                    onClick={handleNewChat} 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Nova conversa
+                  </Button>
                 </div>
               )}
               

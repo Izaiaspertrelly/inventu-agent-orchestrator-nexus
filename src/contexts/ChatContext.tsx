@@ -68,7 +68,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const sendMessage = async (content: string, file?: File | null) => {
-    // If no active chat, create one
+    // Always create a new chat if sending a message without an active chat
     if (!activeChat) {
       const newChat = createNewChat();
       await new Promise(resolve => setTimeout(resolve, 50)); // Small delay to ensure chat is created
@@ -76,6 +76,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     
+    // If there's an active chat, use it
     sendMessageToChat(activeChat.id, content, file);
   };
   

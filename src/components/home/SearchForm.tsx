@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -60,9 +61,11 @@ const SearchForm: React.FC<SearchFormProps> = ({ isProcessing }) => {
     const tempFile = selectedFile;
     clearSelectedFile();
     
-    const chat = createNewChat();
+    // Create a new chat for each conversation started from the home page
+    const newChat = createNewChat();
     navigate("/chat");
     
+    // Small delay to ensure navigation is complete before sending the message
     setTimeout(() => {
       sendMessage(tempMessage, tempFile);
     }, 100);
