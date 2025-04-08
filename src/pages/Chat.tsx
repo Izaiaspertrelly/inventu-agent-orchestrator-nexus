@@ -6,10 +6,16 @@ import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
 import FloatingSearchBar from "@/components/FloatingSearchBar";
 import { Loader2 } from "lucide-react";
+import MemoryConfirmationDialog from "@/components/orchestrator/MemoryConfirmationDialog";
+import { useOrchestratorResponse } from "@/hooks/messaging/use-orchestrator-response";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage, isProcessing } = useChat();
   const [showFloatingBar, setShowFloatingBar] = useState(false);
+  
+  // Get orchestrator memory confirmation state
+  const { pendingMemoryConfirmation, setPendingMemoryConfirmation } = useOrchestratorResponse();
+  const [memoryDialogOpen, setMemoryDialogOpen] = useState(false);
   
   useEffect(() => {
     if (!activeChat) {
@@ -26,6 +32,15 @@ const Chat: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [activeChat, createNewChat]);
+  
+  // Effect to open dialog when there are pending confirmations
+  useEffect(() => {
+    if (pendingMemoryConfirmation) {
+      setMemoryDialogOpen(true);
+    } else {
+      setMemoryDialogOpen(false);
+    }
+  }, [pendingMemoryConfirmation]);
   
   const handleFloatingSearch = (searchText: string, file: File | null) => {
     // Now we also pass any selected file
@@ -78,6 +93,13 @@ const Chat: React.FC = () => {
           </ScrollArea>
         </div>
       </div>
+      
+      {/* Memory Confirmation Dialog */}
+      <MemoryConfirmationDialog
+        open={memoryDialogOpen}
+        setOpen={setMemoryDialogOpen}
+        pendingConfirmation={pendingMemoryConfirmation}
+      />
     </div>
   );
 };
