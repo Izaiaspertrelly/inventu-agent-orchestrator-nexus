@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,7 +29,6 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProfileDialog from "@/components/ProfileDialog";
 import { useToast } from "@/hooks/use-toast";
 import SidebarIcon from "@/components/icons/SidebarIcon";
@@ -218,44 +216,25 @@ const ChatSidebar: React.FC = () => {
               Configurações
             </Button>
             
-            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-sidebar-accent/50 cursor-pointer transition-colors">
-                    <Avatar className="w-10 h-10">
-                      {user?.profileImage ? (
-                        <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
-                      ) : (
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          <User className="h-5 w-5" />
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <p className="text-sm font-medium leading-none truncate">{user?.name || "Usuário"}</p>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                    </div>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Perfil</span>
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ProfileDialog />
-            </Dialog>
+            <div className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-sidebar-accent/50 cursor-pointer transition-colors"
+                 onClick={() => setProfileDialogOpen(true)}>
+              <Avatar className="w-10 h-10">
+                {user?.profileImage ? (
+                  <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+                ) : (
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium leading-none truncate">{user?.name || "Usuário"}</p>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+            </div>
           </div>
         </>
       ) : (
@@ -325,23 +304,27 @@ const ChatSidebar: React.FC = () => {
               <Settings className="h-4 w-4" />
             </Button>
             
-            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-              <DialogTrigger asChild>
-                <Avatar className="w-8 h-8 cursor-pointer" title={user?.name || "Usuário"}>
-                  {user?.profileImage ? (
-                    <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
-                  ) : (
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-              </DialogTrigger>
-              <ProfileDialog />
-            </Dialog>
+            <Avatar 
+              className="w-8 h-8 cursor-pointer" 
+              title={user?.name || "Usuário"}
+              onClick={() => setProfileDialogOpen(true)}
+            >
+              {user?.profileImage ? (
+                <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+              ) : (
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  <User className="h-4 w-4" />
+                </AvatarFallback>
+              )}
+            </Avatar>
           </div>
         </>
       )}
+      
+      <ProfileDialog 
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+      />
     </div>
   );
 };

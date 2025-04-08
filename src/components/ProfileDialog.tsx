@@ -1,6 +1,7 @@
 
 import React, { useState } from "react";
 import {
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -14,7 +15,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const ProfileDialog = () => {
+interface ProfileDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange }) => {
   const { user, updateProfile } = useAuth();
   const { toast } = useToast();
   
@@ -53,6 +59,8 @@ const ProfileDialog = () => {
         description: "Suas informações foram atualizadas com sucesso.",
       });
       
+      // Close the dialog
+      onOpenChange(false);
     } catch (error) {
       toast({
         title: "Erro ao atualizar perfil",
@@ -65,75 +73,77 @@ const ProfileDialog = () => {
   };
 
   return (
-    <DialogContent className="sm:max-w-md">
-      <DialogHeader>
-        <DialogTitle>Configurar perfil</DialogTitle>
-        <DialogDescription>
-          Atualize suas informações pessoais e foto de perfil
-        </DialogDescription>
-      </DialogHeader>
-      
-      <form onSubmit={handleSubmit} className="space-y-6 py-4">
-        <div className="flex flex-col items-center gap-4">
-          <Avatar className="w-24 h-24">
-            {profileImage ? (
-              <AvatarImage src={profileImage} alt={name} />
-            ) : (
-              <AvatarFallback className="bg-primary/10 text-primary">
-                <User className="h-12 w-12" />
-              </AvatarFallback>
-            )}
-          </Avatar>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Configurar perfil</DialogTitle>
+          <DialogDescription>
+            Atualize suas informações pessoais e foto de perfil
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+          <div className="flex flex-col items-center gap-4">
+            <Avatar className="w-24 h-24">
+              {profileImage ? (
+                <AvatarImage src={profileImage} alt={name} />
+              ) : (
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  <User className="h-12 w-12" />
+                </AvatarFallback>
+              )}
+            </Avatar>
+            
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="picture"
+                className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-md bg-secondary hover:bg-secondary/80 text-secondary-foreground"
+              >
+                <Upload className="h-4 w-4" />
+                Alterar foto
+              </Label>
+              <Input
+                id="picture"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </div>
+          </div>
           
-          <div className="flex items-center gap-2">
-            <Label
-              htmlFor="picture"
-              className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-md bg-secondary hover:bg-secondary/80 text-secondary-foreground"
-            >
-              <Upload className="h-4 w-4" />
-              Alterar foto
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="name">Nome</Label>
             <Input
-              id="picture"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Seu nome"
             />
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="name">Nome</Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Seu nome"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={user?.email || ""}
-            disabled
-            className="bg-muted"
-          />
-          <p className="text-xs text-muted-foreground">
-            O email não pode ser alterado.
-          </p>
-        </div>
-        
-        <div className="flex justify-end gap-2">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Salvando..." : "Salvar alterações"}
-          </Button>
-        </div>
-      </form>
-    </DialogContent>
+          
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={user?.email || ""}
+              disabled
+              className="bg-muted"
+            />
+            <p className="text-xs text-muted-foreground">
+              O email não pode ser alterado.
+            </p>
+          </div>
+          
+          <div className="flex justify-end gap-2">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Salvando..." : "Salvar alterações"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

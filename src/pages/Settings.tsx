@@ -1,15 +1,17 @@
 
-import React from "react";
+import React, { useState } from "react";
 import SettingsTabs from "@/components/settings/SettingsTabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ProfileDialog from "@/components/ProfileDialog";
 
 const Settings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const isAdmin = user?.role === "admin";
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   return (
     <div className="container mx-auto py-6">
@@ -26,9 +28,27 @@ const Settings = () => {
             Configurações do Sistema
           </h1>
         </div>
+        
+        <Avatar
+          className="w-10 h-10 cursor-pointer" 
+          onClick={() => setProfileDialogOpen(true)}
+        >
+          {user?.profileImage ? (
+            <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+          ) : (
+            <AvatarFallback className="bg-primary/10 text-primary">
+              <User className="h-5 w-5" />
+            </AvatarFallback>
+          )}
+        </Avatar>
       </div>
       
       <SettingsTabs />
+      
+      <ProfileDialog 
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+      />
     </div>
   );
 };

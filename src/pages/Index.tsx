@@ -30,7 +30,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProfileDialog from "@/components/ProfileDialog";
 
 const Index = () => {
@@ -168,26 +167,24 @@ const Index = () => {
           </SidebarContent>
           
           <SidebarFooter className="px-4 py-6">
-            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-              <DialogTrigger asChild>
-                <div className="flex items-center gap-2 hover:bg-sidebar-accent/50 p-2 rounded-lg cursor-pointer">
-                  <Avatar className="h-8 w-8">
-                    {user?.profileImage ? (
-                      <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
-                    ) : (
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{user?.name || "Usuário"}</p>
-                    <p className="text-xs text-muted-foreground">Plano Básico</p>
-                  </div>
-                </div>
-              </DialogTrigger>
-              <ProfileDialog />
-            </Dialog>
+            <div 
+              className="flex items-center gap-2 hover:bg-sidebar-accent/50 p-2 rounded-lg cursor-pointer"
+              onClick={() => setProfileDialogOpen(true)}
+            >
+              <Avatar className="h-8 w-8">
+                {user?.profileImage ? (
+                  <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+                ) : (
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    <User className="h-4 w-4" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium">{user?.name || "Usuário"}</p>
+                <p className="text-xs text-muted-foreground">Plano Básico</p>
+              </div>
+            </div>
           </SidebarFooter>
         </Sidebar>
         
@@ -224,12 +221,10 @@ const Index = () => {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Perfil</span>
-                  </DropdownMenuItem>
-                </DialogTrigger>
+                <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -237,7 +232,6 @@ const Index = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <ProfileDialog />
           </div>
 
           <div className="absolute top-4 left-4">
@@ -328,6 +322,11 @@ const Index = () => {
           </div>
         </div>
       </div>
+      
+      <ProfileDialog 
+        open={profileDialogOpen} 
+        onOpenChange={setProfileDialogOpen} 
+      />
     </SidebarProvider>
   );
 };
