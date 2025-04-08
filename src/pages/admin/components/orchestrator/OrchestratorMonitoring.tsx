@@ -30,7 +30,7 @@ const OrchestratorMonitoring: React.FC = () => {
     ? tokenUsageMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / tokenUsageMetrics.length
     : 0;
   
-  const formatDate = (date: Date | string | undefined) => {
+  const formatDate = (date: Date | string | undefined): string => {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
@@ -133,11 +133,19 @@ const OrchestratorMonitoring: React.FC = () => {
               <div className="border-t pt-4 mt-4">
                 <h4 className="font-medium mb-2">Tarefas recentes</h4>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {orchestratorState.tasks.slice(-3).reverse().map((task: any, index: number) => (
+                  {(orchestratorState.tasks.slice(-3).reverse() || []).map((task: any, index: number) => (
                     <div key={index} className="bg-muted/50 p-2 rounded-md">
-                      <div className="text-sm font-medium">{task.task.substring(0, 60)}{task.task.length > 60 ? '...' : ''}</div>
+                      <div className="text-sm font-medium">
+                        {task && task.task ? 
+                          `${task.task.substring(0, 60)}${task.task.length > 60 ? '...' : ''}` : 
+                          'Tarefa sem descrição'}
+                      </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Subtasks: {task.subtasks.length} • {formatDate(task.id.split('-')[1])}
+                        Subtasks: {task && task.subtasks ? task.subtasks.length : 0} • {
+                          task && task.id ? 
+                            formatDate(task.id.split('-')[1]) : 
+                            'Data desconhecida'
+                        }
                       </div>
                     </div>
                   ))}
@@ -152,3 +160,4 @@ const OrchestratorMonitoring: React.FC = () => {
 };
 
 export default OrchestratorMonitoring;
+
