@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -106,13 +107,15 @@ const Chat: React.FC = () => {
                   />
                 </div>
                 
-                <p className="text-2xl text-muted-foreground mb-2">
-                  Super Agent
-                </p>
-                
-                <h1 className="text-4xl font-bold mb-2 tracking-tight">
-                  <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"} 
-                </h1>
+                <div className="flex flex-col items-center">
+                  <p className="text-2xl text-muted-foreground mb-2">
+                    Super Agent
+                  </p>
+                  
+                  <h1 className="text-4xl font-bold mb-2 tracking-tight">
+                    <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"} 
+                  </h1>
+                </div>
                 
                 <div className="relative max-w-2xl w-full mx-auto mb-8">
                   <div className="flex flex-col gap-4">
@@ -159,3 +162,4 @@ const Chat: React.FC = () => {
 };
 
 export default Chat;
+
