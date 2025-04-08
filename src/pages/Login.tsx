@@ -92,13 +92,15 @@ const Login = () => {
               />
             </div>
             
-            <Button
-              type="submit"
-              className="inline-flex justify-center items-center px-4 py-2 bg-transparent text-white border-none hover:bg-white/10 rounded-lg transition-colors duration-300 ease-in-out"
-              disabled={isLoading}
-            >
-              {isLoading ? "Entrando..." : "Entrar"}
-            </Button>
+            <div className="flex justify-center">
+              <Button
+                type="submit"
+                className="inline-flex justify-center items-center px-4 py-2 bg-transparent text-white border-none hover:bg-white/10 rounded-lg transition-colors duration-300 ease-in-out"
+                disabled={isLoading}
+              >
+                {isLoading ? "Entrando..." : "Entrar"}
+              </Button>
+            </div>
           </form>
         </div>
       </div>
