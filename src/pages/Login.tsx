@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,7 +98,7 @@ const Login = () => {
             
             <Button
               type="submit"
-              className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/10 py-6 rounded-xl backdrop-blur-sm mt-6 font-medium transition-all"
+              className="w-full bg-transparent text-white border-none hover:bg-white/10 py-4 rounded-lg transition-colors duration-300 ease-in-out"
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
