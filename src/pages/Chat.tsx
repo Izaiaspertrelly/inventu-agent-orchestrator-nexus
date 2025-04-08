@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -72,14 +71,13 @@ const Chat: React.FC = () => {
     });
   };
   
-  // Define MessageInputBar as a React component that returns JSX
   const MessageInputBar: React.FC = () => {
     return (
       <div className="relative">
         <Input 
           className={`w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg backdrop-blur-sm border border-border/40 transition-all duration-300 
             ${superAgentEnabled 
-              ? 'bg-blue-500 text-white placeholder:text-white/70 animate-[vibrate_0.3s_ease-in-out_infinite]' 
+              ? 'bg-blue-500 text-white placeholder:text-white/70 animate-vibrate' 
               : 'bg-secondary/30 placeholder:text-muted-foreground/70'}`}
           placeholder="Dê uma tarefa para Inventor trabalhar..."
           value={message}
