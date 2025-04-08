@@ -29,70 +29,7 @@ const Chat: React.FC = () => {
   }, [activeChat, createNewChat]);
   
   useEffect(() => {
-    if (animationRef.current) {
-      const logoContainer = animationRef.current;
-      logoContainer.innerHTML = '';
-      
-      const logoImg = document.createElement('img');
-      logoImg.src = "/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png";
-      logoImg.style.width = '100%';
-      logoImg.style.height = '100%';
-      logoImg.style.position = 'absolute';
-      logoImg.style.top = '0';
-      logoImg.style.left = '0';
-      logoImg.style.opacity = '0';
-      logoContainer.appendChild(logoImg);
-      
-      const dots = Array.from({ length: 22 }).map(() => {
-        const dot = document.createElement('div');
-        
-        const size = Math.random() * 3 + 3;
-        dot.style.width = `${size}px`;
-        dot.style.height = `${size}px`;
-        dot.style.backgroundColor = '#007AFF';
-        dot.style.borderRadius = '50%';
-        dot.style.position = 'absolute';
-        
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 25 + 10;
-        const x = Math.cos(angle) * distance + 50;
-        const y = Math.sin(angle) * distance + 50;
-        
-        dot.style.left = `${x}%`;
-        dot.style.top = `${y}%`;
-        dot.style.opacity = (Math.random() * 0.5 + 0.5).toString();
-        dot.style.transition = 'all 1.2s ease-in-out';
-        
-        dot.dataset.originX = x.toString();
-        dot.dataset.originY = y.toString();
-        
-        return dot;
-      });
-      
-      dots.forEach(dot => logoContainer.appendChild(dot));
-      
-      const animate = () => {
-        dots.forEach(dot => {
-          const originX = parseFloat(dot.dataset.originX || '50');
-          const originY = parseFloat(dot.dataset.originY || '50');
-          
-          const offsetX = (Math.random() * 2) - 1; 
-          const offsetY = (Math.random() * 2) - 1;
-          
-          dot.style.left = `${originX + offsetX}%`;
-          dot.style.top = `${originY + offsetY}%`;
-          
-          setTimeout(() => {
-            dot.style.left = `${originX}%`;
-            dot.style.top = `${originY}%`;
-          }, 800 + Math.random() * 400);
-        });
-        
-        setTimeout(animate, 1800 + Math.random() * 600);
-      };
-      
-      setTimeout(animate, 800);
-    }
+    // This is intentionally left empty to remove the previous custom animation
   }, []);
   
   const handleSendMessage = (e: React.FormEvent) => {
@@ -171,7 +108,7 @@ const Chat: React.FC = () => {
                     <img 
                       src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
                       alt="Super Agent Logo" 
-                      className="w-32 h-32 object-contain opacity-0"
+                      className="w-32 h-32 object-contain"
                     />
                   </div>
                 </div>
