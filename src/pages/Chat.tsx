@@ -1,18 +1,23 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
-import { Paperclip, Search, X, Check } from "lucide-react";
+import { Paperclip, Search, X, Check, ToggleRight, ToggleLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SuggestionBar from "@/components/SuggestionBar";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
+import { useAgent } from "@/contexts/AgentContext";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage } = useChat();
+  const { models } = useAgent();
+  const { toast } = useToast();
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
   const [message, setMessage] = useState("");
+  const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -36,6 +41,15 @@ const Chat: React.FC = () => {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    
+    // If superAgent is enabled, we can handle the message differently
+    if (superAgentEnabled) {
+      toast({
+        title: "Super Agent Ativado",
+        description: "Usando modelo avançado para processar sua mensagem",
+      });
+    }
+    
     sendMessage(message);
     setMessage("");
   };
@@ -45,6 +59,16 @@ const Chat: React.FC = () => {
       e.preventDefault();
       handleSendMessage(e as unknown as React.FormEvent);
     }
+  };
+  
+  const toggleSuperAgent = () => {
+    setSuperAgentEnabled(!superAgentEnabled);
+    toast({
+      title: superAgentEnabled ? "Super Agent Desativado" : "Super Agent Ativado",
+      description: superAgentEnabled 
+        ? "Voltando ao modelo padrão" 
+        : "Usando o modelo avançado para respostas melhores",
+    });
   };
   
   const MessageInputBar = () => (
@@ -67,6 +91,15 @@ const Chat: React.FC = () => {
         >
           <Paperclip className="h-5 w-5" />
         </button>
+        
+        <div className="flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-3 py-1.5 rounded-full transition-colors cursor-pointer" onClick={toggleSuperAgent} title="Ativar/Desativar Super Agent">
+          {superAgentEnabled ? 
+            <ToggleRight className="h-4 w-4 text-primary" /> : 
+            <ToggleLeft className="h-4 w-4" />
+          }
+          <span className="text-xs font-medium">Super Agent</span>
+        </div>
+        
         <button 
           type="submit"
           onClick={handleSendMessage}
