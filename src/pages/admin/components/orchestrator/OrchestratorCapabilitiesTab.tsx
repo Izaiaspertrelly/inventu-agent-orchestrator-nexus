@@ -11,7 +11,7 @@ const OrchestratorCapabilitiesTab: React.FC = () => {
   const [memoryEnabled, setMemoryEnabled] = React.useState(orchestratorConfig?.memory?.enabled || true);
   const [memoryType, setMemoryType] = React.useState(orchestratorConfig?.memory?.type || "buffer");
   const [reasoningEnabled, setReasoningEnabled] = React.useState(orchestratorConfig?.reasoning?.enabled || true);
-  const [reasoningDepth, setReasoningDepth] = React.useState(orchestratorConfig?.reasoning?.depth?.toString() || "2");
+  const [reasoningDepth, setReasoningDepth] = React.useState(orchestratorConfig?.reasoning?.depth?.toString() || "5");
   const [planningEnabled, setPlanningEnabled] = React.useState(orchestratorConfig?.planning?.enabled || false);
   
   // Effect to update state when orchestratorConfig changes
@@ -20,7 +20,7 @@ const OrchestratorCapabilitiesTab: React.FC = () => {
       setMemoryEnabled(orchestratorConfig.memory?.enabled || true);
       setMemoryType(orchestratorConfig.memory?.type || "buffer");
       setReasoningEnabled(orchestratorConfig.reasoning?.enabled || true);
-      setReasoningDepth(orchestratorConfig.reasoning?.depth?.toString() || "2");
+      setReasoningDepth(orchestratorConfig.reasoning?.depth?.toString() || "5");
       setPlanningEnabled(orchestratorConfig.planning?.enabled || false);
     }
   }, [orchestratorConfig]);
@@ -36,13 +36,15 @@ const OrchestratorCapabilitiesTab: React.FC = () => {
       const reasoningConfig = {
         depth: parseInt(reasoningDepth),
         strategy: "chain-of-thought",
-        enabled: reasoningEnabled
+        enabled: reasoningEnabled,
+        dynamicSteps: true // Enable dynamic step adjustment
       };
       
       const planningConfig = {
         enabled: planningEnabled,
-        horizon: 5,
-        strategy: "goal-decomposition"
+        horizon: parseInt(reasoningDepth) * 3, // Make planning horizon scale with reasoning depth
+        strategy: "goal-decomposition",
+        adaptive: true // Enable adaptive planning
       };
       
       const updatedConfig = {

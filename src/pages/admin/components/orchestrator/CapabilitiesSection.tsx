@@ -5,6 +5,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
 
 interface CapabilitiesSectionProps {
   memoryEnabled: boolean;
@@ -33,6 +35,14 @@ const CapabilitiesSection: React.FC<CapabilitiesSectionProps> = ({
   setPlanningEnabled,
   handleUpdateConfig,
 }) => {
+  // Convert string reasoning depth to number for slider
+  const reasoningDepthValue = parseInt(reasoningDepth) || 2;
+  
+  // Handle slider change
+  const handleSliderChange = (value: number[]) => {
+    setReasoningDepth(value[0].toString());
+  };
+
   return (
     <div className="border-t pt-4">
       <h3 className="text-lg font-medium mb-4">Capacidades Neurais do Orquestrador</h3>
@@ -99,25 +109,35 @@ const CapabilitiesSection: React.FC<CapabilitiesSectionProps> = ({
           </div>
           
           {reasoningEnabled && (
-            <div className="ml-4 space-y-2">
-              <Label htmlFor="reasoning-depth">Profundidade de Raciocínio</Label>
-              <Select
-                value={reasoningDepth}
-                onValueChange={setReasoningDepth}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a profundidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Básico (1 passo)</SelectItem>
-                  <SelectItem value="2">Intermediário (2 passos)</SelectItem>
-                  <SelectItem value="3">Avançado (3+ passos)</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="ml-4 space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="reasoning-depth">Profundidade de Raciocínio</Label>
+                  <Badge variant="outline">{reasoningDepthValue} passos</Badge>
+                </div>
+                
+                <Slider
+                  id="reasoning-depth"
+                  min={1}
+                  max={15}
+                  step={1}
+                  value={[reasoningDepthValue]}
+                  onValueChange={handleSliderChange}
+                  className="w-full"
+                />
+                
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Simples</span>
+                  <span>Avançado</span>
+                </div>
+              </div>
               
-              <p className="text-xs text-muted-foreground mt-2">
-                Profundidade maior permite análises mais complexas, mas consome mais tokens e aumenta o tempo de resposta
-              </p>
+              <div className="bg-muted/50 p-3 rounded-md">
+                <p className="text-sm">
+                  <span className="font-medium">Modo dinâmico:</span> O orquestrador agora ajusta automaticamente a profundidade do raciocínio com base na complexidade da consulta. 
+                  O valor configurado ({reasoningDepthValue}) serve como referência, mas o orquestrador pode aumentar ou diminuir o número de passos conforme necessário.
+                </p>
+              </div>
             </div>
           )}
         </TabsContent>
@@ -138,10 +158,12 @@ const CapabilitiesSection: React.FC<CapabilitiesSectionProps> = ({
           
           {planningEnabled && (
             <div className="ml-4">
-              <p className="text-xs text-muted-foreground mt-2">
-                O planejamento permite que o orquestrador quebre problemas complexos em passos mais simples
-                e delegue esses passos para agentes especializados quando necessário
-              </p>
+              <div className="bg-muted/50 p-3 rounded-md mt-2">
+                <p className="text-sm">
+                  <span className="font-medium">Planejamento adaptativo:</span> O orquestrador decompõe tarefas em 
+                  passos lógicos (5-15 etapas) com base na complexidade da solicitação, priorizando clareza e completude.
+                </p>
+              </div>
             </div>
           )}
         </TabsContent>
