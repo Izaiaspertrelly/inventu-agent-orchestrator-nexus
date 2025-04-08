@@ -22,7 +22,6 @@ const Chat: React.FC = () => {
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
   const [showFloatingBar, setShowFloatingBar] = useState(false);
-  const [showFixedInputBar, setShowFixedInputBar] = useState(true);
   const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -38,14 +37,13 @@ const Chat: React.FC = () => {
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
     
-    // Reset floating bar state when returning to home screen
-    if (activeChat && activeChat.messages.length === 0) {
-      setShowFloatingBar(false);
-      setShowFixedInputBar(true);
+    // Show floating bar when there are messages, otherwise hide it
+    if (activeChat) {
+      setShowFloatingBar(activeChat.messages.length > 0);
     }
   }, [activeChat, createNewChat]);
   
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
     
@@ -56,16 +54,17 @@ const Chat: React.FC = () => {
       });
     }
     
-    sendMessage(message);
+    // Store message temporarily because we'll clear the input
+    const currentMessage = message;
+    
+    // Clear the input field immediately
     setMessage("");
     
-    // Show floating bar and hide fixed input after sending a message
-    if (activeChat && activeChat.messages.length === 0) {
-      setTimeout(() => {
-        setShowFloatingBar(true);
-        setShowFixedInputBar(false);
-      }, 1000); // Small delay to ensure message is processed first
-    }
+    // Show floating bar right after sending a message
+    setShowFloatingBar(true);
+    
+    // Send the message
+    await sendMessage(currentMessage);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -155,7 +154,7 @@ const Chat: React.FC = () => {
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
           onClose={() => setShowFloatingBar(false)}
-          initialMessage={message}  // Pass current message to floating bar
+          initialMessage={message}
         />
       )}
       
@@ -169,13 +168,7 @@ const Chat: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
-            {showFixedInputBar && (
-              <div className="max-w-3xl mx-auto w-full px-4 py-4">
-                <form onSubmit={handleSendMessage}>
-                  <MessageInputBar />
-                </form>
-              </div>
-            )}
+            {/* Fixed input bar completely removed from conversation view */}
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
@@ -240,4 +233,3 @@ const Chat: React.FC = () => {
 };
 
 export default Chat;
-
