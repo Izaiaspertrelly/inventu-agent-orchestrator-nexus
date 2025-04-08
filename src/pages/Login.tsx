@@ -15,7 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirecionar se já estiver autenticado
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
@@ -38,7 +38,7 @@ const Login = () => {
     
     try {
       await login(email, password);
-      navigate("/"); // Explicitamente navegar para a página principal após login
+      navigate("/"); // Explicitly navigate to home page after login
     } catch (error) {
       toast({
         title: "Falha no login",
@@ -51,20 +51,22 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-inventu-background dark">
-      <div className="w-full max-w-md m-auto glass-panel p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold inventu-gradient-text mb-2">
-            Inventu Super Agent
+    <div className="flex min-h-screen bg-black">
+      <div className="relative w-full max-w-md m-auto neo-blur p-8 rounded-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-inventu-primary/20 to-inventu-secondary/20 rounded-2xl backdrop-blur-3xl -z-10"></div>
+        
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-bold text-white mb-2">
+            Inventor
           </h2>
-          <p className="text-muted-foreground">
-            Entre para acessar sua experiência de IA personalizada
+          <p className="text-white/80 text-lg">
+            Super Agent
           </p>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-white/90">Email</Label>
             <Input
               id="email"
               type="email"
@@ -72,11 +74,12 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-inventu-primary"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password" className="text-white/90">Senha</Label>
             <Input
               id="password"
               type="password"
@@ -84,21 +87,17 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-inventu-primary"
             />
           </div>
           
           <Button
             type="submit"
-            className="w-full inventu-btn py-5"
+            className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 py-6 rounded-xl backdrop-blur-sm mt-6 font-medium transition-all"
             disabled={isLoading}
           >
             {isLoading ? "Entrando..." : "Entrar"}
           </Button>
-          
-          <div className="pt-4 text-center text-sm text-muted-foreground">
-            <p>Admin: admin@inventu.com / admin123</p>
-            <p>Usuário: user@inventu.com / user123</p>
-          </div>
         </form>
       </div>
     </div>
