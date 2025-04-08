@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
 import { Check, X, ToggleRight, ToggleLeft, Paperclip } from "lucide-react";
@@ -15,6 +16,8 @@ const Index = () => {
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("inventu_user") || "{}");
@@ -54,6 +57,14 @@ const Index = () => {
     const tempMessage = message;
     setMessage("");
     
+    // Show file information in toast if file is selected
+    if (selectedFile) {
+      toast({
+        title: "Arquivo anexado",
+        description: `${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`,
+      });
+    }
+    
     createNewChat();
     
     navigate("/chat");
@@ -72,10 +83,19 @@ const Index = () => {
   
   const handleAttachmentClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    toast({
-      title: "Anexos",
-      description: "Funcionalidade de anexos será implementada em breve.",
-    });
+    // Trigger the hidden file input click
+    fileInputRef.current?.click();
+  };
+  
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      toast({
+        title: "Arquivo selecionado",
+        description: `${file.name} (${Math.round(file.size / 1024)} KB)`,
+      });
+    }
   };
   
   return (
@@ -131,6 +151,16 @@ const Index = () => {
                     <Paperclip className="h-4 w-4" />
                   </button>
                   
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                    // Accept various file types
+                    accept="image/*,application/pdf,application/msword,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  />
+                  
                   <button 
                     type="submit"
                     className="bg-primary hover:bg-primary/90 text-primary-foreground p-2.5 rounded-full transition-colors"
@@ -142,6 +172,23 @@ const Index = () => {
                 </div>
               </div>
             </form>
+            
+            {/* File preview display when a file is selected */}
+            {selectedFile && (
+              <div className="px-4 py-2 bg-secondary/30 rounded-lg mt-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Paperclip className="h-4 w-4" />
+                  <span className="text-sm truncate max-w-[250px]">{selectedFile.name}</span>
+                  <span className="text-xs text-muted-foreground">({Math.round(selectedFile.size / 1024)} KB)</span>
+                </div>
+                <button 
+                  onClick={() => setSelectedFile(null)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
             
             <div className="w-full p-3 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
               <div className="rounded-xl bg-secondary/70 p-2 mr-3">
