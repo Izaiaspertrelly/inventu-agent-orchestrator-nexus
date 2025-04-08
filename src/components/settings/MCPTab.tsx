@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
@@ -31,24 +30,20 @@ const MCPTab = () => {
   const { toast } = useToast();
   const { mcpConfig, updateMCPConfig, addMCPTool, removeMCPTool } = useAgent();
   
-  // State for MCP configuration
   const [mcpServerUrl, setMcpServerUrl] = useState(mcpConfig.serverUrl);
   const [mcpApiKey, setMcpApiKey] = useState(mcpConfig.apiKey || "");
   
-  // Dialog state
   const [toolDialogOpen, setToolDialogOpen] = useState(false);
   
-  // New tool state
   const [newTool, setNewTool] = useState<Partial<MCPTool>>({
     name: "",
     description: "",
     endpoint: "",
-    method: "GET", // Default method
+    method: "GET",
     parameters: "",
     authKey: "",
   });
 
-  // Handle MCP config update
   const handleUpdateMCPConfig = () => {
     updateMCPConfig({
       serverUrl: mcpServerUrl,
@@ -61,7 +56,6 @@ const MCPTab = () => {
     });
   };
 
-  // Handle adding a new tool
   const handleAddTool = () => {
     if (!newTool.name || !newTool.endpoint) {
       toast({
@@ -77,7 +71,7 @@ const MCPTab = () => {
       name: newTool.name || "Nova Ferramenta",
       description: newTool.description || "Descrição da ferramenta",
       endpoint: newTool.endpoint || "/api/tool",
-      method: newTool.method || "GET", // Add method with default value
+      method: newTool.method || "GET",
       parameters: newTool.parameters || "",
       authKey: newTool.authKey,
     };
