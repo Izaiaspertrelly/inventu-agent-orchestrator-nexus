@@ -47,7 +47,7 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
   const availableProviders = [...new Set(models.map(model => model.providerId))];
   
   // Check if we're loading models for the selected provider
-  const isLoading = isLoadingModels[selectedProviderId] || false;
+  const isLoading = selectedProviderId ? isLoadingModels[selectedProviderId] || false : false;
   
   return (
     <div className="space-y-4">

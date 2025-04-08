@@ -92,7 +92,6 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
           
           <ModelSelection
             agent={agent}
-            modelId={agent.modelId}
             models={models}
             availableProviderModels={availableProviderModels}
             isLoadingModels={isLoadingModels}
