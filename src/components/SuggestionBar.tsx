@@ -32,14 +32,15 @@ const SuggestionBar: React.FC = () => {
       className="relative w-full max-w-3xl mx-auto cursor-pointer"
       onClick={handleSuggestionClick}
     >
-      <div className="flex items-center gap-1 bg-black/90 text-white py-4 px-6 rounded-full transition-all hover:bg-black/75">
-        <Quote className="h-5 w-5 flex-shrink-0 text-primary -rotate-180 mr-1" />
-        <p className="text-base font-medium flex-1 truncate">{suggestions[currentIndex]}</p>
-        <Quote className="h-5 w-5 flex-shrink-0 text-primary ml-1" />
+      <div className="bg-black/90 text-white py-4 px-6 rounded-full transition-all hover:bg-black/75">
+        <p className="text-base font-medium flex items-center justify-center">
+          <Quote className="h-5 w-5 flex-shrink-0 text-primary -rotate-180 inline-block mr-0.5" />
+          <span className="mx-0.5">{suggestions[currentIndex]}</span>
+          <Quote className="h-5 w-5 flex-shrink-0 text-primary inline-block ml-0.5" />
+        </p>
       </div>
     </div>
   );
 };
 
 export default SuggestionBar;
-
