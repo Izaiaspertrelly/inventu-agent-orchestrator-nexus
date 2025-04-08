@@ -13,6 +13,7 @@ import Login from "@/pages/Login";
 import Index from "@/pages/Index";
 import Chat from "@/pages/Chat";
 import AdminSettings from "@/pages/AdminSettings";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
 // Create a new QueryClient instance
@@ -51,6 +52,14 @@ const App = () => {
                     element={
                       <ProtectedRoute allowedRoles={["admin"]}>
                         <AdminSettings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
                       </ProtectedRoute>
                     }
                   />
