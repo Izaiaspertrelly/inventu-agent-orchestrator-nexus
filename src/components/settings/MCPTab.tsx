@@ -6,6 +6,8 @@ import { MCPTool } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import MCPConfigCard from "./mcp/MCPConfigCard";
 import MCPToolsList from "./mcp/MCPToolsList";
+import MCPToolTestDialog from "./mcp/MCPToolTestDialog";
+import { executeMCPTool } from "@/contexts/agent/agentUtils";
 
 const MCPTab = () => {
   const { toast } = useToast();
@@ -16,6 +18,9 @@ const MCPTab = () => {
   
   const [toolDialogOpen, setToolDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
+  const [selectedTestTool, setSelectedTestTool] = useState<MCPTool | null>(null);
   
   const [newTool, setNewTool] = useState<Partial<MCPTool>>({
     name: "",
@@ -114,6 +119,32 @@ const MCPTab = () => {
     setNewTool({ ...tool });
     setToolDialogOpen(true);
   };
+  
+  const handleTestTool = (tool: MCPTool) => {
+    setSelectedTestTool(tool);
+    setTestDialogOpen(true);
+  };
+  
+  const executeToolTest = async (parameters: string) => {
+    if (!selectedTestTool) {
+      throw new Error("No tool selected for testing");
+    }
+    
+    if (!mcpConfig.serverUrl) {
+      throw new Error("MCP Server URL not configured");
+    }
+    
+    let params = {};
+    try {
+      params = parameters ? JSON.parse(parameters) : {};
+    } catch (error) {
+      throw new Error("Invalid JSON parameters");
+    }
+    
+    // Use the executeMCPTool function from agentUtils
+    const result = await executeMCPTool(selectedTestTool, params);
+    return result;
+  };
 
   return (
     <div className="space-y-6">
@@ -134,6 +165,14 @@ const MCPTab = () => {
         onAddTool={handleAddTool}
         onDeleteTool={handleDeleteTool}
         onEditTool={handleEditTool}
+        onTestTool={handleTestTool}
+      />
+      
+      <MCPToolTestDialog
+        open={testDialogOpen}
+        onOpenChange={setTestDialogOpen}
+        tool={selectedTestTool}
+        onTest={executeToolTest}
       />
     </div>
   );

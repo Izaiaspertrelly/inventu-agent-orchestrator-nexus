@@ -6,7 +6,8 @@ import { MCPTool } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import MCPConfigCard from "@/components/settings/mcp/MCPConfigCard";
 import MCPToolsList from "@/components/settings/mcp/MCPToolsList";
-import MCPToolDialog from "@/components/settings/mcp/MCPToolDialog";
+import MCPToolTestDialog from "@/components/settings/mcp/MCPToolTestDialog";
+import { executeMCPTool } from "@/contexts/agent/agentUtils";
 
 const MCPSection: React.FC = () => {
   const { toast } = useToast();
@@ -22,6 +23,9 @@ const MCPSection: React.FC = () => {
   
   const [toolDialogOpen, setToolDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
+  const [selectedTestTool, setSelectedTestTool] = useState<MCPTool | null>(null);
   
   const [newTool, setNewTool] = useState<Partial<MCPTool>>({
     name: "",
@@ -120,6 +124,32 @@ const MCPSection: React.FC = () => {
     setNewTool({ ...tool });
     setToolDialogOpen(true);
   };
+  
+  const handleTestTool = (tool: MCPTool) => {
+    setSelectedTestTool(tool);
+    setTestDialogOpen(true);
+  };
+  
+  const executeToolTest = async (parameters: string) => {
+    if (!selectedTestTool) {
+      throw new Error("No tool selected for testing");
+    }
+    
+    if (!mcpConfig.serverUrl) {
+      throw new Error("MCP Server URL not configured");
+    }
+    
+    let params = {};
+    try {
+      params = parameters ? JSON.parse(parameters) : {};
+    } catch (error) {
+      throw new Error("Invalid JSON parameters");
+    }
+    
+    // Use the executeMCPTool function from agentUtils
+    const result = await executeMCPTool(selectedTestTool, params);
+    return result;
+  };
 
   return (
     <>
@@ -141,8 +171,16 @@ const MCPSection: React.FC = () => {
           onAddTool={handleAddTool}
           onDeleteTool={handleDeleteTool}
           onEditTool={handleEditTool}
+          onTestTool={handleTestTool}
         />
       </div>
+      
+      <MCPToolTestDialog
+        open={testDialogOpen}
+        onOpenChange={setTestDialogOpen}
+        tool={selectedTestTool}
+        onTest={executeToolTest}
+      />
     </>
   );
 };

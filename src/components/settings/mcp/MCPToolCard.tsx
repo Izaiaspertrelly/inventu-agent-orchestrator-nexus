@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Trash, Pencil } from "lucide-react";
+import { Trash, Pencil, Play } from "lucide-react";
 import { MCPTool } from "@/types";
 import {
   Card,
@@ -15,9 +15,10 @@ interface MCPToolCardProps {
   tool: MCPTool;
   onDelete: (id: string) => void;
   onEdit: (tool: MCPTool) => void;
+  onTest: (tool: MCPTool) => void;
 }
 
-const MCPToolCard: React.FC<MCPToolCardProps> = ({ tool, onDelete, onEdit }) => {
+const MCPToolCard: React.FC<MCPToolCardProps> = ({ tool, onDelete, onEdit, onTest }) => {
   return (
     <Card key={tool.id}>
       <CardHeader className="pb-2">
@@ -27,7 +28,16 @@ const MCPToolCard: React.FC<MCPToolCardProps> = ({ tool, onDelete, onEdit }) => 
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => onTest(tool)}
+              title="Testar ferramenta"
+            >
+              <Play className="h-4 w-4 text-green-600" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => onEdit(tool)}
+              title="Editar ferramenta"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -35,6 +45,7 @@ const MCPToolCard: React.FC<MCPToolCardProps> = ({ tool, onDelete, onEdit }) => 
               variant="ghost"
               size="icon"
               onClick={() => onDelete(tool.id)}
+              title="Remover ferramenta"
             >
               <Trash className="h-4 w-4" />
             </Button>

@@ -15,6 +15,7 @@ interface MCPToolsListProps {
   onAddTool: () => void;
   onDeleteTool: (id: string) => void;
   onEditTool: (tool: MCPTool) => void;
+  onTestTool: (tool: MCPTool) => void;
 }
 
 const MCPToolsList: React.FC<MCPToolsListProps> = ({
@@ -26,6 +27,7 @@ const MCPToolsList: React.FC<MCPToolsListProps> = ({
   onAddTool,
   onDeleteTool,
   onEditTool,
+  onTestTool,
 }) => {
   return (
     <div className="pt-4">
@@ -57,6 +59,7 @@ const MCPToolsList: React.FC<MCPToolsListProps> = ({
               tool={tool} 
               onDelete={onDeleteTool}
               onEdit={onEditTool}
+              onTest={onTestTool}
             />
           ))}
         </div>
