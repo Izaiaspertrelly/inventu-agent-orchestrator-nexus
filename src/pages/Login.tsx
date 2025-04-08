@@ -97,7 +97,7 @@ const Login = () => {
             
             <Button
               type="submit"
-              className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/10 py-6 rounded-xl backdrop-blur-sm mt-6 font-apple-medium text-apple-base transition-all"
+              className="w-full bg-transparent border-white/20 text-white/80 hover:bg-white/10 py-5 rounded-lg font-apple-medium text-apple-sm transition-all"
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
@@ -110,3 +110,4 @@ const Login = () => {
 };
 
 export default Login;
+
