@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
@@ -92,7 +93,7 @@ const Index = () => {
         <div className="relative max-w-2xl w-full mx-auto mb-8">
           <div className="flex flex-col gap-4">
             <form onSubmit={handleSendMessage}>
-              <div className="relative border border-border/50 rounded-full">
+              <div className={`relative border border-border/50 rounded-full ${isVibrating ? 'animate-vibrate' : ''}`}>
                 <SearchBarInput 
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
