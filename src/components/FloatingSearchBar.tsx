@@ -1,13 +1,14 @@
 
 import React, { useState, useRef } from "react";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import DraggableContainer from "./draggable/DraggableContainer";
 import SearchBarInput from "./search/SearchBarInput";
 import SearchBarActions from "./search/SearchBarActions";
+import FilePreview from "./search/FilePreview";
+import { useFileAttachment } from "@/hooks/use-file-attachment";
 
 interface FloatingSearchBarProps {
-  onSend: (message: string) => void;
+  onSend: (message: string, file?: File | null) => void;
   initialMessage?: string;
 }
 
@@ -21,6 +22,15 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   const { toast } = useToast();
   const logoRef = useRef<HTMLImageElement>(null);
   
+  // Use the shared file attachment hook
+  const {
+    selectedFile,
+    fileInputRef,
+    handleAttachmentClick,
+    handleFileSelect,
+    clearSelectedFile
+  } = useFileAttachment();
+  
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -32,8 +42,10 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       });
     }
     
-    onSend(message);
+    // Pass both message and file to the onSend callback
+    onSend(message, selectedFile);
     setMessage("");
+    clearSelectedFile();
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -81,29 +93,42 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         </div>
 
         {/* Search bar content - visible when not minimized */}
-        <form 
-          onSubmit={handleSendMessage} 
-          className={`flex items-center flex-1 px-2 transition-all duration-300`}
+        <div 
+          className={`flex flex-col w-full transition-all duration-300`}
           style={{ 
             opacity: isMinimized ? 0 : 1,
             width: isMinimized ? '0' : 'auto',
             pointerEvents: isMinimized ? 'none' : 'auto',
           }}
         >
-          <SearchBarInput 
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            isSuperAgentEnabled={superAgentEnabled}
-            onClick={(e) => e.stopPropagation()}
-          />
+          <form 
+            onSubmit={handleSendMessage} 
+            className="flex items-center flex-1 px-2"
+          >
+            <SearchBarInput 
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              isSuperAgentEnabled={superAgentEnabled}
+              onClick={(e) => e.stopPropagation()}
+            />
+            
+            <SearchBarActions 
+              isSuperAgentEnabled={superAgentEnabled}
+              onToggleSuperAgent={toggleSuperAgent}
+              onSubmit={handleSendMessage}
+              onAttachmentClick={handleAttachmentClick}
+              fileInputRef={fileInputRef}
+            />
+          </form>
           
-          <SearchBarActions 
-            isSuperAgentEnabled={superAgentEnabled}
-            onToggleSuperAgent={toggleSuperAgent}
-            onSubmit={handleSendMessage}
-          />
-        </form>
+          {/* File preview display when a file is selected */}
+          {selectedFile && (
+            <div className="px-2 pb-1">
+              <FilePreview file={selectedFile} onClear={clearSelectedFile} />
+            </div>
+          )}
+        </div>
       </div>
     </DraggableContainer>
   );

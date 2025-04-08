@@ -26,8 +26,9 @@ const Chat: React.FC = () => {
     }
   }, [activeChat, createNewChat]);
   
-  const handleFloatingSearch = (searchText: string) => {
-    sendMessage(searchText);
+  const handleFloatingSearch = (searchText: string, file: File | null) => {
+    // Now we also pass any selected file
+    sendMessage(searchText, file);
   };
   
   return (

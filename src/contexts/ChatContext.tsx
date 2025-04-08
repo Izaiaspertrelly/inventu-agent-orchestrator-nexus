@@ -64,19 +64,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, file?: File | null) => {
     if (!activeChat) return;
     
-    if (!content.trim()) {
+    if (!content.trim() && !file) {
       toast({
-        description: "Por favor, digite uma mensagem",
+        description: "Por favor, digite uma mensagem ou anexe um arquivo",
         variant: "destructive",
       });
       return;
     }
     
     // Create user message
-    const userMessage = createUserMessage(content);
+    let messageContent = content;
+    
+    // If there's a file, add information about it to the message
+    if (file) {
+      messageContent += `\n\n[Arquivo anexado: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
+    }
+    
+    const userMessage = createUserMessage(messageContent);
     
     // Update chat with user message
     const updatedMessages = [...activeChat.messages, userMessage];

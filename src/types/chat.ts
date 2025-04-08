@@ -6,7 +6,7 @@ export interface ChatContextType {
   activeChat: Chat | null;
   setActiveChat: (chatId: string) => void;
   createNewChat: () => void;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, file?: File | null) => Promise<void>;
   removeChat: (chatId: string) => void;
 }
 

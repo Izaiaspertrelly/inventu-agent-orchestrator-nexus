@@ -6,13 +6,17 @@ interface SearchBarActionsProps {
   isSuperAgentEnabled: boolean;
   onToggleSuperAgent: (e: React.MouseEvent) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onAttachmentClick?: (e: React.MouseEvent) => void;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
   onClose?: (e: React.MouseEvent) => void;
 }
 
 const SearchBarActions: React.FC<SearchBarActionsProps> = ({
   isSuperAgentEnabled,
   onToggleSuperAgent,
-  onSubmit
+  onSubmit,
+  onAttachmentClick,
+  fileInputRef
 }) => {
   return (
     <div className="flex items-center gap-2 pl-2">
@@ -32,10 +36,19 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
         type="button"
         className="bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md text-foreground p-2 rounded-full transition-colors"
         title="Anexar arquivo"
-        onClick={(e) => e.stopPropagation()}
+        onClick={onAttachmentClick}
       >
         <Paperclip className="h-4 w-4" />
       </button>
+      
+      {fileInputRef && (
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept="image/*,application/pdf,application/msword,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        />
+      )}
       
       <button 
         type="submit"

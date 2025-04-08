@@ -1,10 +1,13 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
 import { Check, X, ToggleRight, ToggleLeft, Paperclip } from "lucide-react";
 import SuggestionBar from "@/components/SuggestionBar";
 import SearchBarInput from "@/components/search/SearchBarInput";
+import SearchBarActions from "@/components/search/SearchBarActions";
+import FilePreview from "@/components/search/FilePreview";
+import { useFileAttachment } from "@/hooks/use-file-attachment";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -16,8 +19,15 @@ const Index = () => {
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Use the shared file attachment hook
+  const {
+    selectedFile,
+    fileInputRef,
+    handleAttachmentClick,
+    handleFileSelect,
+    clearSelectedFile
+  } = useFileAttachment();
   
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("inventu_user") || "{}");
@@ -45,7 +55,7 @@ const Index = () => {
   
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() && !selectedFile) return;
     
     if (superAgentEnabled) {
       toast({
@@ -57,20 +67,17 @@ const Index = () => {
     const tempMessage = message;
     setMessage("");
     
-    // Show file information in toast if file is selected
-    if (selectedFile) {
-      toast({
-        title: "Arquivo anexado",
-        description: `${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`,
-      });
-    }
+    // Store the file before clearing it
+    const tempFile = selectedFile;
+    clearSelectedFile();
     
+    // Create new chat and navigate
     createNewChat();
-    
     navigate("/chat");
     
+    // Send message with delay to ensure navigation is complete
     setTimeout(() => {
-      sendMessage(tempMessage);
+      sendMessage(tempMessage, tempFile);
     }, 100);
   };
 
@@ -78,23 +85,6 @@ const Index = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage(e as unknown as React.FormEvent);
-    }
-  };
-  
-  const handleAttachmentClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Trigger the hidden file input click
-    fileInputRef.current?.click();
-  };
-  
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      toast({
-        title: "Arquivo selecionado",
-        description: `${file.name} (${Math.round(file.size / 1024)} KB)`,
-      });
     }
   };
   
@@ -130,64 +120,20 @@ const Index = () => {
                 />
                 
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                  <div 
-                    className={`flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs ${superAgentEnabled ? 'text-blue-500 font-semibold' : ''}`}
-                    onClick={toggleSuperAgent} 
-                    title="Ativar/Desativar God Mode"
-                  >
-                    {superAgentEnabled ? 
-                      <ToggleRight className="h-3.5 w-3.5" /> : 
-                      <ToggleLeft className="h-3.5 w-3.5" />
-                    }
-                    <span className="font-medium ml-1">God Mode</span>
-                  </div>
-                  
-                  <button 
-                    type="button"
-                    className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2 rounded-full transition-colors"
-                    onClick={handleAttachmentClick}
-                    title="Anexar arquivo"
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </button>
-                  
-                  {/* Hidden file input */}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    style={{ display: 'none' }}
-                    // Accept various file types
-                    accept="image/*,application/pdf,application/msword,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  <SearchBarActions 
+                    isSuperAgentEnabled={superAgentEnabled}
+                    onToggleSuperAgent={toggleSuperAgent}
+                    onSubmit={handleSendMessage}
+                    onAttachmentClick={handleAttachmentClick}
+                    fileInputRef={fileInputRef}
                   />
-                  
-                  <button 
-                    type="submit"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground p-2.5 rounded-full transition-colors"
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </form>
             
-            {/* File preview display when a file is selected */}
+            {/* File preview when a file is selected */}
             {selectedFile && (
-              <div className="px-4 py-2 bg-secondary/30 rounded-lg mt-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Paperclip className="h-4 w-4" />
-                  <span className="text-sm truncate max-w-[250px]">{selectedFile.name}</span>
-                  <span className="text-xs text-muted-foreground">({Math.round(selectedFile.size / 1024)} KB)</span>
-                </div>
-                <button 
-                  onClick={() => setSelectedFile(null)}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+              <FilePreview file={selectedFile} onClear={clearSelectedFile} />
             )}
             
             <div className="w-full p-3 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
