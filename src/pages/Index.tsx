@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X } from "lucide-react";
+import { Check, X, ToggleRight, ToggleLeft } from "lucide-react";
 import SuggestionBar from "@/components/SuggestionBar";
 import SearchBarInput from "@/components/search/SearchBarInput";
 import { useNavigate } from "react-router-dom";
@@ -18,11 +17,9 @@ const Index = () => {
   const [isVibrating, setIsVibrating] = useState(false);
   
   useEffect(() => {
-    // Load user data
     const user = JSON.parse(localStorage.getItem("inventu_user") || "{}");
     setUserName(user.name || "");
     
-    // Set greeting based on time of day
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Bom dia");
     else if (hour < 18) setGreeting("Boa tarde");
@@ -54,17 +51,13 @@ const Index = () => {
       });
     }
     
-    // Create a new chat and navigate to it
     const tempMessage = message;
     setMessage("");
     
-    // Create a new chat if needed
     createNewChat();
     
-    // Navigate to chat page and then send message
     navigate("/chat");
     
-    // Send the message after navigation
     setTimeout(() => {
       sendMessage(tempMessage);
     }, 100);
@@ -115,15 +108,8 @@ const Index = () => {
                     title="Ativar/Desativar God Mode"
                   >
                     {superAgentEnabled ? 
-                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34" />
-                        <path d="m14 3 7 7-7 7" />
-                      </svg> : 
-                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <path d="M16 17H9V7h7" />
-                        <path d="m12 3 4 4-4 4" />
-                      </svg>
+                      <ToggleRight className="h-3.5 w-3.5" /> : 
+                      <ToggleLeft className="h-3.5 w-3.5" />
                     }
                     <span className="font-medium ml-1">God Mode</span>
                   </div>
