@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
@@ -13,6 +13,7 @@ const Chat: React.FC = () => {
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
   const [message, setMessage] = useState("");
+  const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (!activeChat) {
@@ -27,6 +28,88 @@ const Chat: React.FC = () => {
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
   }, [activeChat, createNewChat]);
+  
+  useEffect(() => {
+    // Create neural network animation effect
+    if (animationRef.current) {
+      const logoContainer = animationRef.current;
+      const dots = Array.from({ length: 22 }).map(() => {
+        // Create 22 dots with different sizes and positions
+        const dot = document.createElement('div');
+        
+        // Random dot properties
+        const size = Math.random() * 4 + 2; // 2px to 6px
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.backgroundColor = '#007AFF'; // Bright blue color
+        dot.style.borderRadius = '50%';
+        dot.style.position = 'absolute';
+        
+        // Distribute dots in a circular pattern around center point
+        const angle = Math.random() * Math.PI * 2; // Random angle around circle
+        const distance = Math.random() * 25 + 10; // Random distance from center (10px to 35px)
+        const x = Math.cos(angle) * distance + 50; // Center X + offset (where 50 is center)
+        const y = Math.sin(angle) * distance + 50; // Center Y + offset (where 50 is center)
+        
+        dot.style.left = `${x}%`;
+        dot.style.top = `${y}%`;
+        dot.style.opacity = (Math.random() * 0.5 + 0.5).toString(); // 0.5 to 1.0 opacity
+        
+        // Adding animation with unique timing for each dot
+        dot.style.transition = 'transform 2s ease-in-out';
+        
+        // Store original position for animation reference
+        dot.dataset.originX = x.toString();
+        dot.dataset.originY = y.toString();
+        dot.dataset.animated = 'true';
+        
+        // Individual animation parameters
+        dot.dataset.amplitude = ((Math.random() * 3) + 1).toString(); // 1-4px movement range
+        dot.dataset.speed = ((Math.random() * 3) + 2).toString(); // 2-5s cycle time
+        dot.dataset.directionX = (Math.random() > 0.5 ? 1 : -1).toString();
+        dot.dataset.directionY = (Math.random() > 0.5 ? 1 : -1).toString();
+        dot.dataset.offset = (Math.random() * Math.PI * 2).toString(); // Random start position in animation cycle
+        
+        return dot;
+      });
+      
+      // Clear any existing content and add new dots
+      logoContainer.innerHTML = '';
+      dots.forEach(dot => logoContainer.appendChild(dot));
+      
+      // Animation function
+      let animationFrame: number;
+      const animate = () => {
+        const time = Date.now() / 1000; // Current time in seconds
+        
+        dots.forEach(dot => {
+          if (dot.dataset.animated === 'true') {
+            const amplitude = parseFloat(dot.dataset.amplitude || '2');
+            const speed = parseFloat(dot.dataset.speed || '3');
+            const dirX = parseFloat(dot.dataset.directionX || '1');
+            const dirY = parseFloat(dot.dataset.directionY || '1');
+            const offset = parseFloat(dot.dataset.offset || '0');
+            
+            // Slight sinusoidal movement
+            const dx = dirX * amplitude * Math.sin(time / speed + offset);
+            const dy = dirY * amplitude * Math.sin(time / (speed * 1.3) + offset);
+            
+            dot.style.transform = `translate(${dx}px, ${dy}px)`;
+          }
+        });
+        
+        animationFrame = requestAnimationFrame(animate);
+      };
+      
+      // Start animation
+      animate();
+      
+      // Cleanup function
+      return () => {
+        cancelAnimationFrame(animationFrame);
+      };
+    }
+  }, []);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,14 +183,16 @@ const Chat: React.FC = () => {
             <div className="flex-1 flex flex-col items-center justify-center p-4">
               <div className="text-center max-w-2xl">
                 <div className="flex justify-center mb-2">
-                  <img 
-                    src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
-                    alt="Super Agent Logo" 
-                    className="w-32 h-32 object-contain"
-                  />
+                  <div className="relative w-32 h-32" ref={animationRef}>
+                    <img 
+                      src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
+                      alt="Super Agent Logo" 
+                      className="w-32 h-32 object-contain opacity-0"
+                    />
+                  </div>
                 </div>
                 
-                <div className="flex flex-col items-center mb-8">
+                <div className="flex flex-col items-center mb-2">
                   <h1 className="text-4xl font-bold mb-2 tracking-tight">
                     <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"}
                   </h1>
