@@ -1,0 +1,24 @@
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      port:
+        type: number
+        default: 3000
+      apiKey:
+        type: string
+        description: "API key for authentication"
+  commandFunction: |
+    (config) => {
+      return {
+        command: "node",
+        args: ["index.js"],
+        env: {
+          PORT: config.port.toString(),
+          API_KEY: config.apiKey || "",
+          NODE_ENV: "production"
+        }
+      };
+    }
