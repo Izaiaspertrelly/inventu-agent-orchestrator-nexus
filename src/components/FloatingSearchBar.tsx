@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DraggableContainer from "./draggable/DraggableContainer";
@@ -111,15 +110,13 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
               />
             </div>
             
-            <div className="ml-auto">
-              <SearchBarActions 
-                isSuperAgentEnabled={superAgentEnabled}
-                onToggleSuperAgent={toggleSuperAgent}
-                onSubmit={handleSendMessage}
-                onAttachmentClick={handleAttachmentClick}
-                fileInputRef={fileInputRef}
-              />
-            </div>
+            <SearchBarActions 
+              isSuperAgentEnabled={superAgentEnabled}
+              onToggleSuperAgent={toggleSuperAgent}
+              onSubmit={handleSendMessage}
+              onAttachmentClick={handleAttachmentClick}
+              fileInputRef={fileInputRef}
+            />
           </form>
           
           {selectedFile && (
