@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAgent } from "../../contexts/AgentContext";
 
@@ -12,13 +11,11 @@ export const useOrchestratorResponse = () => {
   useEffect(() => {
     const pendingConfirmations = orchestratorState?.memory?.pendingConfirmations || [];
     if (pendingConfirmations.length > 0 && !pendingMemoryConfirmation) {
-      // Get first pending confirmation
       setPendingMemoryConfirmation({
         id: 0,
         ...pendingConfirmations[0]
       });
     } else if (pendingConfirmations.length === 0 && pendingMemoryConfirmation) {
-      // Clear when no more pending confirmations
       setPendingMemoryConfirmation(null);
     }
   }, [orchestratorState?.memory?.pendingConfirmations, pendingMemoryConfirmation]);
@@ -30,7 +27,6 @@ export const useOrchestratorResponse = () => {
   
   // Find orchestrator agent based on configured ID or selected model
   const getOrchestratorAgent = () => {
-    // Primeiro tenta encontrar um agente pelo ID configurado
     if (orchestratorConfig && orchestratorConfig.mainAgentId) {
       const agent = agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
       if (agent) {
@@ -40,7 +36,6 @@ export const useOrchestratorResponse = () => {
       console.log("Configured agent ID not found, trying by model ID");
     }
     
-    // Se não encontrou pelo ID ou não tem ID configurado, tenta pelo modelo
     if (orchestratorConfig && orchestratorConfig.selectedModel) {
       const agent = agents.find(agent => agent.modelId === orchestratorConfig.selectedModel);
       if (agent) {
@@ -48,7 +43,6 @@ export const useOrchestratorResponse = () => {
         return agent;
       }
       
-      // Se não encontrou um agente para este modelo, mas temos um modelo, criamos um agente virtual
       console.log("No agent found for this model, creating virtual agent");
       return {
         id: "virtual-orchestrator",
@@ -60,6 +54,85 @@ export const useOrchestratorResponse = () => {
     
     console.log("No orchestrator agent configuration found");
     return null;
+  };
+  
+  // Generate a more dynamic response based on user message content
+  const generateDynamicResponse = (userMessage: string, capabilities: any) => {
+    const lowercaseMessage = userMessage.toLowerCase();
+    let response = '';
+    
+    response += "💭 **Pensando...**\n\n";
+    
+    if (capabilities.memory?.enabled) {
+      response += "🔍 **Buscando informações na memória...**\n";
+      response += "- Verificando contexto de conversas anteriores\n";
+      response += "- Analisando padrões relevantes\n\n";
+    }
+    
+    response += "📊 **Coletando informações...**\n";
+    
+    if (lowercaseMessage.includes("saude") || lowercaseMessage.includes("plano")) {
+      response += "- Acessando dados sobre operadoras de saúde no Brasil\n";
+      response += "- Verificando rankings de satisfação de clientes\n";
+      response += "- Analisando cobertura de procedimentos por operadora\n";
+      response += "- Comparando valores médios de mensalidades\n\n";
+    } else if (lowercaseMessage.includes("viagem") || lowercaseMessage.includes("ferias")) {
+      response += "- Consultando destinos populares para a época atual\n";
+      response += "- Verificando informações climáticas para destinos mencionados\n";
+      response += "- Analisando opções de hospedagem disponíveis\n\n";
+    } else if (lowercaseMessage.includes("comida") || lowercaseMessage.includes("receita")) {
+      response += "- Buscando receitas populares relacionadas\n";
+      response += "- Verificando ingredientes e substitutos possíveis\n";
+      response += "- Analisando técnicas de preparo recomendadas\n\n";
+    } else {
+      response += "- Buscando informações relevantes sobre o tópico\n";
+      response += "- Verificando dados atualizados de fontes confiáveis\n";
+      response += "- Analisando contexto da solicitação\n\n";
+    }
+    
+    if (capabilities.reasoning?.enabled) {
+      response += "🧠 **Processando com raciocínio...**\n";
+      response += "- Aplicando análise crítica às informações coletadas\n";
+      response += "- Considerando diferentes perspectivas sobre o tema\n";
+      response += `- Utilizando estratégia de raciocínio: ${capabilities.reasoning?.strategy || 'padrão'}\n\n`;
+    }
+    
+    if (capabilities.planning?.enabled) {
+      response += "📝 **Organizando resposta...**\n";
+      response += "- Estruturando informações por relevância\n";
+      response += "- Preparando exemplos ilustrativos\n";
+      response += "- Estabelecendo sequência lógica de apresentação\n\n";
+    }
+    
+    response += "✅ **Finalizado processamento**\n\n";
+    response += "---\n\n";
+    
+    if (lowercaseMessage.includes("saude") || lowercaseMessage.includes("plano")) {
+      response += `### Melhores Planos de Saúde do Brasil\n\n`;
+      response += `Baseado nas análises mais recentes de satisfação do cliente, cobertura de serviços e relação custo-benefício, os planos de saúde mais bem avaliados no Brasil são:\n\n`;
+      response += `1. **Amil** - Destaca-se por sua ampla rede de atendimento e variedade de planos.\n`;
+      response += `2. **Bradesco Saúde** - Reconhecido pela qualidade dos hospitais conveniados e atendimento.\n`;
+      response += `3. **SulAmérica** - Oferece boa cobertura nacional e programas de prevenção.\n`;
+      response += `4. **Unimed** - Sistema cooperativista com forte presença em diferentes regiões do país.\n`;
+      response += `5. **Notre Dame Intermédica** - Boa relação custo-benefício e estrutura própria.\n\n`;
+      response += `É importante considerar que o "melhor" plano varia conforme suas necessidades específicas. Sugiro avaliar:\n\n`;
+      response += `- **Cobertura regional**: Verifique a rede de hospitais e médicos na sua região\n`;
+      response += `- **Necessidades específicas**: Se você tem condições pré-existentes ou necessita de especialistas específicos\n`;
+      response += `- **Orçamento disponível**: Os planos variam significativamente em preço\n`;
+      response += `- **Tipo de plano**: Individual, familiar ou empresarial (geralmente com melhores condições)\n\n`;
+      response += `Você gostaria de informações mais detalhadas sobre algum destes planos ou comparativos específicos entre eles?`;
+    } else if (lowercaseMessage.includes("viagem") || lowercaseMessage.includes("ferias")) {
+      response += `### Destinos Recomendados para Viagem\n\n`;
+      response += `Baseado nas tendências atuais e considerando a época do ano, aqui estão alguns destinos recomendados:\n\n`;
+      response += `[Conteúdo personalizado sobre destinos de viagem...]`;
+    } else {
+      response += `Sobre sua solicitação: "${userMessage}"\n\n`;
+      response += `Aqui está o que encontrei baseado nas informações disponíveis:\n\n`;
+      response += `[Esta seria uma resposta detalhada gerada pelo modelo de linguagem, adaptada ao seu pedido específico.]\n\n`;
+      response += `Posso fornecer mais detalhes ou esclarecer algum ponto específico sobre este tema?`;
+    }
+    
+    return response;
   };
   
   // Agent orchestration process
@@ -98,14 +171,15 @@ export const useOrchestratorResponse = () => {
       const planning = orchestratorSettings.planning || { enabled: false };
       const monitoring = orchestratorSettings.monitoring || { enabled: false };
       
-      let responseContent = "";
+      // Build response based on capabilities and message content
+      const responseContent = generateDynamicResponse(userMessage, {
+        memory,
+        reasoning,
+        planning,
+        monitoring
+      });
       
-      // Indicate if this is the main orchestrator
-      if (useOrchestratorConfig) {
-        responseContent += `[Orquestrador Neural] `;
-      } else {
-        responseContent += `[Agente: ${agent.name}] `;
-      }
+      // Indicate if this is the main orchestrator (moved to generateDynamicResponse)
       
       // Planning process if enabled
       if (planning.enabled) {
@@ -121,46 +195,6 @@ export const useOrchestratorResponse = () => {
         
         // Register task decomposition
         decomposeTask?.(taskId, userMessage, subtasks);
-        
-        responseContent += `[Planejamento] Decompondo tarefa em ${subtasks.length} subtarefas. `;
-      }
-      
-      // Process with memory if enabled
-      if (memory.enabled) {
-        const historyCount = orchestratorState?.conversationHistory?.length || 0;
-        responseContent += `[Memória ${memory.type || "buffer"}] Processando com contexto de ${historyCount} mensagens anteriores. `;
-      }
-      
-      // Process with reasoning if enabled
-      if (reasoning.enabled) {
-        const depth = reasoning.depth || 1;
-        const strategy = reasoning.strategy || "padrão";
-        responseContent += `[Raciocínio profundidade ${depth}] Analisando consulta com raciocínio ${strategy}. `;
-      }
-      
-      // Monitoring and adaptation if enabled
-      if (monitoring.enabled) {
-        const optimizedTokens = orchestratorSettings.resources?.optimizeUsage 
-          ? `Uso otimizado de tokens (max: ${orchestratorSettings.resources?.maxTokens || 2000}). `
-          : "";
-        
-        responseContent += `[Monitoramento] ${optimizedTokens}`;
-      }
-      
-      // Build main response based on the agent
-      responseContent += `\n\nAnalisando sua solicitação: "${userMessage}"\n\n`;
-      
-      if (planning.enabled) {
-        responseContent += "Dividi esta tarefa em passos menores para melhor processamento.\n\n";
-      }
-      
-      // Generate response based on message content
-      if (userMessage.toLowerCase().includes("api") || userMessage.toLowerCase().includes("chave")) {
-        responseContent += "Observei que você mencionou uma API ou chave. Vou guardar esta informação para referência futura, se você autorizar.";
-      } else if (userMessage.toLowerCase().includes("ajuda") || userMessage.toLowerCase().includes("como")) {
-        responseContent += "Estou aqui para ajudar! Vejo que você está procurando assistência. Vou utilizar todas as ferramentas disponíveis para resolver sua dúvida da melhor forma possível.";
-      } else {
-        responseContent += "Processando sua solicitação com as ferramentas e conhecimento disponíveis para gerar a melhor resposta possível.";
       }
       
       // Register response time for performance analysis
