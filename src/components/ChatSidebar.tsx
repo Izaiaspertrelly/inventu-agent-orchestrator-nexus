@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { 
   Plus, 
   MessageSquare, 
-  Settings, 
   Search, 
   Bell,
   File,
@@ -72,8 +72,10 @@ const ChatSidebar: React.FC = () => {
     navigate("/");
   };
 
-  const handleNavigateToSettings = () => {
-    navigate("/settings");
+  const navigateToAdminPanel = () => {
+    if (isAdmin) {
+      navigate("/admin");
+    }
   };
 
   const sampleChats = [
@@ -207,14 +209,16 @@ const ChatSidebar: React.FC = () => {
               Conversas
             </Button>
             
-            <Button
-              variant="outline"
-              className="w-full justify-start mb-3 rounded-xl"
-              onClick={handleNavigateToSettings}
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Configurações
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                className="w-full justify-start mb-3 rounded-xl"
+                onClick={navigateToAdminPanel}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Painel Admin
+              </Button>
+            )}
             
             <div className="flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-sidebar-accent/50 cursor-pointer transition-colors"
                  onClick={() => setProfileDialogOpen(true)}>
@@ -294,15 +298,17 @@ const ChatSidebar: React.FC = () => {
               <MessageSquare className="h-4 w-4" />
             </Button>
             
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-xl"
-              onClick={handleNavigateToSettings}
-              title="Configurações"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-xl"
+                onClick={navigateToAdminPanel}
+                title="Painel Admin"
+              >
+                <User className="h-4 w-4" />
+              </Button>
+            )}
             
             <Avatar 
               className="w-8 h-8 cursor-pointer" 

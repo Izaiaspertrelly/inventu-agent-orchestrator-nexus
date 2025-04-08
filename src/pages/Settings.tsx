@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SettingsTabs from "@/components/settings/SettingsTabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft, User } from "lucide-react";
@@ -12,6 +12,13 @@ const Settings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  
+  // Redirect non-admin users back to home
+  useEffect(() => {
+    if (user && user.role !== "admin") {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="container mx-auto py-6">
@@ -20,7 +27,7 @@ const Settings = () => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/admin")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

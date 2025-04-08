@@ -10,6 +10,7 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 interface RequestConfig extends RequestInit {
   params?: Record<string, string>;
   withCredentials?: boolean;
+  body?: unknown;
 }
 
 interface ApiResponse<T> {

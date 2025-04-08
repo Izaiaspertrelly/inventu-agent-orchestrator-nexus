@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AgentProvider } from "@/contexts/AgentContext";
 import { ChatProvider } from "@/contexts/ChatContext";
@@ -59,20 +59,15 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <Routes>
+                  {/* Public route */}
                   <Route path="/login" element={<Login />} />
+                  
+                  {/* User routes */}
                   <Route
                     path="/"
                     element={
                       <ProtectedRoute>
                         <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute allowedRoles={["admin"]}>
-                        <AdminDashboard />
                       </ProtectedRoute>
                     }
                   />
@@ -84,14 +79,26 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
+                  
+                  {/* Admin routes */}
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route
                     path="/settings"
                     element={
-                      <ProtectedRoute>
+                      <ProtectedRoute allowedRoles={["admin"]}>
                         <Settings />
                       </ProtectedRoute>
                     }
                   />
+                  
+                  {/* Catch-all */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </TooltipProvider>
