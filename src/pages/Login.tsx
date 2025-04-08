@@ -50,13 +50,17 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F5F5F7]">
+    <div className="flex min-h-screen bg-cover bg-center" 
+         style={{ 
+           backgroundImage: "url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=2400&q=80')", 
+           backgroundSize: "cover" 
+         }}>
       <div className="relative w-full max-w-md m-auto p-0.5 rounded-3xl">
         {/* Animated border gradient effect */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#0EA5E9] via-[#33C3F0] to-[#1EAEDB] opacity-80 animate-border-glow"></div>
         
-        {/* Frosted glass container */}
-        <div className="relative bg-white/60 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/30">
+        {/* Frosted glass container - enhanced */}
+        <div className="relative bg-white/30 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/40">
           <div className="text-center mb-10">
             <div className="flex justify-center mb-4">
               <img 
@@ -65,14 +69,14 @@ const Login = () => {
                 className="h-16 w-auto"
               />
             </div>
-            <p className="text-gray-600 text-apple-lg font-apple-sf">
+            <p className="text-gray-800 font-semibold text-apple-lg font-apple-sf">
               Super Agent
             </p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-apple-sf text-apple-sm">Email</Label>
+              <Label htmlFor="email" className="text-gray-800 font-apple-sf text-apple-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -80,12 +84,12 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="bg-white/50 backdrop-blur-sm border-gray-200 text-gray-800 placeholder:text-gray-400 focus:border-blue-400 rounded-xl h-12 font-apple-sf text-apple-base"
+                className="bg-white/50 backdrop-blur-sm border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 rounded-xl h-12 font-apple-sf text-apple-base"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-apple-sf text-apple-sm">Senha</Label>
+              <Label htmlFor="password" className="text-gray-800 font-apple-sf text-apple-sm">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -93,7 +97,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="bg-white/50 backdrop-blur-sm border-gray-200 text-gray-800 placeholder:text-gray-400 focus:border-blue-400 rounded-xl h-12 font-apple-sf text-apple-base"
+                className="bg-white/50 backdrop-blur-sm border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 rounded-xl h-12 font-apple-sf text-apple-base"
               />
             </div>
             
