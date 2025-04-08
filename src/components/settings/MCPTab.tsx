@@ -178,7 +178,25 @@ const MCPTab = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="toolEndpoint">Endpoint</Label>
+                  <Label htmlFor="toolMethod">Método HTTP</Label>
+                  <Select
+                    value={newTool.method || "GET"}
+                    onValueChange={(value) => setNewTool({ ...newTool, method: value })}
+                  >
+                    <SelectTrigger id="toolMethod">
+                      <SelectValue placeholder="Selecione o método HTTP" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GET">GET</SelectItem>
+                      <SelectItem value="POST">POST</SelectItem>
+                      <SelectItem value="PUT">PUT</SelectItem>
+                      <SelectItem value="DELETE">DELETE</SelectItem>
+                      <SelectItem value="PATCH">PATCH</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="toolEndpoint">Endpoint/Path</Label>
                   <Input
                     id="toolEndpoint"
                     value={newTool.endpoint}
@@ -186,6 +204,17 @@ const MCPTab = () => {
                       setNewTool({ ...newTool, endpoint: e.target.value })
                     }
                     placeholder="/api/ferramentas/pesquisa"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="toolParameters">Parâmetros</Label>
+                  <Textarea
+                    id="toolParameters"
+                    value={newTool.parameters}
+                    onChange={(e) =>
+                      setNewTool({ ...newTool, parameters: e.target.value })
+                    }
+                    placeholder='{"param1": "value1", "param2": "value2"}'
                   />
                 </div>
                 <div className="space-y-2">
@@ -243,9 +272,19 @@ const MCPTab = () => {
                 <CardContent>
                   <div className="text-sm space-y-2">
                     <div className="flex justify-between">
+                      <span className="text-muted-foreground">Método:</span>
+                      <span>{tool.method}</span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Endpoint:</span>
                       <span>{tool.endpoint}</span>
                     </div>
+                    {tool.parameters && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Parâmetros:</span>
+                        <span className="truncate max-w-[200px]">{tool.parameters}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Chave:</span>
                       <span>{tool.authKey ? "••••••••" : "Não configurada"}</span>

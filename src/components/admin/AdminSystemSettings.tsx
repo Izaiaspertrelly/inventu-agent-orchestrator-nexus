@@ -11,11 +11,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OrchestratorTab from "../settings/OrchestratorTab";
 import ModelsTab from "../settings/ModelsTab";
-import ToolsTab from "../settings/ToolsTab";
 import AgentsTab from "../settings/AgentsTab";
 import MCPTab from "../settings/MCPTab";
 import ApiConfigTab from "../settings/ApiConfigTab";
-import { Database, Code, Wrench, Users, BarChart, Server } from "lucide-react";
+import { Database, Code, Users, BarChart, Server } from "lucide-react";
 
 interface SettingModuleProps {
   title: string;
@@ -71,13 +70,6 @@ const AdminSystemSettings: React.FC = () => {
       description: "Gerencie modelos de inteligência artificial e suas configurações.",
       icon: <BarChart className="h-5 w-5" />,
       component: <ModelsTab />
-    },
-    {
-      id: "tools",
-      title: "Ferramentas",
-      description: "Configure as ferramentas disponíveis para os agentes do sistema.",
-      icon: <Wrench className="h-5 w-5" />,
-      component: <ToolsTab />
     },
     {
       id: "agents",
