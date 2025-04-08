@@ -35,6 +35,31 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Save, Trash, Edit } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+// Lista dos 20 principais provedores de IA
+const AI_PROVIDERS = [
+  { id: "openai", name: "OpenAI", models: ["GPT-4o", "GPT-3.5 Turbo", "Claude 3"] },
+  { id: "anthropic", name: "Anthropic", models: ["Claude 3 Opus", "Claude 3 Sonnet", "Claude 3 Haiku"] },
+  { id: "google", name: "Google AI", models: ["Gemini Pro", "Gemini Ultra", "PaLM"] },
+  { id: "meta", name: "Meta AI", models: ["Llama 3", "Llama 3.1"] },
+  { id: "cohere", name: "Cohere", models: ["Command R+", "Command R", "Embed"] },
+  { id: "mistral", name: "Mistral AI", models: ["Mistral Large", "Mistral Medium", "Mistral Small"] },
+  { id: "perplexity", name: "Perplexity", models: ["pplx-7b", "pplx-70b"] },
+  { id: "microsoft", name: "Microsoft", models: ["Turing", "Phi-3"] },
+  { id: "nvidia", name: "NVIDIA", models: ["Nemotron", "NV LLM"] },
+  { id: "stability", name: "Stability AI", models: ["Stable Diffusion 3", "Stable Diffusion XL"] },
+  { id: "deepmind", name: "DeepMind", models: ["Gemini", "AlphaCode"] },
+  { id: "huggingface", name: "HuggingFace", models: ["BLOOM", "Falcon"] },
+  { id: "adept", name: "Adept AI", models: ["Fuyu", "Persimmon"] },
+  { id: "inflection", name: "Inflection AI", models: ["Pi", "Inflection-1"] },
+  { id: "midjourney", name: "Midjourney", models: ["MJ v6", "MJ v5"] },
+  { id: "amazon", name: "Amazon Bedrock", models: ["Titan", "Claude (via Bedrock)"] },
+  { id: "replicate", name: "Replicate", models: ["SDXL", "LLaMA"] },
+  { id: "databricks", name: "Databricks", models: ["DBRX", "Dolly"] },
+  { id: "ibm", name: "IBM", models: ["Watson", "Granite"] },
+  { id: "baidu", name: "Baidu", models: ["ERNIE Bot", "Wenxin"] }
+];
 
 const ModelsTab = () => {
   const { toast } = useToast();
@@ -44,6 +69,10 @@ const ModelsTab = () => {
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [isAssigningModel, setIsAssigningModel] = useState(false);
   
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("openai");
+  const [modelKey, setModelKey] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("");
+
   const [newModel, setNewModel] = useState<Partial<AIModel>>({
     name: "",
     provider: "",
@@ -67,34 +96,52 @@ const ModelsTab = () => {
   // Lista de agentes que ainda não têm modelo atribuído
   const agentsWithoutModel = agents.filter(a => !a.modelId);
 
+  const selectedProvider = AI_PROVIDERS.find(p => p.id === selectedProviderId);
+
+  const handleProviderChange = (providerId: string) => {
+    setSelectedProviderId(providerId);
+    const provider = AI_PROVIDERS.find(p => p.id === providerId);
+    if (provider && provider.models.length > 0) {
+      setSelectedModel(provider.models[0]);
+    }
+  };
+
   const handleAddModel = () => {
-    if (!newModel.name || !newModel.provider) {
+    if (!selectedProviderId || !modelKey) {
       toast({
         title: "Campos obrigatórios",
-        description: "Nome e provedor são obrigatórios",
+        description: "Provedor e Chave de API são obrigatórios",
         variant: "destructive",
       });
       return;
     }
     
+    const provider = AI_PROVIDERS.find(p => p.id === selectedProviderId);
+    
+    if (!provider) {
+      toast({
+        title: "Provedor inválido",
+        description: "Selecione um provedor válido",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const modelName = selectedModel || provider.models[0];
+    
     const model: AIModel = {
       id: uuidv4(),
-      name: newModel.name || "Novo Modelo",
-      provider: newModel.provider || "Provedor",
-      description: newModel.description || "Descrição do modelo",
-      capabilities: newModel.capabilities || [],
-      apiKey: newModel.apiKey,
+      name: `${provider.name} - ${modelName}`,
+      provider: provider.name,
+      description: `Modelo ${modelName} de ${provider.name}`,
+      capabilities: ["chat", "completion"],
+      apiKey: modelKey,
     };
     
     addModel(model);
     setModelDialogOpen(false);
-    setNewModel({
-      name: "",
-      provider: "",
-      description: "",
-      apiKey: "",
-      capabilities: [],
-    });
+    setModelKey("");
+    setSelectedModel("");
     
     toast({
       title: "Modelo adicionado",
@@ -204,54 +251,62 @@ const ModelsTab = () => {
                 <DialogHeader>
                   <DialogTitle>Adicionar Novo Modelo de IA</DialogTitle>
                   <DialogDescription>
-                    Adicione um novo modelo de IA para ser usado pelo agente.
+                    Selecione um provedor e adicione a chave de API para usar o modelo.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nome</Label>
-                    <Input
-                      id="name"
-                      value={newModel.name}
-                      onChange={(e) =>
-                        setNewModel({ ...newModel, name: e.target.value })
-                      }
-                      placeholder="Nome do modelo"
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="provider">Provedor</Label>
-                    <Input
-                      id="provider"
-                      value={newModel.provider}
-                      onChange={(e) =>
-                        setNewModel({ ...newModel, provider: e.target.value })
-                      }
-                      placeholder="Provedor (ex: OpenAI, Anthropic)"
-                    />
+                    <Select
+                      value={selectedProviderId}
+                      onValueChange={handleProviderChange}
+                    >
+                      <SelectTrigger id="provider">
+                        <SelectValue placeholder="Selecione um provedor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {AI_PROVIDERS.map((provider) => (
+                          <SelectItem key={provider.id} value={provider.id}>
+                            {provider.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Descrição</Label>
-                    <Textarea
-                      id="description"
-                      value={newModel.description}
-                      onChange={(e) =>
-                        setNewModel({ ...newModel, description: e.target.value })
-                      }
-                      placeholder="Descrição das capacidades do modelo"
-                    />
-                  </div>
+                  
+                  {selectedProvider && (
+                    <div className="space-y-2">
+                      <Label htmlFor="model">Modelo</Label>
+                      <Select
+                        value={selectedModel}
+                        onValueChange={setSelectedModel}
+                      >
+                        <SelectTrigger id="model">
+                          <SelectValue placeholder="Selecione um modelo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {selectedProvider.models.map((model) => (
+                            <SelectItem key={model} value={model}>
+                              {model}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  
                   <div className="space-y-2">
                     <Label htmlFor="apiKey">Chave de API</Label>
                     <Input
                       id="apiKey"
                       type="password"
-                      value={newModel.apiKey}
-                      onChange={(e) =>
-                        setNewModel({ ...newModel, apiKey: e.target.value })
-                      }
-                      placeholder="Chave de API (opcional)"
+                      value={modelKey}
+                      onChange={(e) => setModelKey(e.target.value)}
+                      placeholder="Insira sua chave de API"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      A chave será armazenada de forma segura e usada para autenticar requisições ao provedor.
+                    </p>
                   </div>
                 </div>
                 <DialogFooter>
