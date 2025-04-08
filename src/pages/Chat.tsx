@@ -106,6 +106,10 @@ const Chat: React.FC = () => {
                   />
                 </div>
                 
+                <p className="text-2xl text-muted-foreground mb-2">
+                  Super Agent
+                </p>
+                
                 <h1 className="text-4xl font-bold mb-2 tracking-tight">
                   <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"} 
                 </h1>
