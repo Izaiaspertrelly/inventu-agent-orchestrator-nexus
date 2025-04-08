@@ -105,21 +105,25 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
             onSubmit={handleSendMessage} 
             className="flex items-center flex-1 px-2"
           >
-            <SearchBarInput 
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              isSuperAgentEnabled={superAgentEnabled}
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="flex-1 pr-2">
+              <SearchBarInput 
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                isSuperAgentEnabled={superAgentEnabled}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
             
-            <SearchBarActions 
-              isSuperAgentEnabled={superAgentEnabled}
-              onToggleSuperAgent={toggleSuperAgent}
-              onSubmit={handleSendMessage}
-              onAttachmentClick={handleAttachmentClick}
-              fileInputRef={fileInputRef}
-            />
+            <div className="flex-shrink-0">
+              <SearchBarActions 
+                isSuperAgentEnabled={superAgentEnabled}
+                onToggleSuperAgent={toggleSuperAgent}
+                onSubmit={handleSendMessage}
+                onAttachmentClick={handleAttachmentClick}
+                fileInputRef={fileInputRef}
+              />
+            </div>
           </form>
           
           {/* File preview display when a file is selected */}
