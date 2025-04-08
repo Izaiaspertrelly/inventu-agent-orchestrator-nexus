@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -41,6 +42,39 @@ const Chat: React.FC = () => {
     }
   };
   
+  const MessageInputBar = () => (
+    <div className="relative">
+      <Input 
+        className="w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
+        placeholder="Dê uma tarefa para Inventor trabalhar..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
+        autoFocus
+      />
+      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+      
+      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+        <button 
+          type="button"
+          className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2.5 rounded-full transition-colors"
+          title="Anexar arquivo"
+        >
+          <Paperclip className="h-5 w-5" />
+        </button>
+        <button 
+          type="submit"
+          onClick={handleSendMessage}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground p-2.5 rounded-full transition-colors"
+        >
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+  
   return (
     <div className="flex h-screen bg-background dark">
       <ChatSidebar />
@@ -48,13 +82,20 @@ const Chat: React.FC = () => {
       <div className="flex flex-col flex-1 h-full">
         <div className="flex-1 flex flex-col">
           {activeChat && activeChat.messages.length > 0 ? (
-            <ScrollArea className="flex-1 p-4">
-              <div className="max-w-3xl mx-auto w-full py-4">
-                {activeChat.messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
-                ))}
+            <div className="flex flex-col flex-1">
+              <ScrollArea className="flex-1 p-4">
+                <div className="max-w-3xl mx-auto w-full py-4">
+                  {activeChat.messages.map((message) => (
+                    <ChatMessage key={message.id} message={message} />
+                  ))}
+                </div>
+              </ScrollArea>
+              <div className="max-w-3xl mx-auto w-full px-4 py-4">
+                <form onSubmit={handleSendMessage}>
+                  <MessageInputBar />
+                </form>
               </div>
-            </ScrollArea>
+            </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-4">
               <div className="text-center max-w-2xl">
@@ -67,36 +108,9 @@ const Chat: React.FC = () => {
                 
                 <div className="relative max-w-2xl w-full mx-auto mb-8">
                   <div className="flex flex-col gap-4">
-                    <div className="relative">
-                      <Input 
-                        className="w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
-                        placeholder="Dê uma tarefa para Inventor trabalhar..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        autoFocus
-                      />
-                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
-                      
-                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                        <button 
-                          type="button"
-                          className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2.5 rounded-full transition-colors"
-                          title="Anexar arquivo"
-                        >
-                          <Paperclip className="h-5 w-5" />
-                        </button>
-                        <button 
-                          type="submit"
-                          onClick={handleSendMessage}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground p-2.5 rounded-full transition-colors"
-                        >
-                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
+                    <form onSubmit={handleSendMessage}>
+                      <MessageInputBar />
+                    </form>
                     
                     <div className="w-full p-3 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
                       <div className="rounded-xl bg-secondary/70 p-2 mr-3">
