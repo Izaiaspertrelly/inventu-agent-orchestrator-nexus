@@ -30,10 +30,24 @@ const OrchestratorMonitoring: React.FC = () => {
     ? tokenUsageMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / tokenUsageMetrics.length
     : 0;
   
+  // Helper function to safely format dates with proper typing
   const formatDate = (date: Date | string | undefined): string => {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+  };
+
+  // Helper function to safely extract and format task ID dates
+  const formatTaskDate = (taskId: string | undefined): React.ReactNode => {
+    if (!taskId) return 'Data desconhecida';
+    
+    try {
+      const datePart = taskId.split('-')[1];
+      if (!datePart) return 'Data desconhecida';
+      return formatDate(datePart);
+    } catch (error) {
+      return 'Data desconhecida';
+    }
   };
   
   return (
@@ -143,7 +157,7 @@ const OrchestratorMonitoring: React.FC = () => {
                       <div className="text-xs text-muted-foreground mt-1">
                         Subtasks: {task && task.subtasks ? task.subtasks.length : 0} • {
                           task && task.id ? 
-                            formatDate(task.id.split('-')[1]) : 
+                            formatTaskDate(task.id) : 
                             'Data desconhecida'
                         }
                       </div>
