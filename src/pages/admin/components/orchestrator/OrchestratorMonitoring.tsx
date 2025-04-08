@@ -6,6 +6,13 @@ import { useAgent } from "@/contexts/AgentContext";
 import { Brain, MessageCircle, ListTodo, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+// Define a more specific task type to help with type safety
+interface Task {
+  id: string;
+  task?: string;
+  subtasks?: any[];
+}
+
 const OrchestratorMonitoring: React.FC = () => {
   const { orchestratorState, orchestratorConfig } = useAgent();
   
@@ -38,8 +45,8 @@ const OrchestratorMonitoring: React.FC = () => {
   };
   
   // Renderiza as informações da data da tarefa de forma segura
-  const renderTaskDate = (task: any): JSX.Element => {
-    if (!task || !task.id) {
+  const renderTaskDate = (task: Task | null | undefined): JSX.Element => {
+    if (!task || typeof task !== 'object' || !task.id) {
       return <span>Data desconhecida</span>;
     }
     
@@ -56,6 +63,11 @@ const OrchestratorMonitoring: React.FC = () => {
       return <span>Data desconhecida</span>;
     }
   };
+  
+  // Ensure tasks is an array or provide fallback
+  const recentTasks = Array.isArray(orchestratorState?.tasks) 
+    ? orchestratorState.tasks.slice(-3).reverse() 
+    : [];
   
   return (
     <div className="space-y-6">
@@ -150,11 +162,11 @@ const OrchestratorMonitoring: React.FC = () => {
               </div>
             </div>
             
-            {orchestratorState?.tasks?.length > 0 && (
+            {recentTasks.length > 0 && (
               <div className="border-t pt-4 mt-4">
                 <h4 className="font-medium mb-2">Tarefas recentes</h4>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {(orchestratorState.tasks.slice(-3).reverse() || []).map((task: any, index: number) => (
+                  {recentTasks.map((task: Task, index: number) => (
                     <div key={index} className="bg-muted/50 p-2 rounded-md">
                       <div className="text-sm font-medium">
                         {task && task.task ? 
