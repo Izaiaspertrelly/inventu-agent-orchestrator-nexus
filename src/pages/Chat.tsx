@@ -18,6 +18,7 @@ const Chat: React.FC = () => {
   const [userName, setUserName] = useState("");
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
+  const [isVibrating, setIsVibrating] = useState(false);
   const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -62,7 +63,17 @@ const Chat: React.FC = () => {
   };
   
   const toggleSuperAgent = () => {
+    // Set vibrating state to trigger animation
+    setIsVibrating(true);
+    
+    // Toggle the state after a brief delay to ensure animation completes
     setSuperAgentEnabled(!superAgentEnabled);
+    
+    // Reset vibrating state after animation duration
+    setTimeout(() => {
+      setIsVibrating(false);
+    }, 1500);
+    
     toast({
       title: superAgentEnabled ? "God Mode Desativado" : "God Mode Ativado",
       description: superAgentEnabled 
@@ -77,7 +88,7 @@ const Chat: React.FC = () => {
         <Input 
           className={`w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg backdrop-blur-sm border border-border/40 transition-all duration-300 
             ${superAgentEnabled 
-              ? 'bg-blue-500 text-white placeholder:text-white/70 animate-vibrate' 
+              ? `bg-blue-500 text-white placeholder:text-white/70 ${isVibrating ? 'animate-vibrate' : ''}` 
               : 'bg-secondary/30 placeholder:text-muted-foreground/70'}`}
           placeholder="Dê uma tarefa para Inventor trabalhar..."
           value={message}

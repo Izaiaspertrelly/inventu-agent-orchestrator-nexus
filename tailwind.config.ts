@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -110,9 +111,7 @@ export default {
 					'15%': { transform: 'translateX(-6px) rotate(-3deg)' },
 					'20%': { transform: 'translateX(6px) rotate(3deg)' },
 					'25%': { transform: 'translateX(0) rotate(0)' },
-					'30%, 100%': { transform: 'translateX(-1px) rotate(-0.25deg)' },
-					'40%': { transform: 'translateX(1px) rotate(0.25deg)' },
-					'50%': { transform: 'translateX(0)' }
+					'100%': { transform: 'translateX(0)' }
 				}
 			},
 			animation: {
@@ -120,7 +119,7 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'float': 'float 3s ease-in-out infinite',
-				'vibrate': 'vibrate 3s ease-in-out infinite'
+				'vibrate': 'vibrate 1.5s ease-out forwards'
 			}
 		}
 	},
