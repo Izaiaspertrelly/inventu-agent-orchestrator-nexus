@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Search, X, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
+import { Search, X, Paperclip, ToggleRight, ToggleLeft, Minimize } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
@@ -219,9 +219,9 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
               type="button"
               onClick={(e) => { e.stopPropagation(); onClose(); }}
               className="bg-secondary/50 hover:bg-secondary/90 text-foreground p-1.5 rounded-full transition-colors"
-              title="Fechar barra de pesquisa"
+              title="Minimizar barra de pesquisa"
             >
-              <X className="h-4 w-4" />
+              <Minimize className="h-4 w-4" />
             </button>
           </div>
         </form>

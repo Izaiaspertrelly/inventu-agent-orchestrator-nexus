@@ -168,7 +168,7 @@ const Chat: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
-            {/* Fixed input bar completely removed from conversation view */}
+            {/* No fixed input bar in the conversation view */}
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
