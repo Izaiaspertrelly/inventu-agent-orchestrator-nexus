@@ -84,6 +84,18 @@ const Chat: React.FC = () => {
       <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
       
       <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+        <div 
+          className="flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs" 
+          onClick={toggleSuperAgent} 
+          title="Ativar/Desativar Super Agent"
+        >
+          {superAgentEnabled ? 
+            <ToggleRight className="h-3 w-3 text-primary" /> : 
+            <ToggleLeft className="h-3 w-3" />
+          }
+          <span className="font-medium ml-1">Super</span>
+        </div>
+        
         <button 
           type="button"
           className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2.5 rounded-full transition-colors"
@@ -91,14 +103,6 @@ const Chat: React.FC = () => {
         >
           <Paperclip className="h-5 w-5" />
         </button>
-        
-        <div className="flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-3 py-1.5 rounded-full transition-colors cursor-pointer" onClick={toggleSuperAgent} title="Ativar/Desativar Super Agent">
-          {superAgentEnabled ? 
-            <ToggleRight className="h-4 w-4 text-primary" /> : 
-            <ToggleLeft className="h-4 w-4" />
-          }
-          <span className="text-xs font-medium">Super Agent</span>
-        </div>
         
         <button 
           type="submit"
