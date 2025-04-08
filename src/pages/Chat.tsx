@@ -12,6 +12,7 @@ import { useAgent } from "@/contexts/AgentContext";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import MemorySuggestionCard from "@/components/memory/MemorySuggestionCard";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage, isProcessing } = useChat();
@@ -20,8 +21,16 @@ const Chat: React.FC = () => {
   const navigate = useNavigate();
   
   // Get orchestrator memory confirmation state
-  const { pendingMemoryConfirmation, setPendingMemoryConfirmation } = useOrchestratorResponse();
+  const { 
+    pendingMemoryConfirmation, 
+    setPendingMemoryConfirmation,
+    acceptMemorySuggestion,
+    declineMemorySuggestion,
+    memorySuggestions
+  } = useOrchestratorResponse();
+  
   const [memoryDialogOpen, setMemoryDialogOpen] = useState(false);
+  const [currentSuggestion, setCurrentSuggestion] = useState<any>(null);
   
   useEffect(() => {
     if (!activeChat) {
@@ -39,14 +48,12 @@ const Chat: React.FC = () => {
     }
   }, [activeChat, createNewChat]);
   
-  // Effect to open dialog when there are pending confirmations
+  // Effect to set current suggestion
   useEffect(() => {
-    if (pendingMemoryConfirmation) {
-      setMemoryDialogOpen(true);
-    } else {
-      setMemoryDialogOpen(false);
+    if (pendingMemoryConfirmation && !currentSuggestion) {
+      setCurrentSuggestion(pendingMemoryConfirmation);
     }
-  }, [pendingMemoryConfirmation]);
+  }, [pendingMemoryConfirmation, currentSuggestion]);
   
   const handleFloatingSearch = (searchText: string, file: File | null) => {
     // Now we also pass any selected file
@@ -57,6 +64,20 @@ const Chat: React.FC = () => {
     createNewChat();
     // Navigate to the chat page (stay on the same page, but with a fresh chat)
     navigate("/chat");
+  };
+  
+  const handleAcceptSuggestion = () => {
+    if (currentSuggestion) {
+      acceptMemorySuggestion(currentSuggestion.id);
+      setCurrentSuggestion(null);
+    }
+  };
+  
+  const handleDeclineSuggestion = () => {
+    if (currentSuggestion) {
+      declineMemorySuggestion(currentSuggestion.id);
+      setCurrentSuggestion(null);
+    }
   };
   
   const isOrchestratorActive = orchestratorConfig && 
@@ -93,6 +114,14 @@ const Chat: React.FC = () => {
           
           <ScrollArea className="flex-1 px-4 py-6">
             <div className="max-w-3xl mx-auto w-full py-4 space-y-6">
+              {currentSuggestion && (
+                <MemorySuggestionCard 
+                  suggestion={currentSuggestion}
+                  onAccept={handleAcceptSuggestion}
+                  onDecline={handleDeclineSuggestion}
+                />
+              )}
+              
               {activeChat && activeChat.messages.length > 0 ? (
                 activeChat.messages.map((message) => (
                   <ChatMessage key={message.id} message={message} />

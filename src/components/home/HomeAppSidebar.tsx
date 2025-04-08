@@ -1,93 +1,94 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Home, MessageSquare, User } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarHeader, 
-  SidebarMenu, 
-  SidebarMenuItem, 
-  SidebarMenuButton,
-  SidebarFooter
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarGroup,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Database, Home, MessageCircle, Settings, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import SidebarIcon from "@/components/icons/SidebarIcon";
 
 interface HomeAppSidebarProps {
   sidebarOpen: boolean;
   onSidebarToggle: () => void;
   onProfileDialogOpen: () => void;
+  onKnowledgeDialogOpen?: () => void; // Make this optional for backward compatibility
 }
 
 const HomeAppSidebar: React.FC<HomeAppSidebarProps> = ({ 
   sidebarOpen, 
   onSidebarToggle,
-  onProfileDialogOpen
+  onProfileDialogOpen,
+  onKnowledgeDialogOpen
 }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  
+
   return (
-    <Sidebar side="left">
-      <SidebarHeader className="px-4 py-6">
-        <div className="flex items-center justify-between">
+    <Sidebar className="border-r border-border/40">
+      <SidebarHeader className="h-14 flex items-center px-4">
+        {sidebarOpen ? (
           <div className="flex items-center gap-2">
-            <img 
-              src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
-              alt="Logo" 
-              className="w-8 h-8 object-contain"
-            />
-            <h3 className="font-semibold text-lg">Inventor</h3>
+            <SidebarIcon />
+            <span className="font-semibold">Inventor</span>
           </div>
-          <div>
-            <SidebarIcon 
-              className="h-5 w-5 text-sidebar-foreground" 
-              onClick={onSidebarToggle}
-            />
-          </div>
-        </div>
+        ) : (
+          <SidebarIcon />
+        )}
       </SidebarHeader>
-      
       <SidebarContent>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => navigate("/")} isActive={true} tooltip="Início">
-              <Home className="mr-2 h-4 w-4" />
-              <span>Início</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => navigate("/chat")} tooltip="Conversas">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              <span>Conversas</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <SidebarGroup>
+          <Button
+            variant="ghost"
+            className={`w-full justify-${sidebarOpen ? "start" : "center"} mb-1`}
+            onClick={() => navigate("/")}
+          >
+            <Home className="h-5 w-5 mr-2" />
+            {sidebarOpen && <span>Início</span>}
+          </Button>
+          <Button
+            variant="ghost"
+            className={`w-full justify-${sidebarOpen ? "start" : "center"} mb-1`}
+            onClick={() => navigate("/chat")}
+          >
+            <MessageCircle className="h-5 w-5 mr-2" />
+            {sidebarOpen && <span>Chat</span>}
+          </Button>
+          {onKnowledgeDialogOpen && (
+            <Button
+              variant="ghost"
+              className={`w-full justify-${sidebarOpen ? "start" : "center"} mb-1`}
+              onClick={onKnowledgeDialogOpen}
+            >
+              <Database className="h-5 w-5 mr-2" />
+              {sidebarOpen && <span>Conhecimento</span>}
+            </Button>
+          )}
+        </SidebarGroup>
       </SidebarContent>
-      
-      <SidebarFooter className="px-4 py-6">
-        <div 
-          className="flex items-center gap-2 hover:bg-sidebar-accent/50 p-2 rounded-lg cursor-pointer"
-          onClick={onProfileDialogOpen}
-        >
-          <Avatar className="h-8 w-8">
-            {user?.profileImage ? (
-              <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
-            ) : (
-              <AvatarFallback className="bg-primary/10 text-primary">
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            )}
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium">{user?.name || "Usuário"}</p>
-            <p className="text-xs text-muted-foreground">
-              {user?.role === "admin" ? "Administrador" : "Plano Básico"}
-            </p>
-          </div>
+      <SidebarFooter className="border-t border-border/40 p-4">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={onProfileDialogOpen}
+          >
+            <User className="h-5 w-5" />
+          </Button>
+          {sidebarOpen && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => navigate("/settings")}
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       </SidebarFooter>
     </Sidebar>

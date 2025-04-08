@@ -6,6 +6,7 @@ import { createChat, createUserMessage, createChatTitle } from "../utils/chatUti
 import { useChatMessageProcessor } from "../hooks/use-chat-message-processor";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "./AgentContext";
+import { useOrchestratorResponse } from "../hooks/messaging/use-orchestrator-response";
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
@@ -15,6 +16,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const { toast } = useToast();
   const { generateBotResponse, selectModelForTask, isProcessing } = useChatMessageProcessor();
   const { orchestratorConfig } = useAgent();
+  const { analyzeMessageForMemorySuggestions } = useOrchestratorResponse();
   
   const [chats, setChats] = useState<Chat[]>(() => {
     const savedChats = localStorage.getItem("inventu_chats");
@@ -91,6 +93,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         variant: "destructive",
       });
       return;
+    }
+    
+    // Analyze the message for memory suggestions when orchestrator is active
+    if (orchestratorConfig && orchestratorConfig.memory?.enabled !== false) {
+      analyzeMessageForMemorySuggestions(content);
     }
     
     // Create user message
