@@ -40,10 +40,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }
 
-  // If user is admin and trying to access a non-admin route without explicit role check
+  // IMPORTANT: Remove this restriction to allow admins to access user routes
+  // This was preventing the "Ir para Aplicação" button from working properly
+  /*
   if (!allowedRoles && user?.role === "admin" && window.location.pathname === "/") {
     return <Navigate to="/admin" replace />;
   }
+  */
 
   return <>{children}</>;
 };

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,10 +41,14 @@ const AdminDashboard = () => {
   
   // Handle navigation to user application
   const goToUserInterface = () => {
-    console.log("Navigating to home page from admin dashboard");
     try {
-      navigate("/");
-      console.log("Navigation successful");
+      // Use direct navigation with replace to avoid protected route issues
+      window.location.href = '/';
+      
+      toast({
+        title: "Navegação",
+        description: "Redirecionando para a aplicação principal...",
+      });
     } catch (error) {
       console.error("Navigation error:", error);
       toast({
