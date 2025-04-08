@@ -102,10 +102,9 @@ export const useChatMessageProcessor = () => {
           }
         } else {
           console.log("No orchestrator agent found, using fallback processing");
-          responseContent += "Orquestrador não configurado corretamente. ";
+          responseContent += "O orquestrador está configurado, mas não conseguiu processar sua mensagem. Usando processamento padrão. ";
           
           // Fallback to basic model response
-          // Fix: Passing the missing third argument (agent) as null
           const modelResponse = generateModelBasedResponse(userMessage, selectedModelId, null);
           responseContent += modelResponse;
         }
@@ -125,7 +124,6 @@ export const useChatMessageProcessor = () => {
         
         // Find agent for model and generate response
         const agent = findAgentByModel(selectedModelId);
-        // This line is correctly passing all three required arguments
         responseContent += generateModelBasedResponse(userMessage, selectedModelId, agent);
       }
       

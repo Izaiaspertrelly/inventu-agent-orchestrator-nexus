@@ -28,28 +28,45 @@ export const useOrchestratorResponse = () => {
     return agents.find(agent => agent.modelId === modelId);
   };
   
-  // Find orchestrator agent based on configured ID
+  // Find orchestrator agent based on configured ID or selected model
   const getOrchestratorAgent = () => {
-    if (!orchestratorConfig || !orchestratorConfig.mainAgentId) {
-      console.log("No orchestrator agent configured");
-      return null;
+    // Primeiro tenta encontrar um agente pelo ID configurado
+    if (orchestratorConfig && orchestratorConfig.mainAgentId) {
+      const agent = agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
+      if (agent) {
+        console.log("Found orchestrator agent by ID:", agent.name);
+        return agent;
+      }
+      console.log("Configured agent ID not found, trying by model ID");
     }
     
-    const agent = agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
-    if (!agent) {
-      console.log("Configured orchestrator agent not found");
-      return null;
+    // Se não encontrou pelo ID ou não tem ID configurado, tenta pelo modelo
+    if (orchestratorConfig && orchestratorConfig.selectedModel) {
+      const agent = agents.find(agent => agent.modelId === orchestratorConfig.selectedModel);
+      if (agent) {
+        console.log("Found orchestrator agent by model ID:", agent.name);
+        return agent;
+      }
+      
+      // Se não encontrou um agente para este modelo, mas temos um modelo, criamos um agente virtual
+      console.log("No agent found for this model, creating virtual agent");
+      return {
+        id: "virtual-orchestrator",
+        name: "Orquestrador Neural",
+        modelId: orchestratorConfig.selectedModel,
+        configJson: JSON.stringify(orchestratorConfig)
+      };
     }
     
-    console.log("Found orchestrator agent:", agent.name);
-    return agent;
+    console.log("No orchestrator agent configuration found");
+    return null;
   };
   
   // Agent orchestration process
   const orchestrateAgentResponse = async (userMessage: string, agent: any) => {
     const startTime = Date.now();
     try {
-      console.log("Orchestrating response using agent:", agent?.name);
+      console.log("Orchestrating response using agent:", agent?.name || "Virtual Orchestrator");
       
       // Register user message in conversation history
       addToConversationHistory?.({
@@ -69,8 +86,8 @@ export const useOrchestratorResponse = () => {
       
       // Use orchestrator settings if this agent is the main orchestrator
       let useOrchestratorConfig = false;
-      if (orchestratorConfig && orchestratorConfig.mainAgentId === agent.id) {
-        console.log("This agent is the main orchestrator, using central configuration");
+      if (orchestratorConfig && (orchestratorConfig.mainAgentId === agent.id || agent.id === "virtual-orchestrator")) {
+        console.log("Using central orchestrator configuration");
         useOrchestratorConfig = true;
       }
       
