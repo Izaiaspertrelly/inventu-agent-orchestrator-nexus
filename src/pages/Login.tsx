@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,28 +69,34 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-white/90">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-                className="bg-black/80 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500"
-              />
+              <div className="relative">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  className="bg-black/80 border-[0.5px] border-blue-500/30 text-white placeholder:text-white/40 focus:border-blue-500 transition-all duration-300"
+                />
+                <div className="absolute inset-0 rounded-md pointer-events-none border border-blue-500/20 shadow-[0_0_10px_1px_rgba(33,150,243,0.3)] blur-[1px] transition-opacity opacity-0 peer-focus:opacity-100"></div>
+              </div>
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="password" className="text-white/90">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                className="bg-black/80 border-white/20 text-white placeholder:text-white/40 focus:border-blue-500"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  className="bg-black/80 border-[0.5px] border-blue-500/30 text-white placeholder:text-white/40 focus:border-blue-500 transition-all duration-300"
+                />
+                <div className="absolute inset-0 rounded-md pointer-events-none border border-blue-500/20 shadow-[0_0_10px_1px_rgba(33,150,243,0.3)] blur-[1px] transition-opacity opacity-0 peer-focus:opacity-100"></div>
+              </div>
             </div>
             
             <div className="flex justify-center">
