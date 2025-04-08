@@ -31,19 +31,19 @@ const SettingsTabs = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onSelect={() => document.querySelector('[data-radix-tabs-trigger="profile"]')?.click()}>
+            <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="profile"]') as HTMLElement)?.click()}>
               <UserCog className="mr-2 h-4 w-4" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => document.querySelector('[data-radix-tabs-trigger="orchestrator"]')?.click()}>
+            <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="orchestrator"]') as HTMLElement)?.click()}>
               <SlidersHorizontal className="mr-2 h-4 w-4" />
               Orquestrador
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => document.querySelector('[data-radix-tabs-trigger="models"]')?.click()}>
+            <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="models"]') as HTMLElement)?.click()}>
               <Layers className="mr-2 h-4 w-4" />
               Modelos
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => document.querySelector('[data-radix-tabs-trigger="tools"]')?.click()}>
+            <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="tools"]') as HTMLElement)?.click()}>
               <Code className="mr-2 h-4 w-4" />
               Ferramentas
             </DropdownMenuItem>
