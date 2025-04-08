@@ -1,11 +1,24 @@
 import { useState, useEffect } from "react";
 import { useAgent } from "../../contexts/AgentContext";
 
+// Define a type for memory confirmations to address the TypeScript errors
+interface MemoryConfirmation {
+  id: number;
+  userId: string;
+  entry: {
+    key: string;
+    value: any;
+    label?: string;
+    source: string;
+  };
+  timestamp: Date;
+}
+
 export const useOrchestratorResponse = () => {
   const { agents, orchestratorConfig, orchestratorState, addToConversationHistory, recordPerformanceMetric, decomposeTask } = useAgent();
   
   // State to control memory confirmation pending status
-  const [pendingMemoryConfirmation, setPendingMemoryConfirmation] = useState(null);
+  const [pendingMemoryConfirmation, setPendingMemoryConfirmation] = useState<MemoryConfirmation | null>(null);
   
   // Monitor pending confirmations
   useEffect(() => {
