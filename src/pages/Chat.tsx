@@ -1,11 +1,11 @@
-
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
-import { Paperclip, Search, Sparkles, X, Check } from "lucide-react";
+import { Paperclip, Search, X, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import SuggestionBar from "@/components/SuggestionBar";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage } = useChat();
@@ -137,13 +137,8 @@ const Chat: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-6 mt-12">
-                  <div className="col-span-1">
-                    <h3 className="text-lg font-medium text-left mb-3 flex items-center">
-                      <Sparkles className="h-5 w-5 mr-2 text-primary" />
-                      Destaques
-                    </h3>
-                  </div>
+                <div className="mt-12 w-full">
+                  <SuggestionBar />
                 </div>
               </div>
             </div>
