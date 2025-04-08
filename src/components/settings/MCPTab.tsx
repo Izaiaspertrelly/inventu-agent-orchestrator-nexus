@@ -71,7 +71,7 @@ const MCPTab = () => {
       name: newTool.name || "Nova Ferramenta",
       description: newTool.description || "Descrição da ferramenta",
       endpoint: newTool.endpoint || "/api/tool",
-      method: newTool.method || "GET",
+      method: (newTool.method as "GET" | "POST" | "PUT" | "DELETE") || "GET",
       parameters: newTool.parameters || "",
       authKey: newTool.authKey,
     };
@@ -174,8 +174,10 @@ const MCPTab = () => {
                 <div className="space-y-2">
                   <Label htmlFor="toolMethod">Método HTTP</Label>
                   <Select
-                    value={newTool.method || "GET"}
-                    onValueChange={(value) => setNewTool({ ...newTool, method: value })}
+                    value={newTool.method}
+                    onValueChange={(value: "GET" | "POST" | "PUT" | "DELETE") => 
+                      setNewTool({ ...newTool, method: value })
+                    }
                   >
                     <SelectTrigger id="toolMethod">
                       <SelectValue placeholder="Selecione o método HTTP" />
