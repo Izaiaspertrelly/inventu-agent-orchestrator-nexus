@@ -37,7 +37,7 @@ const OrchestratorCapabilitiesTab: React.FC = () => {
         depth: parseInt(reasoningDepth),
         strategy: "chain-of-thought",
         enabled: reasoningEnabled,
-        dynamicSteps: true // Enable dynamic step adjustment
+        dynamicSteps: true // Keep this for backend processing
       };
       
       const planningConfig = {
