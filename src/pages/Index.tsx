@@ -14,8 +14,8 @@ const Index: React.FC = () => {
     e.preventDefault();
     if (!prompt.trim()) return;
     
-    // Navigate to the chat page when search is submitted
-    navigate("/chat");
+    // Navigate to the chat page with the prompt as a query parameter
+    navigate(`/chat?prompt=${encodeURIComponent(prompt)}`);
   };
   
   return (
