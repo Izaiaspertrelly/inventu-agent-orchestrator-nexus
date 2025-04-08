@@ -18,7 +18,7 @@ interface AgentContextType {
   addMCPTool: (tool: MCPTool) => void;
   removeMCPTool: (id: string) => void;
   selectModelForTask: (taskDescription: string) => Promise<string>;
-  executeMCPTool: (toolId: string, params: Record<string, any>) => Promise<any>;
+  executeMCPTool: (tool: MCPTool, params: Record<string, any>) => Promise<any>;
   addAgent: (agent: Agent) => void;
   updateAgent: (id: string, agent: Partial<Agent>) => void;
   removeAgent: (id: string) => void;
@@ -55,16 +55,14 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     return selectModelForTask(taskDescription);
   };
 
-  const handleExecuteMCPTool = async (toolId: string, params: Record<string, any>) => {
-    const tool = mcpConfig.tools.find(t => t.id === toolId);
-    
+  const handleExecuteMCPTool = async (tool: MCPTool, params: Record<string, any>) => {
     if (!tool) {
       toast({
         title: "Tool not found",
-        description: `MCP tool with ID ${toolId} is not available`,
+        description: `MCP tool is not available`,
         variant: "destructive",
       });
-      throw new Error(`Tool ${toolId} not found`);
+      throw new Error(`Tool not found`);
     }
     
     if (!mcpConfig.serverUrl) {

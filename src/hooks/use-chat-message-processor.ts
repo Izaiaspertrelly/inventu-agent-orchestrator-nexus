@@ -34,6 +34,7 @@ export const useChatMessageProcessor = () => {
             const matchingTool = mcpConfig.tools.find(t => t.id === call.toolId);
             
             if (matchingTool) {
+              // Fixed: Pass the tool object instead of just the ID
               const result = await executeMCPTool(matchingTool, call.params);
               toolsUsed.push(call.toolId);
               
