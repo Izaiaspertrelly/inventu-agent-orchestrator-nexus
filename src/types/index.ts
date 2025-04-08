@@ -1,3 +1,4 @@
+
 // User related types
 export interface User {
   id: string;
@@ -63,3 +64,16 @@ export interface Category {
   name: string;
   description?: string;
 }
+
+// Agent related types
+export interface Agent {
+  id: string;
+  name: string;
+  description: string;
+  modelId: string;
+  configJson: string;
+  toolIds: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+

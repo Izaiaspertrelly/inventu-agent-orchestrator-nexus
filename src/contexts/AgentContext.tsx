@@ -1,11 +1,12 @@
 
 import React, { createContext, useContext, useState } from "react";
-import { AIModel, MCPServerConfig, MCPTool } from "../types";
+import { AIModel, MCPServerConfig, MCPTool, Agent } from "../types";
 import { useToast } from "@/hooks/use-toast";
 
 interface AgentContextType {
   models: AIModel[];
   mcpConfig: MCPServerConfig;
+  agents: Agent[];
   addModel: (model: AIModel) => void;
   updateModel: (id: string, model: Partial<AIModel>) => void;
   removeModel: (id: string) => void;
@@ -14,6 +15,9 @@ interface AgentContextType {
   removeMCPTool: (id: string) => void;
   selectModelForTask: (taskDescription: string) => Promise<string>;
   executeMCPTool: (toolId: string, params: Record<string, any>) => Promise<any>;
+  addAgent: (agent: Agent) => void;
+  updateAgent: (id: string, agent: Partial<Agent>) => void;
+  removeAgent: (id: string) => void;
 }
 
 // Default models
@@ -47,6 +51,9 @@ const DEFAULT_MCP_CONFIG: MCPServerConfig = {
   tools: [],
 };
 
+// Default agent array
+const DEFAULT_AGENTS: Agent[] = [];
+
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
 
 export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -63,18 +70,25 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     return savedConfig ? JSON.parse(savedConfig) : DEFAULT_MCP_CONFIG;
   });
 
+  const [agents, setAgents] = useState<Agent[]>(() => {
+    const savedAgents = localStorage.getItem("inventu_agents");
+    return savedAgents ? JSON.parse(savedAgents) : DEFAULT_AGENTS;
+  });
+
   const updateLocalStorage = (
     models: AIModel[], 
-    config: MCPServerConfig
+    config: MCPServerConfig,
+    agents: Agent[]
   ) => {
     localStorage.setItem("inventu_models", JSON.stringify(models));
     localStorage.setItem("inventu_mcp_config", JSON.stringify(config));
+    localStorage.setItem("inventu_agents", JSON.stringify(agents));
   };
 
   const addModel = (model: AIModel) => {
     setModels((prev) => {
       const updated = [...prev, model];
-      updateLocalStorage(updated, mcpConfig);
+      updateLocalStorage(updated, mcpConfig, agents);
       return updated;
     });
   };
@@ -84,7 +98,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
       const updated = prev.map((model) => 
         model.id === id ? { ...model, ...modelUpdate } : model
       );
-      updateLocalStorage(updated, mcpConfig);
+      updateLocalStorage(updated, mcpConfig, agents);
       return updated;
     });
   };
@@ -92,7 +106,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
   const removeModel = (id: string) => {
     setModels((prev) => {
       const updated = prev.filter((model) => model.id !== id);
-      updateLocalStorage(updated, mcpConfig);
+      updateLocalStorage(updated, mcpConfig, agents);
       return updated;
     });
   };
@@ -100,7 +114,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateMCPConfig = (config: Partial<MCPServerConfig>) => {
     setMCPConfig((prev) => {
       const updated = { ...prev, ...config };
-      updateLocalStorage(models, updated);
+      updateLocalStorage(models, updated, agents);
       return updated;
     });
   };
@@ -111,7 +125,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         ...prev, 
         tools: [...prev.tools, tool] 
       };
-      updateLocalStorage(models, updated);
+      updateLocalStorage(models, updated, agents);
       return updated;
     });
   };
@@ -122,7 +136,34 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         ...prev,
         tools: prev.tools.filter((tool) => tool.id !== id),
       };
-      updateLocalStorage(models, updated);
+      updateLocalStorage(models, updated, agents);
+      return updated;
+    });
+  };
+
+  // Agent CRUD operations
+  const addAgent = (agent: Agent) => {
+    setAgents((prev) => {
+      const updated = [...prev, agent];
+      updateLocalStorage(models, mcpConfig, updated);
+      return updated;
+    });
+  };
+
+  const updateAgent = (id: string, agentUpdate: Partial<Agent>) => {
+    setAgents((prev) => {
+      const updated = prev.map((agent) => 
+        agent.id === id ? { ...agent, ...agentUpdate } : agent
+      );
+      updateLocalStorage(models, mcpConfig, updated);
+      return updated;
+    });
+  };
+
+  const removeAgent = (id: string) => {
+    setAgents((prev) => {
+      const updated = prev.filter((agent) => agent.id !== id);
+      updateLocalStorage(models, mcpConfig, updated);
       return updated;
     });
   };
@@ -187,6 +228,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         models,
         mcpConfig,
+        agents,
         addModel,
         updateModel,
         removeModel,
@@ -195,6 +237,9 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         removeMCPTool,
         selectModelForTask,
         executeMCPTool,
+        addAgent,
+        updateAgent,
+        removeAgent,
       }}
     >
       {children}
