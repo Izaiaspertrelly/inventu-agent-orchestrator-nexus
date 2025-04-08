@@ -116,35 +116,31 @@ export default {
 				'lightning': {
 					'0%': { 
 						opacity: '0',
-						height: '0%'
+						transform: 'scaleY(0)'
 					},
 					'5%': { 
 						opacity: '0.9',
-						height: '100%'
+						transform: 'scaleY(1)'
 					},
 					'20%': { 
 						opacity: '1',
-						height: '100%'
-					},
-					'25%': { 
-						opacity: '0.8',
-						height: '100%'
+						transform: 'scaleY(1)'
 					},
 					'40%': { 
-						opacity: '0.6',
-						height: '100%'
-					},
-					'50%': { 
-						opacity: '0.4',
-						height: '100%'
+						opacity: '0.8',
+						transform: 'scaleY(1)'
 					},
 					'60%': { 
+						opacity: '0.4',
+						transform: 'scaleY(1)'
+					},
+					'80%': { 
 						opacity: '0.2',
-						height: '100%'
+						transform: 'scaleY(1)'
 					},
 					'100%': { 
 						opacity: '0',
-						height: '0%'
+						transform: 'scaleY(0)'
 					}
 				}
 			},
@@ -158,5 +154,30 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		function({ addComponents }) {
+			addComponents({
+				'.lightning-bolt': {
+					position: 'absolute',
+					width: '12px',
+					height: '100vh',
+					background: 'transparent',
+					transformOrigin: 'top center',
+					'&::before': {
+						content: '""',
+						position: 'absolute',
+						top: '0',
+						left: '0',
+						width: '100%',
+						height: '100%',
+						clipPath: 'polygon(50% 0%, 40% 30%, 60% 35%, 45% 60%, 65% 65%, 40% 100%, 50% 70%, 30% 65%, 55% 40%, 35% 35%)',
+						backgroundColor: '#007AFF',
+						boxShadow: '0 0 15px 5px rgba(59, 130, 246, 0.7)',
+						filter: 'blur(1px)',
+					}
+				}
+			});
+		}
+	],
 } satisfies Config;
