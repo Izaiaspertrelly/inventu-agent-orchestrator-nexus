@@ -66,6 +66,22 @@ class ApiService {
     return url.toString();
   }
 
+  // Helper method to convert a value to BodyInit
+  private convertToBodyInit(value: unknown): BodyInit | null {
+    if (value == null) {
+      return null;
+    }
+    
+    if (typeof value === 'string' || value instanceof Blob || value instanceof FormData || 
+        value instanceof URLSearchParams || value instanceof ReadableStream || 
+        value instanceof ArrayBuffer || ArrayBuffer.isView(value)) {
+      return value as BodyInit;
+    }
+    
+    // For objects and any other types, convert to JSON string
+    return JSON.stringify(value);
+  }
+
   // Método para fazer requisições
   private async request<T>(
     method: HttpMethod,
@@ -86,9 +102,8 @@ class ApiService {
       ...restConfig,
     };
     
-    if (body) {
-      requestConfig.body =
-        typeof body === "string" ? body : JSON.stringify(body);
+    if (body !== undefined) {
+      requestConfig.body = this.convertToBodyInit(body);
     }
     
     try {
