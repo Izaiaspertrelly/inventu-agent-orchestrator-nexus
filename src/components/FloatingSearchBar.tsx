@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Search, X, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: 80 });
+  const [position, setPosition] = useState({ x: window.innerWidth / 2 - 250, y: 80 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const { toast } = useToast();
   const floatingBarRef = useRef<HTMLDivElement>(null);
@@ -34,9 +33,13 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
     
+    // Calculate new position with boundaries to keep on screen
+    const newX = Math.max(0, Math.min(window.innerWidth - 500, e.clientX - offset.x));
+    const newY = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - offset.y));
+    
     setPosition({
-      x: e.clientX - offset.x,
-      y: e.clientY - offset.y
+      x: newX,
+      y: newY
     });
   };
   
@@ -57,6 +60,12 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging]);
+  
+  useEffect(() => {
+    // Ensure the floating bar is visible initially
+    const centerX = window.innerWidth / 2 - 250;
+    setPosition({ x: centerX, y: 80 });
+  }, []);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,17 +102,17 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
   return (
     <div 
       ref={floatingBarRef}
-      className="absolute z-50 shadow-lg rounded-full"
+      className="fixed z-50 shadow-lg rounded-full"
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
         width: "500px",
-        cursor: isDragging ? "grabbing" : "grab",
       }}
     >
       <div 
         className="bg-secondary/50 backdrop-blur-md rounded-full border border-border/40 p-1"
         onMouseDown={handleMouseDown}
+        style={{ cursor: isDragging ? "grabbing" : "grab" }}
       >
         <div className="flex items-center px-2">
           <div className="flex-1 relative">
