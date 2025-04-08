@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
@@ -103,8 +102,8 @@ const OrchestratorSection: React.FC = () => {
       
       const newConfig = {
         mainAgentId: mainAgent,
-        name: "Orquestrador Neural", // Nome fixo
-        description: "Centro de controle do sistema de IA", // Descrição fixa
+        name: "Orquestrador Neural",
+        description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA.",
         memory: memoryConfig,
         reasoning: reasoningConfig,
         planning: planningConfig,
@@ -133,7 +132,7 @@ const OrchestratorSection: React.FC = () => {
       
       // Garantindo que o nome e descrição estejam fixos
       config.name = "Orquestrador Neural";
-      config.description = "Centro de controle do sistema de IA";
+      config.description = "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA.";
       
       updateOrchestratorConfig(config);
       

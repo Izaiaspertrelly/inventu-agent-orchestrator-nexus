@@ -34,7 +34,7 @@ export const useFormSubmit = () => {
       const newAgent = {
         id: uuidv4(),
         name: "Orquestrador Neural", // Nome fixo
-        description: "Centro de controle do sistema de IA", // Descrição fixa
+        description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA.", // Descrição fixa atualizada
         modelId: selectedModel,
         configJson: JSON.stringify({
           orchestrator: configObj

@@ -10,10 +10,10 @@ const OrchestratorHeader: React.FC = () => {
         <h3 className="text-2xl font-semibold">Orquestrador Neural</h3>
       </div>
       <p className="text-muted-foreground">
-        O Orquestrador Neural é o centro de controle que gerencia a memória, o estado, 
-        o raciocínio e o planejamento do sistema. Ele coordena o fluxo de informações entre 
-        modelos e ferramentas, mantém o histórico de interações, decompõe tarefas complexas, 
-        monitora o desempenho e gerencia recursos computacionais.
+        O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar 
+        todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA. Ele atua como o 
+        "cérebro executivo" da arquitetura, integrando diferentes contextos, entradas, intenções e ferramentas 
+        em uma única malha neural operacional.
       </p>
     </div>
   );
