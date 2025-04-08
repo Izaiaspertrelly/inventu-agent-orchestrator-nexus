@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Message } from "../types";
 import { createBotMessage } from "../utils/chatUtils";
@@ -14,14 +13,14 @@ export const useChatMessageProcessor = () => {
   const { selectModelForTask, optimizeResources, orchestratorConfig, createUserDatabase, requestMemoryConfirmation } = useAgent();
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Importar hooks específicos para cada funcionalidade
+  // Import hooks for specific functionalities
   const { findAgentByModel, getOrchestratorAgent, orchestrateAgentResponse } = useOrchestratorResponse();
   const { executeToolsFromMessage, processFileUpload } = useToolExecutor();
   const { generateModelBasedResponse } = useModelResponse();
   
-  // Detectar informações potencialmente importantes para memória
+  // Detect information potentially important for memory
   const detectImportantInformation = (userMessage: string) => {
-    // Exemplo de padrões para detectar informações importantes
+    // Example of patterns for detecting important information
     const patterns = [
       { regex: /minha\s+api\s+[é:]?\s+([^\s.,]+)/i, key: 'api_key', label: 'API Key' },
       { regex: /uso\s+(o\s+)?([^\s.,]+)\s+para/i, key: 'tool_usage', label: 'Ferramenta utilizada' },
@@ -51,109 +50,79 @@ export const useChatMessageProcessor = () => {
     setIsProcessing(true);
     
     try {
-      console.log(`Gerando resposta usando modelo: ${selectedModelId}`);
+      console.log(`Generating response using model: ${selectedModelId}`);
       
-      // 1. RECEBIMENTO DA TAREFA
-      console.log("Passo 1: Recebimento da tarefa");
-      // Gerar ID de usuário temporário (em uma implementação real, viria da autenticação)
+      // 1. Setup user info and database
+      console.log("Step 1: Setting up user context");
       const userId = localStorage.getItem('temp_user_id') || uuidv4();
       localStorage.setItem('temp_user_id', userId);
-      
-      // Criar base de dados para o usuário se não existir
       createUserDatabase(userId);
-      
-      // Otimizar recursos se necessário
-      const optimizedTokenLimit = optimizeResources ? optimizeResources() : 4000;
-      console.log(`Limite otimizado de tokens: ${optimizedTokenLimit}`);
-      
-      // 2. PLANEJAMENTO
-      console.log("Passo 2: Planejamento");
-      // Verificar se temos um orquestrador configurado
-      const orchestratorAgent = getOrchestratorAgent();
       
       let responseContent = "";
       let toolsUsed: string[] = [];
       
-      if (orchestratorAgent) {
-        console.log("Orquestrador encontrado:", orchestratorAgent.name);
+      // Check if orchestrator is configured and should be used
+      if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
+        console.log("Orchestrator is configured, using orchestrated response flow");
         
-        // Criar ID único para a tarefa
-        const taskId = `task-${Date.now()}`;
-        
-        // Determinar subtasks baseado na configuração do orquestrador
-        const useSteps = orchestratorConfig?.planning?.enabled || false;
-        
-        // 3. PROCESSAMENTO PELO MODELO
-        console.log("Passo 3: Processamento pelo modelo");
-        if (useSteps) {
-          // Exemplo simplificado de decomposição de tarefas
-          const subtasks = [
-            `Entender a consulta: "${userMessage.substring(0, 30)}..."`,
-            "Recuperar informações relevantes do contexto",
-            "Identificar ferramentas necessárias",
-            "Formular resposta com base nas informações disponíveis"
-          ];
-          
-          // Registrar a decomposição da tarefa no orquestrador
-          if (orchestratorConfig?.planning?.enabled) {
-            console.log("Registrando decomposição de tarefa:", subtasks);
-          }
+        // Process file if uploaded
+        if (file) {
+          const fileResponse = processFileUpload(file);
+          responseContent += fileResponse;
         }
         
-        // 4. EXECUÇÃO DE FERRAMENTAS
-        console.log("Passo 4: Execução de ferramentas");
-        // Executar ferramentas se necessário
+        // Execute tools based on message content
         const toolResult = await executeToolsFromMessage(userMessage);
         toolsUsed = toolResult.toolsUsed;
-        responseContent += toolResult.responseContent;
+        if (toolResult.responseContent) {
+          responseContent += toolResult.responseContent;
+        }
         
-        // Processar arquivo se enviado
-        const fileResponse = processFileUpload(file);
-        responseContent += fileResponse;
+        // Get orchestrator agent
+        const orchestratorAgent = getOrchestratorAgent();
         
-        // 5 & 6. INTEGRAÇÃO DE RESULTADOS E GERAÇÃO DE RESPOSTA
-        console.log("Passos 5 e 6: Integração de resultados e geração de resposta");
-        // Orquestrar a resposta com o agente principal
-        const orchestratedResponse = await orchestrateAgentResponse(userMessage, orchestratorAgent);
-        responseContent += orchestratedResponse;
-        
-        // 7. ATUALIZAÇÃO DE MEMÓRIA
-        console.log("Passo 7: Atualização de memória");
-        // Detectar informações importantes
-        const importantInfo = detectImportantInformation(userMessage);
-        
-        // Solicitar confirmação para salvar na memória
-        if (importantInfo.length > 0 && orchestratorConfig?.memory?.userPromptEnabled) {
-          console.log("Informações importantes detectadas:", importantInfo);
+        if (orchestratorAgent) {
+          console.log("Using orchestrator agent:", orchestratorAgent.name);
           
-          // Para cada informação importante, solicitar confirmação
-          for (const info of importantInfo) {
-            requestMemoryConfirmation(userId, info);
+          // Use orchestrator to generate response
+          const orchestratedResponse = await orchestrateAgentResponse(userMessage, orchestratorAgent);
+          responseContent += orchestratedResponse;
+          
+          // Process memory aspects if enabled
+          if (orchestratorConfig.memory?.enabled) {
+            const importantInfo = detectImportantInformation(userMessage);
             
-            // Adicionar mensagem sobre a informação detectada
-            responseContent += `\n\nDetectei que você mencionou ${info.label}: "${info.value}". Gostaria de salvar isso para referência futura?`;
+            if (importantInfo.length > 0 && orchestratorConfig.memory?.userPromptEnabled) {
+              for (const info of importantInfo) {
+                requestMemoryConfirmation(userId, info);
+                responseContent += `\n\nDetectei que você mencionou ${info.label}: "${info.value}". Gostaria de salvar isso para referência futura?`;
+              }
+            }
           }
+        } else {
+          console.log("No orchestrator agent found, using fallback processing");
+          responseContent += "Orquestrador não configurado corretamente. ";
+          
+          // Fallback to basic model response
+          const modelResponse = generateModelBasedResponse(userMessage, selectedModelId);
+          responseContent += modelResponse;
         }
-        
-        // Simular delay para UI
-        await new Promise(resolve => setTimeout(resolve, 1000));
       } else {
-        // Fallback para processamento simples sem orquestrador
-        console.log("Nenhum orquestrador configurado, usando processamento simples");
+        console.log("Orchestrator not configured, using standard processing flow");
         
-        // Encontrar o agente associado ao modelo selecionado
-        const agent = findAgentByModel(selectedModelId);
-        
-        // Executar ferramentas
+        // Execute tools
         const toolResult = await executeToolsFromMessage(userMessage);
         toolsUsed = toolResult.toolsUsed;
         responseContent += toolResult.responseContent;
         
-        // Processar arquivo
-        const fileResponse = processFileUpload(file);
-        responseContent += fileResponse;
+        // Process file
+        if (file) {
+          const fileResponse = processFileUpload(file);
+          responseContent += fileResponse;
+        }
         
-        // Gerar resposta
+        // Find agent for model and generate response
+        const agent = findAgentByModel(selectedModelId);
         responseContent += generateModelBasedResponse(userMessage, selectedModelId, agent);
       }
       
@@ -161,7 +130,7 @@ export const useChatMessageProcessor = () => {
       return createBotMessage(responseContent, selectedModelId, toolsUsed.length > 0 ? toolsUsed : undefined);
     } catch (error) {
       setIsProcessing(false);
-      console.error("Erro ao gerar resposta:", error);
+      console.error("Error generating response:", error);
       return createBotMessage(
         "Desculpe, houve um erro ao processar sua mensagem. Por favor, tente novamente.",
         "error",

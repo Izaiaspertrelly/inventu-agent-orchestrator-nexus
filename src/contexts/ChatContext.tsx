@@ -5,6 +5,7 @@ import { ChatContextType } from "../types/chat";
 import { createChat, createUserMessage, createChatTitle } from "../utils/chatUtils";
 import { useChatMessageProcessor } from "../hooks/use-chat-message-processor";
 import { useToast } from "@/hooks/use-toast";
+import { useAgent } from "./AgentContext";
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
@@ -13,6 +14,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { toast } = useToast();
   const { generateBotResponse, selectModelForTask, isProcessing } = useChatMessageProcessor();
+  const { orchestratorConfig } = useAgent();
   
   const [chats, setChats] = useState<Chat[]>(() => {
     const savedChats = localStorage.getItem("inventu_chats");
@@ -78,9 +80,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   
   const sendMessageToChat = async (chatId: string, content: string, file?: File | null) => {
-    console.log("Enviando mensagem para o chat:", chatId);
-    console.log("Conteúdo:", content);
-    console.log("Arquivo anexado:", file?.name || "nenhum");
+    console.log("Sending message to chat:", chatId);
+    console.log("Content:", content);
+    console.log("Attached file:", file?.name || "none");
     
     if (!content.trim() && !file) {
       toast({
@@ -111,15 +113,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     
     try {
-      // Select the appropriate model for this task
-      console.log("Selecionando modelo para a tarefa...");
-      const selectedModelId = await selectModelForTask(content);
-      console.log("Modelo selecionado:", selectedModelId);
+      // Use orchestrator's selected model if available, otherwise use default selection
+      console.log("Selecting model for task...");
+      let selectedModelId;
       
-      // Generate AI response
-      console.log("Gerando resposta com o modelo:", selectedModelId);
+      if (orchestratorConfig && orchestratorConfig.selectedModel) {
+        console.log("Using orchestrator's selected model:", orchestratorConfig.selectedModel);
+        selectedModelId = orchestratorConfig.selectedModel;
+      } else {
+        selectedModelId = await selectModelForTask(content);
+        console.log("Selected model using standard selection:", selectedModelId);
+      }
+      
+      // Generate AI response using the orchestrator
+      console.log("Generating response with model:", selectedModelId);
       const botMessage = await generateBotResponse(content, selectedModelId, file);
-      console.log("Resposta gerada:", botMessage);
+      console.log("Response generated:", botMessage);
       
       // Update chat with AI response
       const finalMessages = [...updatedMessages, botMessage];

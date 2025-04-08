@@ -5,67 +5,76 @@ import { useAgent } from "../../contexts/AgentContext";
 export const useOrchestratorResponse = () => {
   const { agents, orchestratorConfig, orchestratorState, addToConversationHistory, recordPerformanceMetric, decomposeTask } = useAgent();
   
-  // Estado para controlar pendência de confirmações de memória
+  // State to control memory confirmation pending status
   const [pendingMemoryConfirmation, setPendingMemoryConfirmation] = useState(null);
   
-  // Monitorar confirmações pendentes
+  // Monitor pending confirmations
   useEffect(() => {
     const pendingConfirmations = orchestratorState?.memory?.pendingConfirmations || [];
     if (pendingConfirmations.length > 0 && !pendingMemoryConfirmation) {
-      // Pegar a primeira confirmação pendente
+      // Get first pending confirmation
       setPendingMemoryConfirmation({
         id: 0,
         ...pendingConfirmations[0]
       });
     } else if (pendingConfirmations.length === 0 && pendingMemoryConfirmation) {
-      // Limpar quando não há mais confirmações pendentes
+      // Clear when no more pending confirmations
       setPendingMemoryConfirmation(null);
     }
-  }, [orchestratorState?.memory?.pendingConfirmations]);
+  }, [orchestratorState?.memory?.pendingConfirmations, pendingMemoryConfirmation]);
   
-  // Função para encontrar o agente correto baseado no modelo selecionado
+  // Function to find the correct agent based on selected model
   const findAgentByModel = (modelId: string) => {
     return agents.find(agent => agent.modelId === modelId);
   };
   
-  // Encontrar o agente orquestrador baseado no ID configurado
+  // Find orchestrator agent based on configured ID
   const getOrchestratorAgent = () => {
     if (!orchestratorConfig || !orchestratorConfig.mainAgentId) {
+      console.log("No orchestrator agent configured");
       return null;
     }
-    return agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
+    
+    const agent = agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
+    if (!agent) {
+      console.log("Configured orchestrator agent not found");
+      return null;
+    }
+    
+    console.log("Found orchestrator agent:", agent.name);
+    return agent;
   };
   
-  // Processo de orquestração de agentes
+  // Agent orchestration process
   const orchestrateAgentResponse = async (userMessage: string, agent: any) => {
     const startTime = Date.now();
     try {
-      console.log("Orquestrando resposta usando agente:", agent?.name);
+      console.log("Orchestrating response using agent:", agent?.name);
       
-      // Registrar a mensagem do usuário no histórico de conversas
+      // Register user message in conversation history
       addToConversationHistory?.({
         role: "user",
         content: userMessage,
         timestamp: new Date()
       });
       
-      // Tentar analisar a configuração do agente
+      // Try to parse agent configuration
       let agentConfig: any = {};
       try {
         agentConfig = JSON.parse(agent.configJson || "{}");
-        console.log("Configuração do agente carregada:", agentConfig);
+        console.log("Agent configuration loaded:", agentConfig);
       } catch (e) {
-        console.error("Erro ao analisar configuração do agente:", e);
+        console.error("Error parsing agent configuration:", e);
       }
       
-      // Usar configurações do orquestrador se este agente for o orquestrador principal
+      // Use orchestrator settings if this agent is the main orchestrator
       let useOrchestratorConfig = false;
       if (orchestratorConfig && orchestratorConfig.mainAgentId === agent.id) {
-        console.log("Este agente é o orquestrador principal, usando configurações centrais");
+        console.log("This agent is the main orchestrator, using central configuration");
         useOrchestratorConfig = true;
       }
       
-      // Verificar capacidades do orquestrador - com validação para evitar o erro
+      // Check orchestrator capabilities - with validation to avoid errors
       const orchestratorSettings = useOrchestratorConfig ? orchestratorConfig : (agentConfig.orchestrator || {});
       const memory = orchestratorSettings.memory || { enabled: false };
       const reasoning = orchestratorSettings.reasoning || { enabled: false };
@@ -74,44 +83,45 @@ export const useOrchestratorResponse = () => {
       
       let responseContent = "";
       
-      // Indicar se este é o orquestrador principal
+      // Indicate if this is the main orchestrator
       if (useOrchestratorConfig) {
         responseContent += `[Orquestrador Neural] `;
       } else {
         responseContent += `[Agente: ${agent.name}] `;
       }
       
-      // Processo de planejamento se habilitado
+      // Planning process if enabled
       if (planning.enabled) {
-        // Criar um ID único para a tarefa
+        // Create unique task ID
         const taskId = `task-${Date.now()}`;
         
-        // Exemplo simplificado de decomposição de tarefas
+        // Simplified task decomposition example
         const subtasks = [
-          `Entender a consulta: "${userMessage.substring(0, 30)}..."`,
-          "Recuperar informações relevantes do contexto",
-          "Formular resposta com base nas informações disponíveis"
+          `Understand the query: "${userMessage.substring(0, 30)}..."`,
+          "Retrieve relevant information from context",
+          "Formulate response based on available information"
         ];
         
-        // Registrar a decomposição da tarefa
+        // Register task decomposition
         decomposeTask?.(taskId, userMessage, subtasks);
         
         responseContent += `[Planejamento] Decompondo tarefa em ${subtasks.length} subtarefas. `;
       }
       
-      // Processar com memória se habilitado
+      // Process with memory if enabled
       if (memory.enabled) {
         const historyCount = orchestratorState?.conversationHistory?.length || 0;
-        responseContent += `[Memória ${memory.type}] Processando com contexto de ${historyCount} mensagens anteriores. `;
+        responseContent += `[Memória ${memory.type || "buffer"}] Processando com contexto de ${historyCount} mensagens anteriores. `;
       }
       
-      // Processar com raciocínio se habilitado
+      // Process with reasoning if enabled
       if (reasoning.enabled) {
         const depth = reasoning.depth || 1;
-        responseContent += `[Raciocínio profundidade ${depth}] Analisando consulta com raciocínio ${reasoning.strategy}. `;
+        const strategy = reasoning.strategy || "padrão";
+        responseContent += `[Raciocínio profundidade ${depth}] Analisando consulta com raciocínio ${strategy}. `;
       }
       
-      // Monitoramento e adaptação se habilitados
+      // Monitoring and adaptation if enabled
       if (monitoring.enabled) {
         const optimizedTokens = orchestratorSettings.resources?.optimizeUsage 
           ? `Uso otimizado de tokens (max: ${orchestratorSettings.resources?.maxTokens || 2000}). `
@@ -120,16 +130,14 @@ export const useOrchestratorResponse = () => {
         responseContent += `[Monitoramento] ${optimizedTokens}`;
       }
       
-      // Construir resposta principal baseada no agente
+      // Build main response based on the agent
       responseContent += `\n\nAnalisando sua solicitação: "${userMessage}"\n\n`;
       
       if (planning.enabled) {
         responseContent += "Dividi esta tarefa em passos menores para melhor processamento.\n\n";
       }
       
-      // Simular uma resposta baseada na consulta (em uma implementação real, isso viria do modelo)
-      responseContent += `Baseado na sua consulta, aqui está minha resposta como ${useOrchestratorConfig ? "Orquestrador Neural" : agent.name}:\n\n`;
-      
+      // Generate response based on message content
       if (userMessage.toLowerCase().includes("api") || userMessage.toLowerCase().includes("chave")) {
         responseContent += "Observei que você mencionou uma API ou chave. Vou guardar esta informação para referência futura, se você autorizar.";
       } else if (userMessage.toLowerCase().includes("ajuda") || userMessage.toLowerCase().includes("como")) {
@@ -138,15 +146,15 @@ export const useOrchestratorResponse = () => {
         responseContent += "Processando sua solicitação com as ferramentas e conhecimento disponíveis para gerar a melhor resposta possível.";
       }
       
-      // Registrar o tempo de resposta para análise de desempenho
+      // Register response time for performance analysis
       const responseTime = Date.now() - startTime;
       recordPerformanceMetric?.("responseTime", responseTime);
       
-      // Estimar e registrar o uso aproximado de tokens (simplificado)
+      // Estimate and register token usage (simplified)
       const estimatedTokens = Math.ceil(userMessage.length / 4) + Math.ceil(responseContent.length / 4);
       recordPerformanceMetric?.("tokenUsage", estimatedTokens);
       
-      // Registrar a resposta do agente no histórico de conversas
+      // Register agent response in conversation history
       addToConversationHistory?.({
         role: "assistant",
         content: responseContent,
@@ -155,8 +163,8 @@ export const useOrchestratorResponse = () => {
       
       return responseContent;
     } catch (error) {
-      console.error("Erro na orquestração do agente:", error);
-      return `Erro ao processar com o agente: ${error.message}`;
+      console.error("Error in agent orchestration:", error);
+      return `Error processing with agent: ${error.message}`;
     }
   };
 

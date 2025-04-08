@@ -21,7 +21,7 @@ export const useFormSubmit = () => {
   const handleSaveOrchestrator = (formData: FormData): boolean => {
     const { selectedModel, orchestratorConfig } = formData;
     
-    // Utiliza nome e descrição fixos, validando apenas o modelo
+    // Use fixed name and description, validating only the model
     if (!validateForm({ name: "Orquestrador Neural", selectedModel })) {
       return false;
     }
@@ -33,17 +33,17 @@ export const useFormSubmit = () => {
       try {
         configObj = JSON.parse(orchestratorConfig);
       } catch (e) {
-        console.error("Erro ao parsear JSON:", e);
+        console.error("Error parsing JSON:", e);
         toast({
-          title: "Erro na configuração",
-          description: "O JSON de configuração é inválido.",
+          title: "Configuration Error",
+          description: "The configuration JSON is invalid.",
           variant: "destructive"
         });
         setIsFormLoading(false);
         return false;
       }
       
-      // Garantir que as configurações essenciais estejam presentes
+      // Ensure essential configurations are present
       const updatedConfig = {
         ...configObj,
         name: "Orquestrador Neural",
@@ -51,7 +51,7 @@ export const useFormSubmit = () => {
         selectedModel
       };
       
-      // Garantir que as flags enabled sejam preservadas corretamente
+      // Ensure enabled flags are preserved correctly as boolean values
       if (updatedConfig.memory) {
         updatedConfig.memory.enabled = updatedConfig.memory.enabled !== false;
       }
@@ -64,17 +64,17 @@ export const useFormSubmit = () => {
         updatedConfig.planning.enabled = updatedConfig.planning.enabled === true;
       }
       
-      // Adicionar informações de timestamp
+      // Add timestamp information
       updatedConfig.lastUpdated = new Date().toISOString();
       
-      console.log("Salvando configuração do orquestrador:", updatedConfig);
+      console.log("Saving orchestrator configuration:", updatedConfig);
       
-      // Atualizar configuração do orquestrador
+      // Update orchestrator configuration
       updateOrchestratorConfig(updatedConfig);
       
       toast({
-        title: "Orquestrador atualizado",
-        description: "Configuração do orquestrador salva com sucesso.",
+        title: "Orchestrator Updated",
+        description: "Orchestrator configuration saved successfully.",
       });
       
       setIsFormSubmitted(true);
@@ -82,10 +82,10 @@ export const useFormSubmit = () => {
       
       return true;
     } catch (e) {
-      console.error("Erro ao salvar orquestrador:", e);
+      console.error("Error saving orchestrator:", e);
       toast({
-        title: "Erro na configuração",
-        description: "Não foi possível atualizar a configuração do orquestrador.",
+        title: "Configuration Error",
+        description: "Could not update orchestrator configuration.",
         variant: "destructive"
       });
       return false;
