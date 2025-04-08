@@ -60,7 +60,7 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
         toast({
           title: "Chave de API ausente",
           description: `Configure uma chave de API para ${provider?.provider || providerId} para ver modelos disponíveis.`,
-          variant: "warning",
+          variant: "default",  // Changed from "warning" to "default"
         });
         setAvailableModels([]);
         return;
@@ -73,7 +73,7 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
         toast({
           title: "Nenhum modelo encontrado",
           description: `Não foi possível carregar modelos para ${provider.provider}.`,
-          variant: "warning",
+          variant: "default",  // Changed from "warning" to "default"
         });
       }
       
