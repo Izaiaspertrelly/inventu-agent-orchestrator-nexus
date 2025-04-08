@@ -16,6 +16,7 @@ import Index from "@/pages/Index";
 import Chat from "@/pages/Chat";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
+import AdminDashboard from "@/pages/AdminDashboard";
 
 // Create a new QueryClient instance with default options for error handling
 const queryClient = new QueryClient({
@@ -64,6 +65,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <AdminDashboard />
                       </ProtectedRoute>
                     }
                   />

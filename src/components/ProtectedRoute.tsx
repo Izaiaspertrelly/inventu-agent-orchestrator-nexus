@@ -32,7 +32,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check roles if specified
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+    // Redirect normal users to home, admins to admin panel
+    if (user.role === "admin") {
+      return <Navigate to="/admin" replace />;
+    } else {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;
