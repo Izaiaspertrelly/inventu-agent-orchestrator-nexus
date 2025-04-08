@@ -19,6 +19,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   const [message, setMessage] = useState(initialMessage);
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isVibrating, setIsVibrating] = useState(false);
   const { toast } = useToast();
   const logoRef = useRef<HTMLImageElement>(null);
   
@@ -55,7 +56,14 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   
   const toggleSuperAgent = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsVibrating(true);
     setSuperAgentEnabled(!superAgentEnabled);
+    
+    // Reset vibration after animation completes
+    setTimeout(() => {
+      setIsVibrating(false);
+    }, 1500);
+    
     toast({
       title: superAgentEnabled ? "God Mode Desativado" : "God Mode Ativado",
       description: superAgentEnabled 
@@ -71,7 +79,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   return (
     <DraggableContainer isMinimized={isMinimized}>
       <div 
-        className={`neo-blur rounded-full p-1 transition-all duration-300 flex items-center shadow-lg`}
+        className={`neo-blur rounded-full p-1 transition-all duration-300 flex items-center shadow-lg ${isVibrating ? 'animate-vibrate' : ''}`}
         style={{ 
           width: isMinimized ? '50px' : '600px',
           overflow: 'hidden'
