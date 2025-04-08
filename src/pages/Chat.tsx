@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -98,7 +99,7 @@ const Chat: React.FC = () => {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-4">
               <div className="text-center max-w-2xl">
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center mb-4"> {/* Reduced margin-bottom from mb-8 to mb-4 */}
                   <img 
                     src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
                     alt="Super Agent Logo" 
