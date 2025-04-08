@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -63,7 +64,7 @@ const Chat: React.FC = () => {
     setShowLightning(true);
     setTimeout(() => {
       setShowLightning(false);
-    }, 1000);
+    }, 1500);
     setSuperAgentEnabled(!superAgentEnabled);
     setTimeout(() => {
       setIsVibrating(false);
@@ -127,13 +128,23 @@ const Chat: React.FC = () => {
     );
   };
   
+  const RealisticLightning: React.FC = () => {
+    return (
+      <div className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none">
+        <div className="lightning-bolt animate-lightning">
+          <div className="lightning-main"></div>
+          <div className="lightning-branch-1"></div>
+          <div className="lightning-branch-2"></div>
+          <div className="lightning-branch-3"></div>
+        </div>
+        <div className="lightning-flash animate-lightning-flash"></div>
+      </div>
+    );
+  };
+  
   return (
     <div className="flex h-screen bg-background dark">
-      {showLightning && (
-        <div className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none">
-          <div className="lightning-bolt animate-lightning"></div>
-        </div>
-      )}
+      {showLightning && <RealisticLightning />}
       
       <ChatSidebar />
       

@@ -116,31 +116,68 @@ export default {
 				'lightning': {
 					'0%': { 
 						opacity: '0',
-						transform: 'scaleY(0)'
+						filter: 'brightness(0)'
 					},
 					'5%': { 
 						opacity: '0.9',
-						transform: 'scaleY(1)'
+						filter: 'brightness(1.5)'
 					},
 					'20%': { 
 						opacity: '1',
-						transform: 'scaleY(1)'
+						filter: 'brightness(2)'
 					},
 					'40%': { 
 						opacity: '0.8',
-						transform: 'scaleY(1)'
+						filter: 'brightness(1.8)'
 					},
 					'60%': { 
 						opacity: '0.4',
-						transform: 'scaleY(1)'
+						filter: 'brightness(1.2)'
 					},
 					'80%': { 
 						opacity: '0.2',
-						transform: 'scaleY(1)'
+						filter: 'brightness(0.8)'
 					},
 					'100%': { 
 						opacity: '0',
-						transform: 'scaleY(0)'
+						filter: 'brightness(0)'
+					}
+				},
+				'lightning-flash': {
+					'0%': {
+						opacity: '0',
+						filter: 'brightness(1)',
+						transform: 'scale(0.95)'
+					},
+					'5%': {
+						opacity: '0.3',
+						filter: 'brightness(1.5)',
+						transform: 'scale(0.975)'
+					},
+					'10%': {
+						opacity: '0.8',
+						filter: 'brightness(2)',
+						transform: 'scale(1)'
+					},
+					'15%': {
+						opacity: '1',
+						filter: 'brightness(3)',
+						transform: 'scale(1.05)'
+					},
+					'30%': {
+						opacity: '0.6',
+						filter: 'brightness(2)',
+						transform: 'scale(1.02)'
+					},
+					'50%': {
+						opacity: '0.3',
+						filter: 'brightness(1.5)',
+						transform: 'scale(1)'
+					},
+					'100%': {
+						opacity: '0',
+						filter: 'brightness(1)',
+						transform: 'scale(0.98)'
 					}
 				}
 			},
@@ -150,7 +187,8 @@ export default {
 				'pulse-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'float': 'float 3s ease-in-out infinite',
 				'vibrate': 'vibrate 1.5s ease-out forwards',
-				'lightning': 'lightning 1s ease-out forwards'
+				'lightning': 'lightning 1s ease-out forwards',
+				'lightning-flash': 'lightning-flash 1.5s ease-out forwards'
 			}
 		}
 	},
@@ -160,10 +198,20 @@ export default {
 			addComponents({
 				'.lightning-bolt': {
 					position: 'absolute',
-					width: '12px',
-					height: '100vh',
+					width: '100%',
+					height: '100%',
 					background: 'transparent',
-					transformOrigin: 'top center',
+					pointerEvents: 'none',
+					overflow: 'hidden',
+					zIndex: 50,
+				},
+				'.lightning-main': {
+					position: 'absolute',
+					top: '0',
+					left: '50%',
+					width: '8px',
+					height: '100%',
+					background: 'transparent',
 					'&::before': {
 						content: '""',
 						position: 'absolute',
@@ -171,11 +219,87 @@ export default {
 						left: '0',
 						width: '100%',
 						height: '100%',
-						clipPath: 'polygon(50% 0%, 40% 30%, 60% 35%, 45% 60%, 65% 65%, 40% 100%, 50% 70%, 30% 65%, 55% 40%, 35% 35%)',
-						backgroundColor: '#007AFF',
-						boxShadow: '0 0 15px 5px rgba(59, 130, 246, 0.7)',
-						filter: 'blur(1px)',
+						backgroundColor: '#FFFFFF',
+						filter: 'blur(5px)',
+						boxShadow: '0 0 20px 2px rgba(30, 174, 219, 0.8), 0 0 40px 6px rgba(59, 130, 246, 0.6)',
+						clipPath: 'polygon(50% 0%, 45% 15%, 60% 25%, 40% 40%, 55% 50%, 40% 65%, 60% 75%, 45% 90%, 50% 100%, 53% 93%, 63% 85%, 49% 75%, 68% 65%, 47% 50%, 60% 35%, 43% 25%, 55% 10%)',
 					}
+				},
+				'.lightning-branch-1': {
+					position: 'absolute',
+					top: '30%',
+					left: 'calc(50% + 4px)',
+					width: '4px',
+					height: '35%',
+					background: 'transparent',
+					transformOrigin: 'top left',
+					transform: 'rotate(25deg)',
+					'&::before': {
+						content: '""',
+						position: 'absolute',
+						top: '0',
+						left: '0',
+						width: '100%',
+						height: '100%',
+						backgroundColor: '#FFFFFF',
+						filter: 'blur(3px)',
+						boxShadow: '0 0 15px 2px rgba(30, 174, 219, 0.8)',
+						clipPath: 'polygon(50% 0%, 40% 20%, 60% 30%, 30% 50%, 70% 60%, 40% 80%, 60% 100%, 55% 85%, 65% 70%, 40% 60%, 75% 45%, 35% 35%, 65% 20%)',
+					}
+				},
+				'.lightning-branch-2': {
+					position: 'absolute',
+					top: '60%',
+					left: 'calc(50% - 6px)',
+					width: '4px',
+					height: '25%',
+					background: 'transparent',
+					transformOrigin: 'top right',
+					transform: 'rotate(-35deg)',
+					'&::before': {
+						content: '""',
+						position: 'absolute',
+						top: '0',
+						left: '0',
+						width: '100%',
+						height: '100%',
+						backgroundColor: '#FFFFFF',
+						filter: 'blur(3px)',
+						boxShadow: '0 0 15px 2px rgba(30, 174, 219, 0.8)',
+						clipPath: 'polygon(50% 0%, 35% 15%, 65% 25%, 30% 45%, 65% 55%, 40% 75%, 55% 100%, 60% 80%, 40% 65%, 70% 50%, 25% 40%, 60% 25%)',
+					}
+				},
+				'.lightning-branch-3': {
+					position: 'absolute',
+					top: '70%',
+					left: 'calc(50% + 2px)',
+					width: '3px',
+					height: '20%',
+					background: 'transparent',
+					transformOrigin: 'top left',
+					transform: 'rotate(15deg)',
+					'&::before': {
+						content: '""',
+						position: 'absolute',
+						top: '0',
+						left: '0',
+						width: '100%',
+						height: '100%',
+						backgroundColor: '#FFFFFF',
+						filter: 'blur(2px)',
+						boxShadow: '0 0 10px 1px rgba(30, 174, 219, 0.8)',
+						clipPath: 'polygon(50% 0%, 40% 20%, 65% 25%, 35% 40%, 60% 55%, 45% 70%, 55% 100%, 60% 75%, 45% 60%, 65% 45%, 35% 35%, 60% 25%)',
+					}
+				},
+				'.lightning-flash': {
+					position: 'fixed',
+					top: '0',
+					left: '0',
+					width: '100%',
+					height: '100%',
+					backgroundColor: 'rgba(30, 174, 219, 0.2)',
+					pointerEvents: 'none',
+					zIndex: 49,
 				}
 			});
 		}
