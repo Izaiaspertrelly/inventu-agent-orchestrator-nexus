@@ -18,15 +18,16 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
   onKeyDown,
   isSuperAgentEnabled,
   onClick,
-  placeholder = "Dê uma tarefa para Inventor trabalhar..."
+  placeholder = "Dê uma tarefa para o Inventor trabalhar..."
 }) => {
   return (
     <div className="flex-1 relative">
       <Input 
-        className={`w-full py-3 px-4 pl-10 rounded-full text-base backdrop-blur-sm border-0 
+        className={`w-full pr-10 pl-10 py-3 rounded-full text-base backdrop-blur-sm border-0 
           ${isSuperAgentEnabled 
             ? 'bg-primary text-primary-foreground placeholder:text-primary-foreground/70' 
-            : 'bg-transparent placeholder:text-foreground/50'}`}
+            : 'bg-transparent placeholder:text-foreground/50'} 
+          text-ellipsis overflow-hidden`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
