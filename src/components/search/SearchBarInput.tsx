@@ -23,7 +23,7 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
   return (
     <div className="flex-1 relative">
       <Input 
-        className={`w-full pr-10 pl-10 py-3 rounded-full text-base backdrop-blur-sm border-0 
+        className={`w-full pl-10 pr-20 py-3 rounded-full text-base backdrop-blur-sm border-0 
           ${isSuperAgentEnabled 
             ? 'bg-primary text-primary-foreground placeholder:text-primary-foreground/70' 
             : 'bg-transparent placeholder:text-foreground/50'} 
