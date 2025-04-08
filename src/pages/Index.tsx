@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
@@ -38,7 +37,7 @@ const Index = () => {
   const { createNewChat, sendMessage } = useChat();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); // Get user and logout from AuthContext
+  const { user, logout } = useAuth();
   const [greeting, setGreeting] = useState("");
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
@@ -46,7 +45,6 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   
-  // Use the shared file attachment hook
   const {
     selectedFile,
     fileInputRef,
@@ -56,8 +54,6 @@ const Index = () => {
   } = useFileAttachment();
   
   useEffect(() => {
-    // No need to set userName anymore as we get it directly from the Auth context
-    
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Bom dia");
     else if (hour < 18) setGreeting("Boa tarde");
@@ -105,15 +101,12 @@ const Index = () => {
     const tempMessage = message;
     setMessage("");
     
-    // Store the file before clearing it
     const tempFile = selectedFile;
     clearSelectedFile();
     
-    // Create new chat and navigate
     createNewChat();
     navigate("/chat");
     
-    // Send message with delay to ensure navigation is complete
     setTimeout(() => {
       sendMessage(tempMessage, tempFile);
     }, 100);
@@ -129,7 +122,6 @@ const Index = () => {
   return (
     <SidebarProvider defaultOpen={sidebarOpen} open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <div className="flex min-h-screen w-full bg-background">
-        {/* Sidebar */}
         <Sidebar side="left">
           <SidebarHeader className="px-4 py-6">
             <div className="flex items-center justify-between">
@@ -188,22 +180,24 @@ const Index = () => {
           </SidebarFooter>
         </Sidebar>
         
-        {/* Main content */}
         <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
-          {/* Profile avatar in top right corner with dropdown */}
           <div className="absolute top-4 right-4">
             <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
-                    <Avatar>
+                  <Button 
+                    variant="ghost" 
+                    className="h-10 w-10 rounded-full p-0"
+                  >
+                    <Avatar className="h-8 w-8">
                       {user?.profileImage ? (
                         <AvatarImage 
                           src={user.profileImage} 
                           alt={user?.name || "User Profile"} 
+                          className="h-full w-full object-cover"
                         />
                       ) : (
-                        <AvatarFallback>
+                        <AvatarFallback className="h-8 w-8">
                           <User className="h-5 w-5" />
                         </AvatarFallback>
                       )}
@@ -241,7 +235,6 @@ const Index = () => {
             </Dialog>
           </div>
 
-          {/* Sidebar toggle button */}
           <div className="absolute top-4 left-4">
             <Button 
               variant="ghost" 
@@ -294,7 +287,6 @@ const Index = () => {
                   </div>
                 </form>
                 
-                {/* File preview when a file is selected */}
                 {selectedFile && (
                   <FilePreview file={selectedFile} onClear={clearSelectedFile} />
                 )}
