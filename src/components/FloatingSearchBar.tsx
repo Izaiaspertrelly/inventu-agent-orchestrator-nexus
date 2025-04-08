@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Search, X, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,11 +17,13 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
 }) => {
   const [message, setMessage] = useState(initialMessage);
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const { toast } = useToast();
   const floatingBarRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
   
   useEffect(() => {
     const centerPosition = () => {
@@ -62,8 +65,9 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
     
-    const newX = Math.max(0, Math.min(window.innerWidth - 600, e.clientX - offset.x));
-    const newY = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - offset.y));
+    // Allow the search bar to move anywhere on the screen
+    const newX = Math.max(0, Math.min(window.innerWidth - (isMinimized ? 50 : 600), e.clientX - offset.x));
+    const newY = Math.max(0, Math.min(window.innerHeight - (isMinimized ? 50 : 60), e.clientY - offset.y));
     
     setPosition({
       x: newX,
@@ -85,7 +89,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging]);
+  }, [isDragging, isMinimized]);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,22 +123,52 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
     });
   };
   
+  const toggleMinimize = () => {
+    setIsMinimized(!isMinimized);
+  };
+  
   return (
     <div 
       ref={floatingBarRef}
-      className="fixed z-50 shadow-lg rounded-full"
+      className="fixed z-50 shadow-lg"
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
-        width: "600px",
+        transition: isDragging ? 'none' : 'all 0.3s ease',
       }}
     >
       <div 
-        className="bg-secondary/50 backdrop-blur-md rounded-full border border-border/40 p-1"
+        className={`bg-secondary/50 backdrop-blur-md rounded-full border border-border/40 p-1 transition-all duration-300 flex items-center`}
         onMouseDown={handleMouseDown}
-        style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        style={{ 
+          cursor: isDragging ? "grabbing" : "grab",
+          width: isMinimized ? '50px' : '600px',
+          overflow: 'hidden'
+        }}
       >
-        <form onSubmit={handleSendMessage} className="flex items-center px-2">
+        {/* Logo for minimized state */}
+        <div 
+          className="min-w-[40px] h-[40px] flex items-center justify-center cursor-pointer"
+          onClick={toggleMinimize}
+        >
+          <img 
+            ref={logoRef}
+            src="/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png" 
+            alt="Logo" 
+            className="w-8 h-8 object-contain" 
+          />
+        </div>
+
+        {/* Search bar content - visible when not minimized */}
+        <form 
+          onSubmit={handleSendMessage} 
+          className={`flex items-center flex-1 px-2 transition-all duration-300`}
+          style={{ 
+            opacity: isMinimized ? 0 : 1,
+            width: isMinimized ? '0' : 'auto',
+            pointerEvents: isMinimized ? 'none' : 'auto',
+          }}
+        >
           <div className="flex-1 relative">
             <Input 
               className={`w-full py-3 px-4 pl-10 rounded-full text-base backdrop-blur-sm border-0 

@@ -36,12 +36,14 @@ const Chat: React.FC = () => {
     if (hour < 12) setGreeting("Bom dia");
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
-    
-    // Show floating bar when there are messages, otherwise hide it
-    if (activeChat) {
-      setShowFloatingBar(activeChat.messages.length > 0);
-    }
   }, [activeChat, createNewChat]);
+  
+  // Check if there are messages in the active chat
+  useEffect(() => {
+    if (activeChat && activeChat.messages.length > 0) {
+      setShowFloatingBar(true);
+    }
+  }, [activeChat?.messages.length]);
   
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,11 +62,9 @@ const Chat: React.FC = () => {
     // Clear the input field immediately
     setMessage("");
     
-    // Show floating bar right after sending a message
-    setShowFloatingBar(true);
-    
-    // Send the message
+    // Send the message and show floating bar
     await sendMessage(currentMessage);
+    setShowFloatingBar(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
