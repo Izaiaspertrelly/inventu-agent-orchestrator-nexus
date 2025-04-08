@@ -12,7 +12,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "@/pages/Login";
 import Index from "@/pages/Index";
 import Chat from "@/pages/Chat";
-import AdminSettings from "@/pages/AdminSettings";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
@@ -44,14 +43,6 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Chat />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute allowedRoles={["admin"]}>
-                        <AdminSettings />
                       </ProtectedRoute>
                     }
                   />
