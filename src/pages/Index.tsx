@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +20,7 @@ import {
   SidebarMenuButton,
   SidebarFooter
 } from "@/components/ui/sidebar";
-import { Home, MessageSquare, Settings, User, LogOut } from "lucide-react";
+import { Home, MessageSquare, User, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -52,8 +51,6 @@ const Index = () => {
     handleFileSelect,
     clearSelectedFile
   } = useFileAttachment();
-  
-  const isAdmin = user?.role === "admin";
   
   useEffect(() => {
     const hour = new Date().getHours();
@@ -121,9 +118,11 @@ const Index = () => {
     }
   };
   
-  const navigateToAdminPanel = () => {
-    navigate("/admin");
-  };
+  useEffect(() => {
+    if (user && user.role === "admin") {
+      navigate("/admin");
+    }
+  }, [user, navigate]);
   
   return (
     <SidebarProvider defaultOpen={sidebarOpen} open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -163,26 +162,6 @@ const Index = () => {
                   <span>Conversas</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => navigate("/settings")} tooltip="Configurações">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Configurações</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              {isAdmin && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    onClick={navigateToAdminPanel} 
-                    tooltip="Painel de Administração"
-                    className="bg-primary/10 hover:bg-primary/20"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Painel Admin</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
             </SidebarMenu>
           </SidebarContent>
           
@@ -247,14 +226,6 @@ const Index = () => {
                   <User className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
-                
-                {isAdmin && (
-                  <DropdownMenuItem onClick={navigateToAdminPanel}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Painel Administrativo</span>
-                  </DropdownMenuItem>
-                )}
-                
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -275,25 +246,7 @@ const Index = () => {
             </Button>
           </div>
 
-          <div className="text-center max-w-2xl">
-            {/* Admin panel quick access banner if user is admin */}
-            {isAdmin && (
-              <div className="mb-6 w-full bg-primary/10 p-4 rounded-lg border border-primary/20 flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">Acesso administrativo disponível</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Você tem acesso ao painel de administração
-                  </p>
-                </div>
-                <Button 
-                  onClick={navigateToAdminPanel}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  Acessar Painel
-                </Button>
-              </div>
-            )}
-            
+          <div className="text-center max-w-2xl">            
             <div className="flex justify-center mb-2">
               <div className="relative w-32 h-32">
                 <img 

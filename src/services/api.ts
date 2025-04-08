@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "";
 // Tipos para requisições HTTP
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-interface RequestConfig extends RequestInit {
+interface RequestConfig extends Omit<RequestInit, 'body'> {
   params?: Record<string, string>;
   withCredentials?: boolean;
   body?: unknown;

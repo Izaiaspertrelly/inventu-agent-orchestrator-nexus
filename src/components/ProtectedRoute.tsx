@@ -32,12 +32,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check roles if specified
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    // Redirect normal users to home, admins to admin panel
+    // Redirect users based on role
     if (user.role === "admin") {
       return <Navigate to="/admin" replace />;
     } else {
       return <Navigate to="/" replace />;
     }
+  }
+
+  // If user is admin and trying to access a non-admin route without explicit role check
+  if (!allowedRoles && user?.role === "admin" && window.location.pathname === "/") {
+    return <Navigate to="/admin" replace />;
   }
 
   return <>{children}</>;

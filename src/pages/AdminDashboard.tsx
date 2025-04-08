@@ -2,24 +2,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  MessageSquare, 
-  Settings, 
-  User, 
-  LogOut, 
-  X
-} from "lucide-react";
+import { User, LogOut, MessageSquare, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import SettingsTabs from "@/components/settings/SettingsTabs";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import ProfileDialog from "@/components/ProfileDialog";
 
 const AdminDashboard = () => {
@@ -37,11 +24,6 @@ const AdminDashboard = () => {
       description: "Você foi desconectado com sucesso.",
     });
     navigate("/login");
-  };
-
-  // Navigate to settings
-  const handleNavigateToSettings = () => {
-    navigate("/settings");
   };
 
   return (
@@ -62,57 +44,33 @@ const AdminDashboard = () => {
             <Button 
               variant="outline"
               onClick={() => navigate("/")}
-              className="hidden sm:flex"
             >
               Voltar para Aplicação
             </Button>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className="h-10 w-10 rounded-full p-0"
-                >
-                  <Avatar className="h-8 w-8">
-                    {user?.profileImage ? (
-                      <AvatarImage 
-                        src={user.profileImage} 
-                        alt={user?.name || "User Profile"} 
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <AvatarFallback className="h-8 w-8">
-                        <User className="h-5 w-5" />
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="flex items-center justify-start p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user?.name || "Usuário"}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user?.email || ""}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleNavigateToSettings}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Configurações</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button 
+              variant="ghost" 
+              className="h-10 w-10 rounded-full p-0"
+              onClick={() => setProfileDialogOpen(true)}
+            >
+              <Avatar className="h-8 w-8">
+                {user?.profileImage ? (
+                  <AvatarImage 
+                    src={user.profileImage} 
+                    alt={user?.name || "User Profile"} 
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <AvatarFallback className="h-8 w-8">
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+            </Button>
+            
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </header>

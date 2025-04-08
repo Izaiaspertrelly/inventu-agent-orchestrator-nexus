@@ -89,11 +89,13 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
+                  
+                  {/* Redirect /settings to /admin for admin users */}
                   <Route
                     path="/settings"
                     element={
                       <ProtectedRoute allowedRoles={["admin"]}>
-                        <Settings />
+                        <Navigate to="/admin" replace />
                       </ProtectedRoute>
                     }
                   />
