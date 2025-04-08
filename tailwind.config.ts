@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -72,45 +73,45 @@ export default {
 					muted: '#86868B', // Apple gray
 					border: '#1D1D1F', // Apple dark gray
 				},
-				fontFamily: {
-					'apple-sf': [
-						'SF Pro Display', 
-						'-apple-system', 
-						'BlinkMacSystemFont', 
-						'Segoe UI', 
-						'Roboto', 
-						'Helvetica', 
-						'Arial', 
-						'sans-serif'
-					],
-					'apple-neue': [
-						'Arial', 
-						'-apple-system', 
-						'BlinkMacSystemFont', 
-						'Helvetica Neue', 
-						'sans-serif'
-					]
-				},
-				fontSize: {
-					'apple-xs': ['0.75rem', { lineHeight: '1rem' }],
-					'apple-sm': ['0.875rem', { lineHeight: '1.25rem' }],
-					'apple-base': ['1rem', { lineHeight: '1.5rem' }],
-					'apple-lg': ['1.125rem', { lineHeight: '1.75rem' }],
-					'apple-xl': ['1.25rem', { lineHeight: '1.75rem' }],
-					'apple-2xl': ['1.5rem', { lineHeight: '2rem' }],
-					'apple-3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-					'apple-4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-					'apple-5xl': ['3rem', { lineHeight: '1' }],
-					'apple-6xl': ['3.75rem', { lineHeight: '1' }],
-					'apple-7xl': ['4.5rem', { lineHeight: '1' }],
-				},
-				fontWeight: {
-					'apple-light': '300',
-					'apple-normal': '400',
-					'apple-medium': '500',
-					'apple-semibold': '600',
-					'apple-bold': '700'
-				}
+			},
+			fontFamily: {
+				'apple-sf': [
+					'SF Pro Display', 
+					'-apple-system', 
+					'BlinkMacSystemFont', 
+					'Segoe UI', 
+					'Roboto', 
+					'Helvetica', 
+					'Arial', 
+					'sans-serif'
+				],
+				'apple-neue': [
+					'Arial', 
+					'-apple-system', 
+					'BlinkMacSystemFont', 
+					'Helvetica Neue', 
+					'sans-serif'
+				]
+			},
+			fontSize: {
+				'apple-xs': ['0.75rem', { lineHeight: '1rem' }],
+				'apple-sm': ['0.875rem', { lineHeight: '1.25rem' }],
+				'apple-base': ['1rem', { lineHeight: '1.5rem' }],
+				'apple-lg': ['1.125rem', { lineHeight: '1.75rem' }],
+				'apple-xl': ['1.25rem', { lineHeight: '1.75rem' }],
+				'apple-2xl': ['1.5rem', { lineHeight: '2rem' }],
+				'apple-3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+				'apple-4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+				'apple-5xl': ['3rem', { lineHeight: '1' }],
+				'apple-6xl': ['3.75rem', { lineHeight: '1' }],
+				'apple-7xl': ['4.5rem', { lineHeight: '1' }],
+			},
+			fontWeight: {
+				'apple-light': '300',
+				'apple-normal': '400',
+				'apple-medium': '500',
+				'apple-semibold': '600',
+				'apple-bold': '700'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
