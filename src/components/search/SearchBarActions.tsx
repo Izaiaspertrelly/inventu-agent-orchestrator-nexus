@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 
@@ -18,7 +19,7 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
   fileInputRef
 }) => {
   return (
-    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+    <div className="flex items-center gap-2 pr-1">
       <div 
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors cursor-pointer text-xs bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md ${isSuperAgentEnabled ? 'text-primary font-semibold' : 'text-foreground'}`}
         onClick={(e) => { e.stopPropagation(); onToggleSuperAgent(e); }}

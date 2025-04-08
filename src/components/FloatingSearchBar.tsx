@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DraggableContainer from "./draggable/DraggableContainer";
@@ -89,7 +90,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         </div>
 
         <div 
-          className={`flex flex-col w-full transition-all duration-300 px-2`}
+          className={`flex flex-col w-full transition-all duration-300 px-0`}
           style={{ 
             opacity: isMinimized ? 0 : 1,
             width: isMinimized ? '0' : 'auto',
@@ -98,7 +99,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         >
           <form 
             onSubmit={handleSendMessage} 
-            className="flex items-center justify-between flex-1 gap-2"
+            className="flex items-center justify-between flex-1 gap-2 px-1"
           >
             <div className="flex-1 mr-auto">
               <SearchBarInput 
