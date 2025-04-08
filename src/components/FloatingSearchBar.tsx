@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DraggableContainer from "./draggable/DraggableContainer";
@@ -107,6 +108,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
                 onKeyDown={handleKeyDown}
                 isSuperAgentEnabled={superAgentEnabled}
                 onClick={(e) => e.stopPropagation()}
+                inputClassName="floating-search-input"
               />
             </div>
             

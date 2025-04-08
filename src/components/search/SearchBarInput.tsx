@@ -10,6 +10,8 @@ interface SearchBarInputProps {
   isSuperAgentEnabled: boolean;
   onClick?: (e: React.MouseEvent) => void;
   placeholder?: string;
+  containerClassName?: string;
+  inputClassName?: string;
 }
 
 const SearchBarInput: React.FC<SearchBarInputProps> = ({
@@ -18,16 +20,18 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
   onKeyDown,
   isSuperAgentEnabled,
   onClick,
-  placeholder = "Dê uma tarefa para o Inventor trabalhar..."
+  placeholder = "Dê uma tarefa para o Inventor trabalhar...",
+  containerClassName = "",
+  inputClassName = ""
 }) => {
   return (
-    <div className="flex-1 relative">
+    <div className={`flex-1 relative ${containerClassName}`}>
       <Input 
         className={`w-full pl-10 pr-24 py-3 rounded-full text-base backdrop-blur-sm border-0 
           ${isSuperAgentEnabled 
             ? 'bg-primary text-primary-foreground placeholder:text-primary-foreground/70' 
             : 'bg-transparent placeholder:text-foreground/50'} 
-          text-ellipsis overflow-hidden`}
+          text-ellipsis overflow-hidden ${inputClassName}`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
