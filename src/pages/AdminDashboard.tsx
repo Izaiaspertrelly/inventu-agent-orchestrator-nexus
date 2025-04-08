@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, ChevronDown } from "lucide-react";
+import { LogOut, User, ChevronDown, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -38,6 +38,11 @@ const AdminDashboard = () => {
     });
     navigate("/login");
   };
+  
+  // Handle navigation to user application
+  const goToUserInterface = () => {
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,36 +58,48 @@ const AdminDashboard = () => {
             <h1 className="text-xl font-bold">Painel Administrativo</h1>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 pr-2">
-                <Avatar className="h-8 w-8">
-                  {user?.profileImage ? (
-                    <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
-                  ) : (
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <span className="text-sm font-medium">{user?.name || "Usuário"}</span>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
-                Meu Perfil
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/")}>
-                Ir para Aplicação
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-3">
+            {/* Botão para ir à interface do usuário */}
+            <Button 
+              onClick={goToUserInterface} 
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Ir para Aplicação
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 pr-2">
+                  <Avatar className="h-8 w-8">
+                    {user?.profileImage ? (
+                      <AvatarImage src={user.profileImage} alt={user?.name || "User"} />
+                    ) : (
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <span className="text-sm font-medium">{user?.name || "Usuário"}</span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
+                  Meu Perfil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={goToUserInterface}>
+                  Ir para Aplicação
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
 
