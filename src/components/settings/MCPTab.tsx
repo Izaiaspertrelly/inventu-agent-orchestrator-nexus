@@ -15,6 +15,7 @@ const MCPTab = () => {
   const [mcpApiKey, setMcpApiKey] = useState(mcpConfig.apiKey || "");
   
   const [toolDialogOpen, setToolDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   
   const [newTool, setNewTool] = useState<Partial<MCPTool>>({
     name: "",
@@ -47,18 +48,49 @@ const MCPTab = () => {
       return;
     }
     
-    const tool: MCPTool = {
-      id: uuidv4(),
-      name: newTool.name || "Nova Ferramenta",
-      description: newTool.description || "Descrição da ferramenta",
-      endpoint: newTool.endpoint || "/api/tool",
-      method: (newTool.method as "GET" | "POST" | "PUT" | "DELETE") || "GET",
-      parameters: newTool.parameters || "",
-      authKey: newTool.authKey,
-    };
+    if (isEditing && newTool.id) {
+      // Update existing tool
+      const updatedTool: MCPTool = {
+        id: newTool.id,
+        name: newTool.name || "Nova Ferramenta",
+        description: newTool.description || "Descrição da ferramenta",
+        endpoint: newTool.endpoint || "/api/tool",
+        method: newTool.method as "GET" | "POST" | "PUT" | "DELETE" || "GET",
+        parameters: newTool.parameters || "",
+        authKey: newTool.authKey,
+      };
+      
+      // First remove the old one
+      removeMCPTool(updatedTool.id);
+      // Then add the updated one
+      addMCPTool(updatedTool);
+      
+      toast({
+        title: "Ferramenta atualizada",
+        description: `${updatedTool.name} foi atualizada com sucesso`,
+      });
+    } else {
+      // Add new tool
+      const tool: MCPTool = {
+        id: uuidv4(),
+        name: newTool.name || "Nova Ferramenta",
+        description: newTool.description || "Descrição da ferramenta",
+        endpoint: newTool.endpoint || "/api/tool",
+        method: (newTool.method as "GET" | "POST" | "PUT" | "DELETE") || "GET",
+        parameters: newTool.parameters || "",
+        authKey: newTool.authKey,
+      };
+      
+      addMCPTool(tool);
+      
+      toast({
+        title: "Ferramenta adicionada",
+        description: `${tool.name} foi adicionada com sucesso`,
+      });
+    }
     
-    addMCPTool(tool);
     setToolDialogOpen(false);
+    setIsEditing(false);
     setNewTool({
       name: "",
       description: "",
@@ -66,11 +98,6 @@ const MCPTab = () => {
       method: "GET",
       parameters: "",
       authKey: "",
-    });
-    
-    toast({
-      title: "Ferramenta adicionada",
-      description: `${tool.name} foi adicionada com sucesso`,
     });
   };
 
@@ -80,6 +107,12 @@ const MCPTab = () => {
       title: "Ferramenta removida",
       description: "A ferramenta foi removida com sucesso",
     });
+  };
+
+  const handleEditTool = (tool: MCPTool) => {
+    setIsEditing(true);
+    setNewTool({ ...tool });
+    setToolDialogOpen(true);
   };
 
   return (
@@ -100,6 +133,7 @@ const MCPTab = () => {
         setNewTool={setNewTool}
         onAddTool={handleAddTool}
         onDeleteTool={handleDeleteTool}
+        onEditTool={handleEditTool}
       />
     </div>
   );
