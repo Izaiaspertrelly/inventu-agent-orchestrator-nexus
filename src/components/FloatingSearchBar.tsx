@@ -8,13 +8,11 @@ import SearchBarActions from "./search/SearchBarActions";
 
 interface FloatingSearchBarProps {
   onSend: (message: string) => void;
-  onClose: () => void;
   initialMessage?: string;
 }
 
 const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ 
   onSend, 
-  onClose, 
   initialMessage = "" 
 }) => {
   const [message, setMessage] = useState(initialMessage);
@@ -103,7 +101,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
           <SearchBarActions 
             isSuperAgentEnabled={superAgentEnabled}
             onToggleSuperAgent={toggleSuperAgent}
-            onClose={onClose}
             onSubmit={handleSendMessage}
           />
         </form>

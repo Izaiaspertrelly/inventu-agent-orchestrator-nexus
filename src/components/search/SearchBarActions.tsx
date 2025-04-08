@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Paperclip, ToggleRight, ToggleLeft, Minimize } from "lucide-react";
+import { Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 
 interface SearchBarActionsProps {
   isSuperAgentEnabled: boolean;
@@ -12,7 +12,6 @@ interface SearchBarActionsProps {
 const SearchBarActions: React.FC<SearchBarActionsProps> = ({
   isSuperAgentEnabled,
   onToggleSuperAgent,
-  onClose,
   onSubmit
 }) => {
   return (
@@ -46,15 +45,6 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="22 2 15 22 11 13 2 9 22 2" />
         </svg>
-      </button>
-      
-      <button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); onClose(e); }}
-        className="bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md text-foreground p-2 rounded-full transition-colors"
-        title="Minimizar barra de pesquisa"
-      >
-        <Minimize className="h-4 w-4" />
       </button>
     </div>
   );
