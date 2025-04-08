@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -143,7 +144,7 @@ const Chat: React.FC = () => {
       {showFloatingBar && (
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
-          onMinimize={() => setShowFloatingBar(false)}
+          onMinimize={() => {}} // Empty function since minimizing is now handled internally
           initialMessage={message}
         />
       )}
