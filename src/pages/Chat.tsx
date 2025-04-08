@@ -98,13 +98,11 @@ const Chat: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="w-full p-6 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
+                    <div className="w-full p-4 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
                       <div className="rounded-xl bg-secondary/70 p-2.5 mr-4">
-                        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></path>
-                          <path d="M8 7h6"></path>
-                          <path d="M8 11h8"></path>
-                          <path d="M8 15h5"></path>
+                          <line x1="8" y1="12" x2="16" y2="12"></line>
                         </svg>
                       </div>
                       <div className="flex-1">
@@ -113,12 +111,12 @@ const Chat: React.FC = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
-                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/70 hover:bg-secondary/90 text-foreground transition-colors">
-                          <X className="h-5 w-5" />
+                        <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/70 hover:bg-secondary/90 text-foreground transition-colors">
+                          <X className="h-4 w-4" />
                           <span>Recusar</span>
                         </button>
-                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
-                          <Check className="h-5 w-5" />
+                        <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
+                          <Check className="h-4 w-4" />
                           <span>Aceitar</span>
                         </button>
                       </div>
