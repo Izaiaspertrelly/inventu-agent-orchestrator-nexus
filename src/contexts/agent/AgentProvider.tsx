@@ -31,6 +31,10 @@ interface AgentContextType {
   decomposeTask: (taskId: string, task: string, subtasks: string[]) => void;
   recordPerformanceMetric: (metric: "responseTime" | "tokenUsage", value: number) => void;
   optimizeResources: () => number;
+  requestMemoryConfirmation: (userId: string, entry: { key: string, value: any, source: string }) => any;
+  processMemoryConfirmation: (confirmationId: number, approved: boolean) => void;
+  createUserDatabase: (userId: string, userData?: any) => boolean;
+  addMemoryEntry: (userId: string, entry: { key: string, value: any, source: string, timestamp: Date }) => void;
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
@@ -69,6 +73,10 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     addToConversationHistory,
     decomposeTask,
     recordPerformanceMetric,
+    requestMemoryConfirmation,
+    processMemoryConfirmation,
+    createUserDatabase,
+    addMemoryEntry,
     optimizeResources
   } = useOrchestrator();
 
@@ -136,6 +144,10 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         addToConversationHistory,
         decomposeTask,
         recordPerformanceMetric,
+        requestMemoryConfirmation,
+        processMemoryConfirmation,
+        createUserDatabase,
+        addMemoryEntry,
         optimizeResources
       }}
     >

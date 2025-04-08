@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OrchestratorBasicTab from "./orchestrator/OrchestratorBasicTab";
 import OrchestratorCapabilitiesTab from "./orchestrator/OrchestratorCapabilitiesTab";
@@ -9,23 +9,56 @@ import OrchestratorHeader from "./orchestrator/OrchestratorHeader";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useAgent } from "@/contexts/AgentContext";
 import { Brain } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const OrchestratorSection: React.FC = () => {
-  const { orchestratorConfig } = useAgent();
+  const { orchestratorConfig, orchestratorState } = useAgent();
   const isOrchestrator = orchestratorConfig && Object.keys(orchestratorConfig).length > 0;
+
+  // Efeito para exibir status do orquestrador no console para debugging
+  useEffect(() => {
+    if (isOrchestrator) {
+      console.log("Orquestrador Neural ativo:", orchestratorConfig);
+    } else {
+      console.log("Orquestrador Neural não configurado");
+    }
+  }, [orchestratorConfig, isOrchestrator]);
 
   return (
     <div className="space-y-6">
       <OrchestratorHeader />
       
       {isOrchestrator && (
-        <Alert className="bg-blue-50 border-blue-200">
-          <Brain className="h-4 w-4 text-blue-500" />
-          <AlertTitle>Orquestrador Neural ativo</AlertTitle>
-          <AlertDescription>
-            O orquestrador está configurado e pronto para uso
-          </AlertDescription>
-        </Alert>
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex gap-3 mb-2 items-start">
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <Brain className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <AlertTitle className="text-lg font-medium">Orquestrador Neural ativo</AlertTitle>
+                <AlertDescription>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {orchestratorConfig.mainAgentId ? (
+                      <p>Usando agente principal: {agents?.find(a => a.id === orchestratorConfig.mainAgentId)?.name || 'ID: ' + orchestratorConfig.mainAgentId}</p>
+                    ) : (
+                      <p>Sem agente principal definido</p>
+                    )}
+                    {orchestratorConfig.memory?.enabled && (
+                      <p>Memória: {orchestratorConfig.memory.type || "buffer"} (ativada)</p>
+                    )}
+                    {orchestratorConfig.reasoning?.enabled && (
+                      <p>Raciocínio: profundidade {orchestratorConfig.reasoning.depth || 2}</p>
+                    )}
+                    {orchestratorConfig.planning?.enabled && (
+                      <p>Planejamento: ativado</p>
+                    )}
+                  </div>
+                </AlertDescription>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
       
       <Tabs defaultValue="basic" className="space-y-4">

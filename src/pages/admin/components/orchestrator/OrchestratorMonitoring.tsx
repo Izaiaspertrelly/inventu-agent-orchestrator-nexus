@@ -1,133 +1,152 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress"; 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { useAgent } from "@/contexts/AgentContext";
+import { Brain, MessageCircle, ListTodo, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-interface OrchestratorMonitoringProps {
-  enableMonitoring: boolean;
-  setEnableMonitoring: (value: boolean) => void;
-  adaptiveBehavior: boolean;
-  setAdaptiveBehavior: (value: boolean) => void;
-  orchestratorState: any;
-  handleUpdateConfig: () => void;
-}
-
-const OrchestratorMonitoring: React.FC<OrchestratorMonitoringProps> = ({
-  enableMonitoring,
-  setEnableMonitoring,
-  adaptiveBehavior,
-  setAdaptiveBehavior,
-  orchestratorState,
-  handleUpdateConfig,
-}) => {
-  // Calcular métricas de desempenho
-  const responseTimeHistory = orchestratorState?.performanceMetrics?.responseTime || [];
-  const tokenUsageHistory = orchestratorState?.performanceMetrics?.tokenUsage || [];
+const OrchestratorMonitoring: React.FC = () => {
+  const { orchestratorState, orchestratorConfig } = useAgent();
   
-  const avgResponseTime = responseTimeHistory.length > 0
-    ? responseTimeHistory.reduce((a: number, b: number) => a + b, 0) / responseTimeHistory.length
+  // Contadores
+  const messageCount = orchestratorState?.conversations?.length || 0;
+  const taskCount = orchestratorState?.tasks?.length || 0;
+  const memoryCount = Object.values(orchestratorState?.users || {}).reduce(
+    (total: number, user: any) => total + (user?.memory?.length || 0), 
+    0
+  );
+  const userCount = Object.keys(orchestratorState?.users || {}).length;
+  
+  // Métricas
+  const responseTimeMetrics = orchestratorState?.metrics?.responseTime || [];
+  const tokenUsageMetrics = orchestratorState?.metrics?.tokenUsage || [];
+  
+  const avgResponseTime = responseTimeMetrics.length > 0
+    ? responseTimeMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / responseTimeMetrics.length
+    : 0;
+    
+  const avgTokenUsage = tokenUsageMetrics.length > 0
+    ? tokenUsageMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / tokenUsageMetrics.length
     : 0;
   
-  const avgTokenUsage = tokenUsageHistory.length > 0
-    ? tokenUsageHistory.reduce((a: number, b: number) => a + b, 0) / tokenUsageHistory.length
-    : 0;
-  
-  const successRate = orchestratorState?.performanceMetrics?.successRate || 100;
+  const formatDate = (date: Date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+  };
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium mb-4">Monitoramento do Orquestrador</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Configure como o orquestrador monitora seu próprio desempenho e se adapta para otimizar resultados.
-        </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Conversas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{messageCount}</div>
+              <MessageCircle className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Tarefas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{taskCount}</div>
+              <ListTodo className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Memória</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{memoryCount}</div>
+              <Brain className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Usuários</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{userCount}</div>
+              <Zap className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="font-medium">Monitoramento Ativo</h4>
-          <p className="text-sm text-muted-foreground">
-            Permite que o orquestrador monitore seu desempenho e uso de recursos
-          </p>
-        </div>
-        <Switch 
-          checked={enableMonitoring}
-          onCheckedChange={setEnableMonitoring}
-        />
-      </div>
-      
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="font-medium">Comportamento Adaptativo</h4>
-          <p className="text-sm text-muted-foreground">
-            Permite que o orquestrador ajuste automaticamente seu comportamento com base em métricas
-          </p>
-        </div>
-        <Switch 
-          checked={adaptiveBehavior}
-          onCheckedChange={setAdaptiveBehavior}
-          disabled={!enableMonitoring}
-        />
-      </div>
-      
-      {enableMonitoring && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Tempo de Resposta</Label>
-                  <span className="text-sm font-medium">{avgResponseTime.toFixed(0)}ms</span>
-                </div>
-                <Progress value={Math.min(100, (avgResponseTime / 5000) * 100)} />
-                <p className="text-xs text-muted-foreground">
-                  Tempo médio de processamento das últimas interações
-                </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Estado do Orquestrador Neural</CardTitle>
+          <CardDescription>Visão geral das métricas e status do sistema</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Tempo médio de resposta</span>
+                <span className="text-sm text-muted-foreground">{avgResponseTime.toFixed(0)} ms</span>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Uso de Tokens</Label>
-                  <span className="text-sm font-medium">{avgTokenUsage.toFixed(0)}</span>
-                </div>
-                <Progress value={Math.min(100, (avgTokenUsage / 2000) * 100)} />
-                <p className="text-xs text-muted-foreground">
-                  Média de tokens utilizados por interação
-                </p>
+              <Progress value={Math.min(avgResponseTime / 50, 100)} className="h-2" />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Uso médio de tokens</span>
+                <span className="text-sm text-muted-foreground">{avgTokenUsage.toFixed(0)} tokens</span>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Taxa de Sucesso</Label>
-                  <span className="text-sm font-medium">{successRate.toFixed(1)}%</span>
-                </div>
-                <Progress value={successRate} />
-                <p className="text-xs text-muted-foreground">
-                  Percentual de interações concluídas sem erros
-                </p>
+              <Progress value={Math.min(avgTokenUsage / 40, 100)} className="h-2" />
+            </div>
+            
+            <div className="border-t pt-4 mt-4">
+              <h4 className="font-medium mb-2">Capacidades ativas</h4>
+              <div className="flex flex-wrap gap-2">
+                {orchestratorConfig?.memory?.enabled && (
+                  <Badge variant="outline" className="bg-blue-50">Memória</Badge>
+                )}
+                {orchestratorConfig?.reasoning?.enabled && (
+                  <Badge variant="outline" className="bg-green-50">Raciocínio</Badge>
+                )}
+                {orchestratorConfig?.planning?.enabled && (
+                  <Badge variant="outline" className="bg-amber-50">Planejamento</Badge>
+                )}
+                {orchestratorConfig?.multiAgent?.enabled && (
+                  <Badge variant="outline" className="bg-purple-50">Multi-Agente</Badge>
+                )}
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      
-      <Button 
-        variant="outline" 
-        onClick={handleUpdateConfig}
-      >
-        Atualizar Configuração
-      </Button>
+            </div>
+            
+            {orchestratorState?.tasks?.length > 0 && (
+              <div className="border-t pt-4 mt-4">
+                <h4 className="font-medium mb-2">Tarefas recentes</h4>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {orchestratorState.tasks.slice(-3).reverse().map((task: any, index: number) => (
+                    <div key={index} className="bg-muted/50 p-2 rounded-md">
+                      <div className="text-sm font-medium">{task.task.substring(0, 60)}{task.task.length > 60 ? '...' : ''}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Subtasks: {task.subtasks.length} • {formatDate(task.id.split('-')[1])}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

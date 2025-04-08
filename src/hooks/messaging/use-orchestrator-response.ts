@@ -1,9 +1,27 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAgent } from "../../contexts/AgentContext";
 
 export const useOrchestratorResponse = () => {
   const { agents, orchestratorConfig, orchestratorState, addToConversationHistory, recordPerformanceMetric, decomposeTask } = useAgent();
+  
+  // Estado para controlar pendência de confirmações de memória
+  const [pendingMemoryConfirmation, setPendingMemoryConfirmation] = useState(null);
+  
+  // Monitorar confirmações pendentes
+  useEffect(() => {
+    const pendingConfirmations = orchestratorState?.memory?.pendingConfirmations || [];
+    if (pendingConfirmations.length > 0 && !pendingMemoryConfirmation) {
+      // Pegar a primeira confirmação pendente
+      setPendingMemoryConfirmation({
+        id: 0,
+        ...pendingConfirmations[0]
+      });
+    } else if (pendingConfirmations.length === 0 && pendingMemoryConfirmation) {
+      // Limpar quando não há mais confirmações pendentes
+      setPendingMemoryConfirmation(null);
+    }
+  }, [orchestratorState?.memory?.pendingConfirmations]);
   
   // Função para encontrar o agente correto baseado no modelo selecionado
   const findAgentByModel = (modelId: string) => {
@@ -102,6 +120,24 @@ export const useOrchestratorResponse = () => {
         responseContent += `[Monitoramento] ${optimizedTokens}`;
       }
       
+      // Construir resposta principal baseada no agente
+      responseContent += `\n\nAnalisando sua solicitação: "${userMessage}"\n\n`;
+      
+      if (planning.enabled) {
+        responseContent += "Dividi esta tarefa em passos menores para melhor processamento.\n\n";
+      }
+      
+      // Simular uma resposta baseada na consulta (em uma implementação real, isso viria do modelo)
+      responseContent += `Baseado na sua consulta, aqui está minha resposta como ${useOrchestratorConfig ? "Orquestrador Neural" : agent.name}:\n\n`;
+      
+      if (userMessage.toLowerCase().includes("api") || userMessage.toLowerCase().includes("chave")) {
+        responseContent += "Observei que você mencionou uma API ou chave. Vou guardar esta informação para referência futura, se você autorizar.";
+      } else if (userMessage.toLowerCase().includes("ajuda") || userMessage.toLowerCase().includes("como")) {
+        responseContent += "Estou aqui para ajudar! Vejo que você está procurando assistência. Vou utilizar todas as ferramentas disponíveis para resolver sua dúvida da melhor forma possível.";
+      } else {
+        responseContent += "Processando sua solicitação com as ferramentas e conhecimento disponíveis para gerar a melhor resposta possível.";
+      }
+      
       // Registrar o tempo de resposta para análise de desempenho
       const responseTime = Date.now() - startTime;
       recordPerformanceMetric?.("responseTime", responseTime);
@@ -127,6 +163,8 @@ export const useOrchestratorResponse = () => {
   return {
     findAgentByModel,
     getOrchestratorAgent,
-    orchestrateAgentResponse
+    orchestrateAgentResponse,
+    pendingMemoryConfirmation,
+    setPendingMemoryConfirmation
   };
 };
