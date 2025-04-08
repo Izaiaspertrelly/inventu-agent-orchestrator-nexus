@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, ToggleRight, ToggleLeft } from "lucide-react";
+import { Check, X, ToggleRight, ToggleLeft, Paperclip } from "lucide-react";
 import SuggestionBar from "@/components/SuggestionBar";
 import SearchBarInput from "@/components/search/SearchBarInput";
 import { useNavigate } from "react-router-dom";
@@ -71,6 +70,14 @@ const Index = () => {
     }
   };
   
+  const handleAttachmentClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Anexos",
+      description: "Funcionalidade de anexos será implementada em breve.",
+    });
+  };
+  
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-screen bg-background">
       <div className="text-center max-w-2xl">
@@ -114,6 +121,15 @@ const Index = () => {
                     }
                     <span className="font-medium ml-1">God Mode</span>
                   </div>
+                  
+                  <button 
+                    type="button"
+                    className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2 rounded-full transition-colors"
+                    onClick={handleAttachmentClick}
+                    title="Anexar arquivo"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </button>
                   
                   <button 
                     type="submit"
