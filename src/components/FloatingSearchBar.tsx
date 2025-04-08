@@ -72,7 +72,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       <div 
         className={`neo-blur rounded-full p-1 transition-all duration-300 flex items-center shadow-lg`}
         style={{ 
-          width: isMinimized ? '50px' : '700px',
+          width: isMinimized ? '50px' : '600px',
           overflow: 'hidden'
         }}
       >
@@ -89,7 +89,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         </div>
 
         <div 
-          className={`flex flex-col w-full transition-all duration-300 px-4`}
+          className={`flex flex-col w-full transition-all duration-300 px-2`}
           style={{ 
             opacity: isMinimized ? 0 : 1,
             width: isMinimized ? '0' : 'auto',
