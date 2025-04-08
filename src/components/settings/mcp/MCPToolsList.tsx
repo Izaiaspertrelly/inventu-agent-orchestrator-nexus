@@ -14,6 +14,7 @@ interface MCPToolsListProps {
   setNewTool: React.Dispatch<React.SetStateAction<Partial<MCPTool>>>;
   onAddTool: () => void;
   onDeleteTool: (id: string) => void;
+  onEditTool: (tool: MCPTool) => void;
 }
 
 const MCPToolsList: React.FC<MCPToolsListProps> = ({
@@ -24,6 +25,7 @@ const MCPToolsList: React.FC<MCPToolsListProps> = ({
   setNewTool,
   onAddTool,
   onDeleteTool,
+  onEditTool,
 }) => {
   return (
     <div className="pt-4">
@@ -53,7 +55,8 @@ const MCPToolsList: React.FC<MCPToolsListProps> = ({
             <MCPToolCard 
               key={tool.id} 
               tool={tool} 
-              onDelete={onDeleteTool} 
+              onDelete={onDeleteTool}
+              onEdit={onEditTool}
             />
           ))}
         </div>

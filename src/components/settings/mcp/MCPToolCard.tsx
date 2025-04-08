@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Trash } from "lucide-react";
+import { Trash, Pencil } from "lucide-react";
 import { MCPTool } from "@/types";
 import {
   Card,
@@ -14,21 +14,31 @@ import { Button } from "@/components/ui/button";
 interface MCPToolCardProps {
   tool: MCPTool;
   onDelete: (id: string) => void;
+  onEdit: (tool: MCPTool) => void;
 }
 
-const MCPToolCard: React.FC<MCPToolCardProps> = ({ tool, onDelete }) => {
+const MCPToolCard: React.FC<MCPToolCardProps> = ({ tool, onDelete, onEdit }) => {
   return (
     <Card key={tool.id}>
       <CardHeader className="pb-2">
         <div className="flex justify-between">
           <CardTitle>{tool.name}</CardTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(tool.id)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(tool)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(tool.id)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <CardDescription>{tool.description}</CardDescription>
       </CardHeader>

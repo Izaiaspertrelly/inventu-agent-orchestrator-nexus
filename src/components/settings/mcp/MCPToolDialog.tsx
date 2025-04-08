@@ -33,6 +33,8 @@ const MCPToolDialog: React.FC<MCPToolDialogProps> = ({
   onAddTool,
   children,
 }) => {
+  const isEditing = Boolean(newTool.id);
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -40,9 +42,13 @@ const MCPToolDialog: React.FC<MCPToolDialogProps> = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adicionar Nova Ferramenta MCP</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Editar Ferramenta MCP" : "Adicionar Nova Ferramenta MCP"}
+          </DialogTitle>
           <DialogDescription>
-            Configure uma nova ferramenta para ser utilizada pelo agente através do servidor MCP.
+            {isEditing 
+              ? "Edite os detalhes da ferramenta para o servidor MCP." 
+              : "Configure uma nova ferramenta para ser utilizada pelo agente através do servidor MCP."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -72,8 +78,8 @@ const MCPToolDialog: React.FC<MCPToolDialogProps> = ({
             <Label htmlFor="toolMethod">Método HTTP</Label>
             <Select
               value={newTool.method}
-              onValueChange={(value: "GET" | "POST" | "PUT" | "DELETE") => 
-                setNewTool({ ...newTool, method: value })
+              onValueChange={(value: "GET" | "POST" | "PUT" | "DELETE" | "PATCH") => 
+                setNewTool({ ...newTool, method: value as "GET" | "POST" | "PUT" | "DELETE" })
               }
             >
               <SelectTrigger id="toolMethod">
@@ -84,7 +90,6 @@ const MCPToolDialog: React.FC<MCPToolDialogProps> = ({
                 <SelectItem value="POST">POST</SelectItem>
                 <SelectItem value="PUT">PUT</SelectItem>
                 <SelectItem value="DELETE">DELETE</SelectItem>
-                <SelectItem value="PATCH">PATCH</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -128,7 +133,7 @@ const MCPToolDialog: React.FC<MCPToolDialogProps> = ({
             Cancelar
           </Button>
           <Button className="inventu-btn" onClick={onAddTool}>
-            Adicionar Ferramenta
+            {isEditing ? "Salvar Alterações" : "Adicionar Ferramenta"}
           </Button>
         </DialogFooter>
       </DialogContent>
