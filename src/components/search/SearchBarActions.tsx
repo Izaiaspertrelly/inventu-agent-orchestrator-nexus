@@ -19,7 +19,7 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
   fileInputRef
 }) => {
   return (
-    <div className="flex items-center gap-2 pr-4">
+    <div className="flex items-center gap-2 mr-4">
       <div 
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors cursor-pointer text-xs bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md ${isSuperAgentEnabled ? 'text-primary font-semibold' : 'text-foreground'}`}
         onClick={(e) => { e.stopPropagation(); onToggleSuperAgent(e); }}
