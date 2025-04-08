@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 
 interface Position {
@@ -35,7 +34,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
         const barHeight = containerRef.current.offsetHeight;
         
         const centerX = (windowWidth - barWidth) / 2;
-        const bottomY = windowHeight - barHeight - 20;
+        const bottomY = windowHeight - barHeight - 60; // 60px from bottom for better visibility
         
         setPosition({
           x: centerX,
@@ -66,7 +65,6 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
     
-    // Allow container to move anywhere on the screen
     const newX = Math.max(0, Math.min(window.innerWidth - (isMinimized ? 50 : 600), e.clientX - offset.x));
     const newY = Math.max(0, Math.min(window.innerHeight - (isMinimized ? 50 : 60), e.clientY - offset.y));
     
