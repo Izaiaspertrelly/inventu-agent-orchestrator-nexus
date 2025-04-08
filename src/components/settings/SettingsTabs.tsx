@@ -1,10 +1,11 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserCog, Layers, Code } from "lucide-react";
+import { UserCog, Layers, Code, SlidersHorizontal } from "lucide-react";
 import ProfileTab from "./ProfileTab";
-import PreferencesTab from "./PreferencesTab";
-import IntegrationsTab from "./IntegrationsTab";
+import OrchestratorTab from "./OrchestratorTab";
+import ModelsTab from "./ModelsTab";
+import ToolsTab from "./ToolsTab";
 
 const SettingsTabs = () => {
   return (
@@ -14,13 +15,17 @@ const SettingsTabs = () => {
           <UserCog className="h-4 w-4" />
           Perfil
         </TabsTrigger>
-        <TabsTrigger value="preferences" className="flex items-center gap-2">
-          <Layers className="h-4 w-4" />
-          Preferências
+        <TabsTrigger value="orchestrator" className="flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4" />
+          Orquestrador
         </TabsTrigger>
-        <TabsTrigger value="integrations" className="flex items-center gap-2">
+        <TabsTrigger value="models" className="flex items-center gap-2">
+          <Layers className="h-4 w-4" />
+          Modelos
+        </TabsTrigger>
+        <TabsTrigger value="tools" className="flex items-center gap-2">
           <Code className="h-4 w-4" />
-          Integrações
+          Ferramentas
         </TabsTrigger>
       </TabsList>
 
@@ -28,12 +33,16 @@ const SettingsTabs = () => {
         <ProfileTab />
       </TabsContent>
 
-      <TabsContent value="preferences" className="space-y-6">
-        <PreferencesTab />
+      <TabsContent value="orchestrator" className="space-y-6">
+        <OrchestratorTab />
       </TabsContent>
 
-      <TabsContent value="integrations" className="space-y-6">
-        <IntegrationsTab />
+      <TabsContent value="models" className="space-y-6">
+        <ModelsTab />
+      </TabsContent>
+
+      <TabsContent value="tools" className="space-y-6">
+        <ToolsTab />
       </TabsContent>
     </Tabs>
   );
