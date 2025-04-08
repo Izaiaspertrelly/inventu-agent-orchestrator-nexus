@@ -33,10 +33,20 @@ const Chat: React.FC = () => {
       const logoContainer = animationRef.current;
       logoContainer.innerHTML = '';
       
+      const logoImg = document.createElement('img');
+      logoImg.src = "/lovable-uploads/5c33ad20-fb0e-41b1-ae4a-ef5922b7de8b.png";
+      logoImg.style.width = '100%';
+      logoImg.style.height = '100%';
+      logoImg.style.position = 'absolute';
+      logoImg.style.top = '0';
+      logoImg.style.left = '0';
+      logoImg.style.opacity = '0';
+      logoContainer.appendChild(logoImg);
+      
       const dots = Array.from({ length: 22 }).map(() => {
         const dot = document.createElement('div');
         
-        const size = Math.random() * 4 + 2;
+        const size = Math.random() * 3 + 3;
         dot.style.width = `${size}px`;
         dot.style.height = `${size}px`;
         dot.style.backgroundColor = '#007AFF';
@@ -51,7 +61,7 @@ const Chat: React.FC = () => {
         dot.style.left = `${x}%`;
         dot.style.top = `${y}%`;
         dot.style.opacity = (Math.random() * 0.5 + 0.5).toString();
-        dot.style.transition = 'all 0.3s ease-in-out';
+        dot.style.transition = 'all 1.2s ease-in-out';
         
         dot.dataset.originX = x.toString();
         dot.dataset.originY = y.toString();
@@ -63,11 +73,11 @@ const Chat: React.FC = () => {
       
       const animate = () => {
         dots.forEach(dot => {
-          const offsetX = (Math.random() * 6) - 3;
-          const offsetY = (Math.random() * 6) - 3;
-          
           const originX = parseFloat(dot.dataset.originX || '50');
           const originY = parseFloat(dot.dataset.originY || '50');
+          
+          const offsetX = (Math.random() * 2) - 1; 
+          const offsetY = (Math.random() * 2) - 1;
           
           dot.style.left = `${originX + offsetX}%`;
           dot.style.top = `${originY + offsetY}%`;
@@ -75,13 +85,13 @@ const Chat: React.FC = () => {
           setTimeout(() => {
             dot.style.left = `${originX}%`;
             dot.style.top = `${originY}%`;
-          }, 500 + Math.random() * 500);
+          }, 800 + Math.random() * 400);
         });
         
-        setTimeout(animate, 1500 + Math.random() * 500);
+        setTimeout(animate, 1800 + Math.random() * 600);
       };
       
-      setTimeout(animate, 500);
+      setTimeout(animate, 800);
     }
   }, []);
   
