@@ -64,6 +64,11 @@ export const useFormSubmit = () => {
         updatedConfig.planning.enabled = updatedConfig.planning.enabled === true;
       }
       
+      // Adicionar informações de timestamp
+      updatedConfig.lastUpdated = new Date().toISOString();
+      
+      console.log("Salvando configuração do orquestrador:", updatedConfig);
+      
       // Atualizar configuração do orquestrador
       updateOrchestratorConfig(updatedConfig);
       
@@ -77,6 +82,7 @@ export const useFormSubmit = () => {
       
       return true;
     } catch (e) {
+      console.error("Erro ao salvar orquestrador:", e);
       toast({
         title: "Erro na configuração",
         description: "Não foi possível atualizar a configuração do orquestrador.",

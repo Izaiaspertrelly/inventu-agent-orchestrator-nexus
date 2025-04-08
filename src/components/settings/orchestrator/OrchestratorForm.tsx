@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -15,7 +14,11 @@ import { useModelConnectionTest } from "@/hooks/use-model-connection-test";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const OrchestratorForm: React.FC = () => {
+interface OrchestratorFormProps {
+  onComplete?: () => void;
+}
+
+const OrchestratorForm: React.FC<OrchestratorFormProps> = ({ onComplete }) => {
   const { models, orchestratorConfig, orchestratorState, addToConversationHistory } = useAgent();
   const { toast } = useToast();
   
@@ -104,6 +107,9 @@ const OrchestratorForm: React.FC = () => {
     
     if (result) {
       setShowConfigDetails(true);
+      if (onComplete) {
+        onComplete();
+      }
     }
   };
   
