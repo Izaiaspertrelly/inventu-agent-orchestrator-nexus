@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -36,6 +37,7 @@ const Chat: React.FC = () => {
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
     
+    // Show floating bar when there are messages, otherwise hide it
     if (activeChat) {
       setShowFloatingBar(activeChat.messages.length > 0);
     }
@@ -52,9 +54,16 @@ const Chat: React.FC = () => {
       });
     }
     
+    // Store message temporarily because we'll clear the input
     const currentMessage = message;
+    
+    // Clear the input field immediately
     setMessage("");
+    
+    // Show floating bar right after sending a message
     setShowFloatingBar(true);
+    
+    // Send the message
     await sendMessage(currentMessage);
   };
 
@@ -134,6 +143,7 @@ const Chat: React.FC = () => {
     );
   };
   
+  // Determine if we should show active conversation UI
   const isActiveConversation = activeChat && activeChat.messages.length > 0;
   
   return (
@@ -143,7 +153,7 @@ const Chat: React.FC = () => {
       {showFloatingBar && (
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
-          onMinimize={() => setShowFloatingBar(false)}
+          onClose={() => setShowFloatingBar(false)}
           initialMessage={message}
         />
       )}
@@ -158,6 +168,7 @@ const Chat: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
+            {/* Fixed input bar completely removed from conversation view */}
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
