@@ -1,7 +1,20 @@
 
-import { MCPTool } from "@/types";
+import { MCPTool, Agent } from "@/types";
 
-export const selectModelForTask = async (taskDescription: string): Promise<string> => {
+// Função para selecionar o modelo com base em agentes configurados
+export const selectModelForTask = async (taskDescription: string, agents?: Agent[]): Promise<string> => {
+  console.log("Selecionando modelo para tarefa:", taskDescription);
+  console.log("Agentes disponíveis:", agents?.length || 0);
+  
+  // Se temos agentes configurados, tente usar o mais adequado
+  if (agents && agents.length > 0) {
+    // Por enquanto, simplesmente use o primeiro agente disponível
+    // Em uma implementação mais avançada, poderíamos analisar o texto para determinar o agente mais adequado
+    console.log("Usando o agente:", agents[0].name);
+    return agents[0].modelId;
+  }
+  
+  // Fallback para a lógica original se não há agentes
   const lowerCaseTask = taskDescription.toLowerCase();
   
   if (lowerCaseTask.includes("image") || 

@@ -52,7 +52,8 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
   } = useAgents();
 
   const handleSelectModelForTask = async (taskDescription: string): Promise<string> => {
-    return selectModelForTask(taskDescription);
+    console.log("Selecionando modelo para tarefa com agentes disponíveis:", agents.length);
+    return selectModelForTask(taskDescription, agents);
   };
 
   const handleExecuteMCPTool = async (tool: MCPTool, params: Record<string, any>) => {

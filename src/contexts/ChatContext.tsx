@@ -78,6 +78,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   
   const sendMessageToChat = async (chatId: string, content: string, file?: File | null) => {
+    console.log("Enviando mensagem para o chat:", chatId);
+    console.log("Conteúdo:", content);
+    console.log("Arquivo anexado:", file?.name || "nenhum");
+    
     if (!content.trim() && !file) {
       toast({
         description: "Por favor, digite uma mensagem ou anexe um arquivo",
@@ -108,10 +112,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     
     try {
       // Select the appropriate model for this task
+      console.log("Selecionando modelo para a tarefa...");
       const selectedModelId = await selectModelForTask(content);
+      console.log("Modelo selecionado:", selectedModelId);
       
       // Generate AI response
+      console.log("Gerando resposta com o modelo:", selectedModelId);
       const botMessage = await generateBotResponse(content, selectedModelId, file);
+      console.log("Resposta gerada:", botMessage);
       
       // Update chat with AI response
       const finalMessages = [...updatedMessages, botMessage];
