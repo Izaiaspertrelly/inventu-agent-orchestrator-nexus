@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { AI_PROVIDERS } from "./aiProviders";
-import { useModelApi } from "@/hooks/use-model-api";
 import { useToast } from "@/hooks/use-toast";
 import { AIModel } from "@/types";
 import { v4 as uuidv4 } from "uuid";
@@ -24,19 +23,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
 
 interface AddModelFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddModel: (model: AIModel) => void;
-}
-
-interface ModelOption {
-  id: string;
-  name: string;
-  description?: string;
 }
 
 const AddModelForm: React.FC<AddModelFormProps> = ({
@@ -45,43 +36,15 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
   onAddModel,
 }) => {
   const { toast } = useToast();
-  const { fetchProviderModels, isLoading } = useModelApi();
   
   const [selectedProvider, setSelectedProvider] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<string>("");
   const [apiKey, setApiKey] = useState<string>("");
-  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
-  const [modelDescription, setModelDescription] = useState<string>("");
   
-  useEffect(() => {
-    if (selectedProvider) {
-      loadModelsForProvider(selectedProvider);
-    } else {
-      setAvailableModels([]);
-      setSelectedModel("");
-    }
-  }, [selectedProvider]);
-  
-  useEffect(() => {
-    if (selectedModel) {
-      const model = availableModels.find(m => m.id === selectedModel);
-      setModelDescription(model?.description || "");
-    } else {
-      setModelDescription("");
-    }
-  }, [selectedModel, availableModels]);
-
-  const loadModelsForProvider = async (providerId: string) => {
-    const models = await fetchProviderModels(providerId);
-    setAvailableModels(models);
-    setSelectedModel("");
-  };
-
   const handleAddModel = () => {
-    if (!selectedProvider || !selectedModel) {
+    if (!selectedProvider) {
       toast({
-        title: "Campos obrigatórios",
-        description: "Selecione um provedor e um modelo",
+        title: "Campo obrigatório",
+        description: "Selecione um provedor",
         variant: "destructive",
       });
       return;
@@ -97,31 +60,29 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
     }
     
     const provider = AI_PROVIDERS.find(p => p.id === selectedProvider);
-    const model = availableModels.find(m => m.id === selectedModel);
     
-    if (!provider || !model) {
+    if (!provider) {
       return;
     }
     
     const newModel: AIModel = {
       id: uuidv4(),
-      name: model.name,
+      name: provider.name,
       provider: provider.name,
-      description: modelDescription || model.description || `Modelo ${model.name} do provedor ${provider.name}`,
+      description: `Provedor de IA ${provider.name} com todos os modelos disponíveis`,
       capabilities: [],
       apiKey,
+      providerId: provider.id
     };
     
     onAddModel(newModel);
     
     // Reset form
     setSelectedProvider("");
-    setSelectedModel("");
     setApiKey("");
-    setModelDescription("");
     
     toast({
-      title: "Modelo adicionado",
+      title: "Provedor adicionado",
       description: `${newModel.name} foi adicionado com sucesso`,
     });
     
@@ -132,9 +93,9 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adicionar Novo Modelo de IA</DialogTitle>
+          <DialogTitle>Adicionar Novo Provedor de IA</DialogTitle>
           <DialogDescription>
-            Selecione um provedor e modelo de IA para usar em seu agente.
+            Selecione um provedor de IA e forneça sua chave de API para acessar todos os seus modelos.
           </DialogDescription>
         </DialogHeader>
         
@@ -159,44 +120,6 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="model">Modelo de IA</Label>
-            <Select
-              value={selectedModel}
-              onValueChange={setSelectedModel}
-              disabled={!selectedProvider || isLoading[selectedProvider]}
-            >
-              <SelectTrigger id="model">
-                {isLoading[selectedProvider] ? (
-                  <div className="flex items-center">
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    <span>Carregando modelos...</span>
-                  </div>
-                ) : (
-                  <SelectValue placeholder="Selecione um modelo" />
-                )}
-              </SelectTrigger>
-              <SelectContent>
-                {availableModels.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={modelDescription}
-              onChange={(e) => setModelDescription(e.target.value)}
-              placeholder="Descrição das capacidades do modelo"
-              disabled={!selectedModel}
-            />
-          </div>
-          
-          <div className="space-y-2">
             <Label htmlFor="apiKey">Chave de API</Label>
             <Input
               id="apiKey"
@@ -213,7 +136,7 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
             Cancelar
           </Button>
           <Button onClick={handleAddModel}>
-            Adicionar Modelo
+            Adicionar Provedor
           </Button>
         </DialogFooter>
       </DialogContent>

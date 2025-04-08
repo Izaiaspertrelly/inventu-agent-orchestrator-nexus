@@ -1,142 +1,184 @@
-
-import React, { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { AIModel, Agent } from "@/types";
-
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from "react";
+import { useAgent } from "@/contexts/AgentContext";
+import { useModelApi } from "@/hooks/use-model-api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { AIModel, Agent } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface ModelAssignmentProps {
   agents: Agent[];
   models: AIModel[];
-  onAssignModel: (agentId: string, modelId: string, configJson: string) => void;
+  onAssignModel: (agentId: string, modelId: string, modelParamsJson: string) => void;
 }
 
 const ModelAssignment: React.FC<ModelAssignmentProps> = ({ agents, models, onAssignModel }) => {
   const { toast } = useToast();
-  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-  const [selectedModelId, setSelectedModelId] = useState("");
-  const [isAssigningModel, setIsAssigningModel] = useState(false);
-  const [modelParams, setModelParams] = useState(JSON.stringify({
-    temperature: 0.7,
-    top_p: 1,
-    presence_penalty: 0,
-    frequency_penalty: 0,
-    max_tokens: 1000,
-  }, null, 2));
+  const { fetchProviderModels, isLoading } = useModelApi();
+  const [agentModelConfigs, setAgentModelConfigs] = useState<Record<string, {
+    selectedModel: string;
+    modelParamsJson: string;
+  }>>({});
+  const [availableModels, setAvailableModels] = useState<Record<string, { id: string; name: string; description?: string; }[]>>({});
 
-  // Encontra o agente selecionado atualmente
-  const selectedAgent = agents.find(a => a.id === selectedAgentId);
+  useEffect(() => {
+    // Initialize agent model configurations
+    const initialConfigs: Record<string, { selectedModel: string; modelParamsJson: string; }> = {};
+    agents.forEach(agent => {
+      try {
+        const config = JSON.parse(agent.configJson);
+        initialConfigs[agent.id] = {
+          selectedModel: config.model?.id || "",
+          modelParamsJson: JSON.stringify(config.model?.parameters || { temperature: 0.7, top_p: 1 }, null, 2)
+        };
+      } catch (e) {
+        console.error("Erro ao analisar configJson do agente:", e);
+        initialConfigs[agent.id] = {
+          selectedModel: "",
+          modelParamsJson: JSON.stringify({ temperature: 0.7, top_p: 1 }, null, 2)
+        };
+      }
+    });
+    setAgentModelConfigs(initialConfigs);
+  }, [agents]);
 
-  const handleAssignModel = () => {
-    if (!selectedAgentId || !selectedModelId) {
-      toast({
-        title: "Seleção necessária",
-        description: "Selecione um agente e um modelo para continuar",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAssigningModel(true);
-    
+  const loadModelsForProvider = async (agentId: string, providerId: string, apiKey: string) => {
     try {
-      onAssignModel(selectedAgentId, selectedModelId, modelParams);
-      
-      toast({
-        title: "Modelo atribuído",
-        description: `Modelo atribuído com sucesso ao agente ${selectedAgent?.name}`,
-      });
-      
-      // Limpar seleção
-      setSelectedAgentId(null);
-      setSelectedModelId("");
-      
+      const models = await fetchProviderModels(providerId, apiKey);
+      setAvailableModels(prev => ({ ...prev, [agentId]: models }));
     } catch (error) {
+      console.error(`Erro ao carregar modelos para o provedor ${providerId}:`, error);
       toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao atribuir o modelo",
-        variant: "destructive"
+        title: "Erro ao carregar modelos",
+        description: `Não foi possível carregar os modelos do provedor selecionado.`,
+        variant: "destructive",
       });
-    } finally {
-      setIsAssigningModel(false);
     }
   };
 
-  if (agents.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        Nenhum agente configurado ainda. Configure um orquestrador primeiro.
-      </div>
-    );
-  }
+  const handleProviderChange = async (agentId: string, providerId: string) => {
+    const apiKey = models.find(model => model.providerId === providerId)?.apiKey || "";
+    if (apiKey) {
+      await loadModelsForProvider(agentId, providerId, apiKey);
+    } else {
+      toast({
+        title: "Chave de API não encontrada",
+        description: "Por favor, adicione a chave de API para este provedor nas configurações.",
+        variant: "destructive",
+      });
+      setAvailableModels(prev => ({ ...prev, [agentId]: [] }));
+    }
+  };
+
+  const handleAssign = (agentId: string) => {
+    const { selectedModel, modelParamsJson } = agentModelConfigs[agentId];
+    onAssignModel(agentId, selectedModel, modelParamsJson);
+    toast({
+      title: "Modelo atribuído",
+      description: `Modelo atribuído ao agente com sucesso.`,
+    });
+  };
+
+  const handleModelParamsChange = (agentId: string, modelParamsJson: string) => {
+    try {
+      JSON.parse(modelParamsJson);
+      setAgentModelConfigs(prev => ({
+        ...prev,
+        [agentId]: { ...prev[agentId], modelParamsJson }
+      }));
+    } catch (e) {
+      toast({
+        title: "JSON inválido",
+        description: "A configuração JSON do modelo é inválida.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label>Selecionar Agente</Label>
-        <Select
-          value={selectedAgentId || ""}
-          onValueChange={setSelectedAgentId}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione um agente" />
-          </SelectTrigger>
-          <SelectContent>
-            {agents.map((agent) => (
-              <SelectItem key={agent.id} value={agent.id}>
-                {agent.name} {agent.modelId ? `(${models.find(m => m.id === agent.modelId)?.name || 'Modelo configurado'})` : '(Sem modelo)'}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="space-y-4">
+      {agents.map((agent) => {
+        const agentConfig = agentModelConfigs[agent.id] || { selectedModel: "", modelParamsJson: JSON.stringify({ temperature: 0.7, top_p: 1 }, null, 2) };
+        const selectedProvider = models.find(model => model.id === agent.modelId)?.providerId || "";
+        const availableModelsForAgent = availableModels[agent.id] || [];
 
-      {selectedAgentId && (
-        <div className="space-y-4 border rounded-md p-4">
-          <div className="space-y-2">
-            <Label>Selecionar Modelo para o Agente</Label>
-            <Select
-              value={selectedModelId}
-              onValueChange={setSelectedModelId}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um modelo" />
-              </SelectTrigger>
-              <SelectContent>
-                {models.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.name} ({model.provider})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="model-params">Parâmetros do Modelo</Label>
-              <span className="text-xs text-muted-foreground">Configuração avançada</span>
-            </div>
-            <Textarea
-              id="model-params"
-              value={modelParams}
-              onChange={(e) => setModelParams(e.target.value)}
-              className="font-mono h-40"
-            />
-          </div>
-
-          <Button 
-            onClick={handleAssignModel} 
-            disabled={isAssigningModel || !selectedModelId}
-            className="w-full"
-          >
-            {isAssigningModel ? "Atribuindo..." : "Atribuir Modelo ao Agente"}
-          </Button>
-        </div>
-      )}
+        return (
+          <Card key={agent.id}>
+            <CardContent className="space-y-4">
+              <h3 className="text-lg font-semibold">{agent.name}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`provider-${agent.id}`}>Provedor de IA</Label>
+                  <Select
+                    id={`provider-${agent.id}`}
+                    value={selectedProvider}
+                    onValueChange={(providerId) => handleProviderChange(agent.id, providerId)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um provedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {models.map((model) => (
+                        <SelectItem key={model.id} value={model.providerId}>
+                          {model.provider}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor={`model-${agent.id}`}>Modelo de IA</Label>
+                  <Select
+                    id={`model-${agent.id}`}
+                    value={agentConfig.selectedModel}
+                    onValueChange={(modelId) => {
+                      setAgentModelConfigs(prev => ({
+                        ...prev,
+                        [agent.id]: { ...prev[agent.id], selectedModel: modelId }
+                      }));
+                    }}
+                    disabled={!selectedProvider || isLoading[selectedProvider]}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um modelo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableModelsForAgent.map((model) => (
+                        <SelectItem key={model.id} value={model.id}>
+                          {model.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor={`model-params-${agent.id}`}>Parâmetros do Modelo (JSON)</Label>
+                <Textarea
+                  id={`model-params-${agent.id}`}
+                  className="font-mono h-32"
+                  value={agentConfig.modelParamsJson}
+                  onChange={(e) => handleModelParamsChange(agent.id, e.target.value)}
+                  placeholder="{}"
+                />
+              </div>
+              <Button onClick={() => handleAssign(agent.id)}>
+                Atribuir Modelo
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };

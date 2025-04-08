@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useGet } from "@/hooks/use-http";
 import { PROVIDER_MODEL_ENDPOINTS } from "@/components/settings/models/aiProviders";
+import { AIModel } from "@/types";
 
 export interface ModelApiResponse {
   models: {
@@ -16,7 +16,7 @@ export const useModelApi = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
-  const fetchProviderModels = async (providerId: string) => {
+  const fetchProviderModels = async (providerId: string, apiKey: string) => {
     setIsLoading(prev => ({ ...prev, [providerId]: true }));
     
     try {
@@ -27,25 +27,43 @@ export const useModelApi = () => {
       }
       
       // Simular resposta da API enquanto os endpoints reais não estão disponíveis
-      // Em produção, isso seria substituído por uma chamada real à API
-      // const response = await apiClient.get<ModelApiResponse>(endpoint);
+      // Em produção, isso seria substituído por uma chamada real à API usando o apiKey
+      // const headers = { 'Authorization': `Bearer ${apiKey}` };
+      // const response = await apiClient.get<ModelApiResponse>(endpoint, { headers });
       
       // Simulação de modelos por provedor
       const mockModels: Record<string, any> = {
         "openai": [
           { id: "gpt-4o", name: "GPT-4o", description: "Modelo mais avançado da OpenAI" },
           { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", description: "Modelo eficiente para a maioria das tarefas" },
-          { id: "gpt-4-vision", name: "GPT-4 Vision", description: "Modelo com capacidade de processamento de imagens" }
+          { id: "gpt-4-vision", name: "GPT-4 Vision", description: "Modelo com capacidade de processamento de imagens" },
+          { id: "dall-e-3", name: "DALL-E 3", description: "Geração de imagens avançada" },
+          { id: "whisper", name: "Whisper", description: "Transcrição e tradução de áudio" }
         ],
         "anthropic": [
           { id: "claude-3-opus", name: "Claude 3 Opus", description: "Modelo de maior capacidade da Anthropic" },
           { id: "claude-3-sonnet", name: "Claude 3 Sonnet", description: "Equilíbrio entre performance e eficiência" },
-          { id: "claude-3-haiku", name: "Claude 3 Haiku", description: "Modelo mais rápido e eficiente da Anthropic" }
+          { id: "claude-3-haiku", name: "Claude 3 Haiku", description: "Modelo mais rápido e eficiente da Anthropic" },
+          { id: "claude-2", name: "Claude 2", description: "Versão anterior do modelo Claude" }
         ],
         "google": [
           { id: "gemini-pro", name: "Gemini Pro", description: "Modelo avançado do Google AI" },
           { id: "gemini-ultra", name: "Gemini Ultra", description: "Modelo de maior capacidade do Google AI" },
-          { id: "palm", name: "PaLM", description: "Modelo de linguagem de grande escala do Google" }
+          { id: "gemini-nano", name: "Gemini Nano", description: "Modelo compacto para dispositivos móveis" },
+          { id: "palm", name: "PaLM", description: "Modelo de linguagem de grande escala do Google" },
+          { id: "imagen", name: "Imagen", description: "Geração de imagens de alta qualidade" }
+        ],
+        "mistral": [
+          { id: "mistral-large", name: "Mistral Large", description: "Modelo de maior capacidade da Mistral AI" },
+          { id: "mistral-medium", name: "Mistral Medium", description: "Modelo intermediário da Mistral AI" },
+          { id: "mistral-small", name: "Mistral Small", description: "Modelo compacto da Mistral AI" },
+          { id: "mistral-tiny", name: "Mistral Tiny", description: "Modelo mais eficiente da Mistral AI" }
+        ],
+        "cohere": [
+          { id: "command", name: "Command", description: "Modelo principal da Cohere para instruções" },
+          { id: "command-light", name: "Command Light", description: "Versão mais leve e rápida do Command" },
+          { id: "command-r", name: "Command R", description: "Versão otimizada para respostas do Command" },
+          { id: "embed", name: "Embed", description: "Modelo de embeddings semânticos" }
         ]
       };
       

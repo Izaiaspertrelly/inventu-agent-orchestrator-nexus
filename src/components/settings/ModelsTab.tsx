@@ -14,12 +14,14 @@ import { Plus } from "lucide-react";
 import AddModelForm from "./models/AddModelForm";
 import ModelsTable from "./models/ModelsTable";
 import ModelAssignment from "./models/ModelAssignment";
+import { useModelApi } from "@/hooks/use-model-api";
 
 const ModelsTab = () => {
   const { models, agents, addModel, removeModel, updateAgent } = useAgent();
+  const { fetchProviderModels } = useModelApi();
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
 
-  const handleAssignModel = (agentId: string, modelId: string, modelParamsJson: string) => {
+  const handleAssignModel = async (agentId: string, modelId: string, modelParamsJson: string) => {
     // Obter o agente existente
     const agent = agents.find(a => a.id === agentId);
     
@@ -70,14 +72,14 @@ const ModelsTab = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Modelos de IA Disponíveis</CardTitle>
+              <CardTitle>Provedores de IA</CardTitle>
               <CardDescription>
-                Selecione e configure os modelos de linguagem a serem usados pelos agentes
+                Adicione provedores de IA e suas chaves de API para acessar seus modelos
               </CardDescription>
             </div>
             <Button onClick={() => setModelDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Adicionar Modelo
+              Adicionar Provedor
             </Button>
           </div>
         </CardHeader>
@@ -105,7 +107,7 @@ const ModelsTab = () => {
         </CardContent>
       </Card>
 
-      {/* Form para adicionar modelo */}
+      {/* Form para adicionar provedor */}
       <AddModelForm 
         open={modelDialogOpen}
         onOpenChange={setModelDialogOpen}

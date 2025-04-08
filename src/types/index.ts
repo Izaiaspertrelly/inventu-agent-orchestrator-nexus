@@ -19,9 +19,10 @@ export interface AIModel {
   id: string;
   name: string;
   provider: string;
-  description: string;
+  description?: string;
   capabilities: string[];
   apiKey?: string;
+  providerId: string;  // Add this field
 }
 
 // Chat related types

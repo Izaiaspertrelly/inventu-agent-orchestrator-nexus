@@ -25,15 +25,15 @@ const ModelsTable: React.FC<ModelsTableProps> = ({ models, onRemoveModel }) => {
   const handleRemoveModel = (model: AIModel) => {
     onRemoveModel(model.id);
     toast({
-      title: "Modelo removido",
-      description: `${model.name} foi removido com sucesso`,
+      title: "Provedor removido",
+      description: `${model.provider} foi removido com sucesso`,
     });
   };
 
   if (models.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Nenhum modelo configurado ainda. Adicione um para começar.
+        Nenhum provedor configurado ainda. Adicione um para começar.
       </div>
     );
   }
@@ -42,7 +42,6 @@ const ModelsTable: React.FC<ModelsTableProps> = ({ models, onRemoveModel }) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nome</TableHead>
           <TableHead>Provedor</TableHead>
           <TableHead>Descrição</TableHead>
           <TableHead>API Key</TableHead>
@@ -52,8 +51,7 @@ const ModelsTable: React.FC<ModelsTableProps> = ({ models, onRemoveModel }) => {
       <TableBody>
         {models.map((model) => (
           <TableRow key={model.id}>
-            <TableCell className="font-medium">{model.name}</TableCell>
-            <TableCell>{model.provider}</TableCell>
+            <TableCell className="font-medium">{model.provider}</TableCell>
             <TableCell>{model.description}</TableCell>
             <TableCell>
               {model.apiKey ? "••••••••" : "Não configurada"}
