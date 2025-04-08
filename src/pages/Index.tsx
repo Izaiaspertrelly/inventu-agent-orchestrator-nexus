@@ -21,20 +21,30 @@ import {
   SidebarMenuButton,
   SidebarFooter
 } from "@/components/ui/sidebar";
-import { Home, MessageSquare, Settings, User } from "lucide-react";
+import { Home, MessageSquare, Settings, User, LogOut, ChevronDown } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import ProfileDialog from "@/components/ProfileDialog";
 
 const Index = () => {
   const { createNewChat, sendMessage } = useChat();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth(); // Get user from AuthContext
+  const { user, logout } = useAuth(); // Get user and logout from AuthContext
   const [greeting, setGreeting] = useState("");
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   
   // Use the shared file attachment hook
   const {
@@ -53,6 +63,15 @@ const Index = () => {
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
   }, []);
+  
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Sessão encerrada",
+      description: "Você foi desconectado com sucesso.",
+    });
+    navigate("/login");
+  };
   
   const toggleSuperAgent = () => {
     setIsVibrating(true);
@@ -171,20 +190,55 @@ const Index = () => {
         
         {/* Main content */}
         <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
-          {/* Profile avatar in top right corner */}
+          {/* Profile avatar in top right corner with dropdown */}
           <div className="absolute top-4 right-4">
-            <Avatar>
-              {user?.profileImage ? (
-                <AvatarImage 
-                  src={user.profileImage} 
-                  alt={user.name || "User Profile"} 
-                />
-              ) : (
-                <AvatarFallback>
-                  <User className="h-5 w-5" />
-                </AvatarFallback>
-              )}
-            </Avatar>
+            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
+                    <Avatar>
+                      {user?.profileImage ? (
+                        <AvatarImage 
+                          src={user.profileImage} 
+                          alt={user?.name || "User Profile"} 
+                        />
+                      ) : (
+                        <AvatarFallback>
+                          <User className="h-5 w-5" />
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user?.name || "Usuário"}</p>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user?.email || ""}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Perfil</span>
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Configurações</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ProfileDialog />
+            </Dialog>
           </div>
 
           {/* Sidebar toggle button */}
