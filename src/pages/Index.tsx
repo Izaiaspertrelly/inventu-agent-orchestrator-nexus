@@ -46,8 +46,7 @@ const Index = () => {
   } = useFileAttachment();
   
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("inventu_user") || "{}");
-    setUserName(user.name || "");
+    // No need to set userName anymore as we get it directly from the Auth context
     
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Bom dia");
@@ -163,7 +162,7 @@ const Index = () => {
                 <User className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-medium">{userName || "Usuário"}</p>
+                <p className="text-sm font-medium">{user?.name || "Usuário"}</p>
                 <p className="text-xs text-muted-foreground">Plano Básico</p>
               </div>
             </div>
@@ -213,7 +212,7 @@ const Index = () => {
             
             <div className="flex flex-col items-center mb-2">
               <h1 className="text-4xl font-bold mb-2 tracking-tight">
-                <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"}
+                <span className="text-gray-400">Olá</span> {user?.name ? user.name : "Usuário"}
               </h1>
             </div>
             
@@ -283,4 +282,3 @@ const Index = () => {
 };
 
 export default Index;
-
