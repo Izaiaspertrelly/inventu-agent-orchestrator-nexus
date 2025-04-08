@@ -155,6 +155,7 @@ const Chat: React.FC = () => {
         <FloatingSearchBar 
           onSend={handleFloatingSearch}
           onClose={() => setShowFloatingBar(false)}
+          initialMessage={message}  // Pass current message to floating bar
         />
       )}
       
@@ -239,3 +240,4 @@ const Chat: React.FC = () => {
 };
 
 export default Chat;
+

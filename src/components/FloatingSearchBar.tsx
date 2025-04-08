@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Search, X, Paperclip, ToggleRight, ToggleLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -6,10 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 interface FloatingSearchBarProps {
   onSend: (message: string) => void;
   onClose: () => void;
+  initialMessage?: string;  // New prop to pass initial message
 }
 
-const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }) => {
-  const [message, setMessage] = useState("");
+const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ 
+  onSend, 
+  onClose, 
+  initialMessage = "" 
+}) => {
+  const [message, setMessage] = useState(initialMessage);
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: window.innerWidth / 2 - 250, y: 80 });
@@ -106,7 +112,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
-        width: "500px",
+        width: "600px",  // Increased width to ensure text fits
       }}
     >
       <div 
@@ -114,14 +120,14 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
         onMouseDown={handleMouseDown}
         style={{ cursor: isDragging ? "grabbing" : "grab" }}
       >
-        <div className="flex items-center px-2">
+        <form onSubmit={handleSendMessage} className="flex items-center px-2">
           <div className="flex-1 relative">
             <Input 
               className={`w-full py-3 px-4 pl-10 rounded-full text-base backdrop-blur-sm border-0 
                 ${superAgentEnabled 
                   ? 'bg-blue-500 text-white placeholder:text-white/70' 
                   : 'bg-secondary/30 placeholder:text-muted-foreground/70'}`}
-              placeholder="Digite uma mensagem..."
+              placeholder="Dê uma tarefa para Inventor trabalhar..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -140,7 +146,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
                 <ToggleRight className="h-3 w-3" /> : 
                 <ToggleLeft className="h-3 w-3" />
               }
-              <span className="font-medium">God</span>
+              <span className="font-medium">God Mode</span>
             </div>
             
             <button 
@@ -154,7 +160,6 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
             
             <button 
               type="submit"
-              onClick={(e) => { e.stopPropagation(); handleSendMessage(e); }}
               className="bg-primary hover:bg-primary/90 text-primary-foreground p-1.5 rounded-full transition-colors"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -171,10 +176,11 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({ onSend, onClose }
               <X className="h-4 w-4" />
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
 };
 
 export default FloatingSearchBar;
+
