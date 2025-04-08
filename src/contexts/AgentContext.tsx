@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from "react";
 import { AIModel, MCPServerConfig, MCPTool, Agent } from "../types";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +25,7 @@ const DEFAULT_MODELS: AIModel[] = [
     id: "minimax",
     name: "MiniMax",
     provider: "MiniMax",
+    providerId: "minimax",
     description: "General purpose model with large context window",
     capabilities: ["general", "summarization", "translation"],
   },
@@ -33,6 +33,7 @@ const DEFAULT_MODELS: AIModel[] = [
     id: "deepseek-r1",
     name: "DeepSeek R1",
     provider: "DeepSeek",
+    providerId: "deepseek",
     description: "Model specializing in deep reasoning and analysis",
     capabilities: ["reasoning", "research", "analysis"],
   },
@@ -40,6 +41,7 @@ const DEFAULT_MODELS: AIModel[] = [
     id: "ideogram",
     name: "Ideogram",
     provider: "Ideogram",
+    providerId: "ideogram",
     description: "Image generation and vision model",
     capabilities: ["image-generation", "vision", "creative"],
   },
@@ -141,7 +143,6 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  // Agent CRUD operations
   const addAgent = (agent: Agent) => {
     setAgents((prev) => {
       const updated = [...prev, agent];
@@ -168,12 +169,9 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  // Logic to select the best model based on the task description
   const selectModelForTask = async (taskDescription: string): Promise<string> => {
-    // This would be more sophisticated in a real implementation
     const lowerCaseTask = taskDescription.toLowerCase();
     
-    // Simple keyword matching for demo purposes
     if (lowerCaseTask.includes("image") || 
         lowerCaseTask.includes("picture") || 
         lowerCaseTask.includes("photo")) {
@@ -184,11 +182,10 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
                lowerCaseTask.includes("deep dive")) {
       return "deepseek-r1";
     } else {
-      return "minimax"; // Default model
+      return "minimax";
     }
   };
 
-  // Simulate executing a tool via MCP server
   const executeMCPTool = async (toolId: string, params: Record<string, any>) => {
     const tool = mcpConfig.tools.find(t => t.id === toolId);
     
@@ -210,10 +207,8 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
       throw new Error("MCP Server URL not configured");
     }
     
-    // In a real implementation, this would make an actual API call
     console.log(`Executing tool ${tool.name} with params:`, params);
     
-    // Simulate API response delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     return {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useAgent } from "@/contexts/AgentContext";
 import { useModelApi } from "@/hooks/use-model-api";
@@ -120,7 +121,6 @@ const ModelAssignment: React.FC<ModelAssignmentProps> = ({ agents, models, onAss
                 <div>
                   <Label htmlFor={`provider-${agent.id}`}>Provedor de IA</Label>
                   <Select
-                    id={`provider-${agent.id}`}
                     value={selectedProvider}
                     onValueChange={(providerId) => handleProviderChange(agent.id, providerId)}
                   >
@@ -139,7 +139,6 @@ const ModelAssignment: React.FC<ModelAssignmentProps> = ({ agents, models, onAss
                 <div>
                   <Label htmlFor={`model-${agent.id}`}>Modelo de IA</Label>
                   <Select
-                    id={`model-${agent.id}`}
                     value={agentConfig.selectedModel}
                     onValueChange={(modelId) => {
                       setAgentModelConfigs(prev => ({

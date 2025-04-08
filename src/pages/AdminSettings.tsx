@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,18 +61,15 @@ const AdminSettings = () => {
     removeAgent,
   } = useAgent();
 
-  // State for MCP configuration
   const [mcpServerUrl, setMcpServerUrl] = useState(mcpConfig.serverUrl);
   const [mcpApiKey, setMcpApiKey] = useState(mcpConfig.apiKey || "");
   
-  // Dialog states
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [toolDialogOpen, setToolDialogOpen] = useState(false);
   const [agentDialogOpen, setAgentDialogOpen] = useState(false);
   const [editAgentDialogOpen, setEditAgentDialogOpen] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   
-  // Form states
   const [newModel, setNewModel] = useState<Partial<AIModel>>({
     name: "",
     provider: "",
@@ -97,7 +93,6 @@ const AdminSettings = () => {
     toolIds: [],
   });
 
-  // Handle MCP config update
   const handleUpdateMCPConfig = () => {
     updateMCPConfig({
       serverUrl: mcpServerUrl,
@@ -110,12 +105,10 @@ const AdminSettings = () => {
     });
   };
 
-  // Handle model update
   const handleUpdateModel = (modelId: string, field: keyof AIModel, value: string) => {
     updateModel(modelId, { [field]: value });
   };
 
-  // Handle adding a new model
   const handleAddModel = () => {
     if (!newModel.name || !newModel.provider) {
       toast({
@@ -130,6 +123,7 @@ const AdminSettings = () => {
       id: uuidv4(),
       name: newModel.name || "Novo Modelo",
       provider: newModel.provider || "Provedor",
+      providerId: newModel.provider?.toLowerCase().replace(/\s+/g, '-') || uuidv4(),
       description: newModel.description || "Descrição do modelo",
       capabilities: newModel.capabilities || [],
       apiKey: newModel.apiKey,
@@ -151,7 +145,6 @@ const AdminSettings = () => {
     });
   };
 
-  // Handle adding a new tool
   const handleAddTool = () => {
     if (!newTool.name || !newTool.endpoint) {
       toast({
@@ -185,7 +178,6 @@ const AdminSettings = () => {
     });
   };
 
-  // Handle adding a new agent
   const handleAddAgent = () => {
     if (!newAgent.name || !newAgent.modelId) {
       toast({
@@ -197,7 +189,6 @@ const AdminSettings = () => {
     }
     
     try {
-      // Validate JSON
       JSON.parse(newAgent.configJson || "{}");
       
       const agent: Agent = {
@@ -234,7 +225,6 @@ const AdminSettings = () => {
     }
   };
 
-  // Handle updating an agent
   const handleUpdateAgent = () => {
     if (!selectedAgentId || !newAgent.name || !newAgent.modelId) {
       toast({
@@ -246,7 +236,6 @@ const AdminSettings = () => {
     }
     
     try {
-      // Validate JSON
       JSON.parse(newAgent.configJson || "{}");
       
       updateAgent(selectedAgentId, {
@@ -274,7 +263,6 @@ const AdminSettings = () => {
     }
   };
 
-  // Open edit agent dialog
   const openEditAgentDialog = (agentId: string) => {
     const agent = agents.find(a => a.id === agentId);
     if (agent) {
@@ -321,7 +309,6 @@ const AdminSettings = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Agents Tab */}
         <TabsContent value="agents" className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Agentes Configurados</h2>
@@ -441,7 +428,6 @@ const AdminSettings = () => {
               </DialogContent>
             </Dialog>
 
-            {/* Edit Agent Dialog */}
             <Dialog open={editAgentDialogOpen} onOpenChange={setEditAgentDialogOpen}>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
@@ -618,7 +604,6 @@ const AdminSettings = () => {
           )}
         </TabsContent>
 
-        {/* Models Tab */}
         <TabsContent value="models" className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Modelos de IA Configurados</h2>
@@ -742,7 +727,6 @@ const AdminSettings = () => {
           </div>
         </TabsContent>
 
-        {/* MCP Tab */}
         <TabsContent value="mcp" className="space-y-6">
           <Card>
             <CardHeader>
