@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -106,9 +105,11 @@ export default {
 				},
 				'vibrate': {
 					'0%, 100%': { transform: 'translateX(0)' },
-					'25%': { transform: 'translateX(-2px)' },
-					'50%': { transform: 'translateX(0)' },
-					'75%': { transform: 'translateX(2px)' }
+					'10%': { transform: 'translateX(-4px) rotate(-2deg)' },
+					'20%': { transform: 'translateX(4px) rotate(2deg)' },
+					'30%': { transform: 'translateX(-4px) rotate(-2deg)' },
+					'40%': { transform: 'translateX(4px) rotate(2deg)' },
+					'50%': { transform: 'translateX(0) rotate(0)' }
 				}
 			},
 			animation: {
