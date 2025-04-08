@@ -10,6 +10,7 @@ import SuggestionBar from "@/components/SuggestionBar";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
+import FloatingSearchBar from "@/components/FloatingSearchBar";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage } = useChat();
@@ -20,6 +21,7 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
+  const [showFloatingBar, setShowFloatingBar] = useState(false);
   const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -49,6 +51,9 @@ const Chat: React.FC = () => {
     
     sendMessage(message);
     setMessage("");
+    
+    // Show floating search bar after sending message
+    setShowFloatingBar(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -70,6 +75,10 @@ const Chat: React.FC = () => {
         ? "Voltando ao modelo padrão" 
         : "Usando o modelo avançado para respostas melhores",
     });
+  };
+  
+  const handleFloatingSearch = (searchText: string) => {
+    sendMessage(searchText);
   };
   
   const MessageInputBar: React.FC = () => {
@@ -126,6 +135,13 @@ const Chat: React.FC = () => {
   return (
     <div className="flex h-screen bg-background dark">
       <ChatSidebar />
+      
+      {showFloatingBar && (
+        <FloatingSearchBar 
+          onSend={handleFloatingSearch}
+          onClose={() => setShowFloatingBar(false)}
+        />
+      )}
       
       <div className="flex flex-col flex-1 h-full">
         {activeChat && activeChat.messages.length > 0 ? (
