@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
-import ChatCategories from "@/components/ChatCategories";
 import { useChat } from "@/contexts/ChatContext";
 import { Paperclip, Search, Sparkles, X, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -149,10 +148,6 @@ const Chat: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
-        
-        <div>
-          <ChatCategories />
         </div>
       </div>
     </div>
