@@ -102,7 +102,7 @@ const Chat: React.FC = () => {
                   <span className="text-gray-400">Olá</span> {userName ? userName : "Usuário"} 
                 </h1>
                 <p className="text-2xl text-muted-foreground mb-10">
-                  O que posso fazer por você?
+                  Super Agent
                 </p>
                 
                 <div className="relative max-w-2xl w-full mx-auto mb-8">
