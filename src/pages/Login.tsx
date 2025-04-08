@@ -52,8 +52,8 @@ const Login = () => {
   return (
     <div className="flex min-h-screen bg-[#F5F5F7]">
       <div className="relative w-full max-w-md m-auto p-0.5 rounded-3xl">
-        {/* Subtle gradient background effect */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 opacity-70 blur-xl"></div>
+        {/* Animated border gradient effect */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#0EA5E9] via-[#33C3F0] to-[#1EAEDB] opacity-80 animate-border-glow"></div>
         
         {/* Frosted glass container */}
         <div className="relative bg-white/60 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/30">
