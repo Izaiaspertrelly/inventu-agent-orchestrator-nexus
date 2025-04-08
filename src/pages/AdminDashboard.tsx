@@ -41,6 +41,7 @@ const AdminDashboard = () => {
   
   // Handle navigation to user application
   const goToUserInterface = () => {
+    // Ensure navigation to the root/home page of the application
     navigate("/");
   };
 
