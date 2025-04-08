@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import DraggableContainer from "./draggable/DraggableContainer";
@@ -73,7 +72,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
       <div 
         className={`neo-blur rounded-full p-1 transition-all duration-300 flex items-center shadow-lg`}
         style={{ 
-          width: isMinimized ? '50px' : '600px',
+          width: isMinimized ? '50px' : '700px',
           overflow: 'hidden'
         }}
       >
@@ -90,7 +89,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         </div>
 
         <div 
-          className={`flex flex-col w-full transition-all duration-300 px-2`} // Added px-2 for more internal padding
+          className={`flex flex-col w-full transition-all duration-300 px-4`}
           style={{ 
             opacity: isMinimized ? 0 : 1,
             width: isMinimized ? '0' : 'auto',
@@ -108,8 +107,8 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
                 onKeyDown={handleKeyDown}
                 isSuperAgentEnabled={superAgentEnabled}
                 onClick={(e) => e.stopPropagation()}
-                inputClassName="floating-search-input w-full" // Ensure full width
-                containerClassName="w-full" // Ensure full width of container
+                inputClassName="floating-search-input w-full"
+                containerClassName="w-full"
               />
             </div>
             
@@ -134,4 +133,3 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
 };
 
 export default FloatingSearchBar;
-
