@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Agent, MCPTool } from "@/types";
+import { Agent, AIModel, MCPTool } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AIModel } from "@/types";
 
 interface AgentDialogProps {
   open: boolean;
@@ -26,6 +25,9 @@ interface AgentDialogProps {
   isEditing: boolean;
   models: AIModel[];
   mcpTools: MCPTool[];
+  availableProviderModels?: any[];
+  isLoadingModels?: Record<string, boolean>;
+  loadModelsForProvider?: (providerId: string) => Promise<void>;
 }
 
 const AgentDialog: React.FC<AgentDialogProps> = ({
@@ -37,6 +39,9 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
   isEditing,
   models,
   mcpTools,
+  availableProviderModels = [],
+  isLoadingModels = {},
+  loadModelsForProvider = async () => {}
 }) => {
   const { toast } = useToast();
   

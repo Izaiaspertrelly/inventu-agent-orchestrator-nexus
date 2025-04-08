@@ -27,8 +27,8 @@ interface AgentDialogProps {
   onSave: () => void;
   isEditing: boolean;
   availableProviderModels: any[];
-  isLoadingModels: boolean;
-  loadModelsForProvider: (providerId: string) => void;
+  isLoadingModels: Record<string, boolean>;
+  loadModelsForProvider: (providerId: string) => Promise<void>;
 }
 
 const AgentDialog: React.FC<AgentDialogProps> = ({
@@ -69,12 +69,6 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     }
   };
 
-  // Get selected provider from models and modelId
-  const getSelectedProvider = () => {
-    const selectedModel = models.find(model => model.id === agent.modelId);
-    return selectedModel?.providerId || "";
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -97,17 +91,13 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
           />
           
           <ModelSelection
-            providerId={getSelectedProvider()}
+            agent={agent}
             modelId={agent.modelId}
             models={models}
             availableProviderModels={availableProviderModels}
             isLoadingModels={isLoadingModels}
-            onProviderChange={(providerId) => {
-              loadModelsForProvider(providerId);
-              // Limpar o modelo atual já que estamos trocando de provedor
-              setAgent({ ...agent, modelId: "" });
-            }}
             onModelChange={(modelId) => setAgent({ ...agent, modelId })}
+            loadModelsForProvider={loadModelsForProvider}
           />
           
           <ToolsSelection
