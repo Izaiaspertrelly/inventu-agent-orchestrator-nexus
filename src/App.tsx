@@ -11,7 +11,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 import Login from "@/pages/Login";
 import Chat from "@/pages/Chat";
-import Index from "@/pages/Index";
 import AdminSettings from "@/pages/AdminSettings";
 import NotFound from "@/pages/NotFound";
 
@@ -32,14 +31,6 @@ const App = () => {
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/"
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/chat"
                     element={
                       <ProtectedRoute>
                         <Chat />

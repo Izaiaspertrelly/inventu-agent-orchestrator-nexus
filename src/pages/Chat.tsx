@@ -4,11 +4,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
-import { Check, X } from "lucide-react";
+import { Paperclip, Search, X, Check, ToggleRight, ToggleLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import SuggestionBar from "@/components/SuggestionBar";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
-import FloatingSearchBar from "@/components/FloatingSearchBar";
 
 const Chat: React.FC = () => {
   const { activeChat, createNewChat, sendMessage } = useChat();
@@ -16,6 +17,7 @@ const Chat: React.FC = () => {
   const { toast } = useToast();
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
+  const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
   const animationRef = useRef<HTMLDivElement>(null);
@@ -34,7 +36,8 @@ const Chat: React.FC = () => {
     else setGreeting("Boa noite");
   }, [activeChat, createNewChat]);
   
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!message.trim()) return;
     
     if (superAgentEnabled) {
@@ -45,6 +48,14 @@ const Chat: React.FC = () => {
     }
     
     sendMessage(message);
+    setMessage("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e as unknown as React.FormEvent);
+    }
   };
   
   const toggleSuperAgent = () => {
@@ -61,19 +72,62 @@ const Chat: React.FC = () => {
     });
   };
   
+  const MessageInputBar: React.FC = () => {
+    return (
+      <div className="relative">
+        <Input 
+          className={`w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg backdrop-blur-sm border border-border/40 transition-all duration-300 
+            ${superAgentEnabled 
+              ? `bg-blue-500 text-white placeholder:text-white/70 ${isVibrating ? 'animate-vibrate' : ''}` 
+              : 'bg-secondary/30 placeholder:text-muted-foreground/70'}`}
+          placeholder="Dê uma tarefa para Inventor trabalhar..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          autoFocus
+        />
+        <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${superAgentEnabled ? 'text-white/70' : 'text-muted-foreground/70'}`} />
+        
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+          <div 
+            className={`flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs ${superAgentEnabled ? 'text-blue-500 font-semibold' : ''}`}
+            onClick={toggleSuperAgent} 
+            title="Ativar/Desativar God Mode"
+          >
+            {superAgentEnabled ? 
+              <ToggleRight className="h-3 w-3" /> : 
+              <ToggleLeft className="h-3 w-3" />
+            }
+            <span className="font-medium ml-1">God Mode</span>
+          </div>
+          
+          <button 
+            type="button"
+            className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-2.5 rounded-full transition-colors"
+            title="Anexar arquivo"
+          >
+            <Paperclip className="h-5 w-5" />
+          </button>
+          
+          <button 
+            type="submit"
+            onClick={handleSendMessage}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground p-2.5 rounded-full transition-colors"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
   return (
     <div className="flex h-screen bg-background dark">
       <ChatSidebar />
       
       <div className="flex flex-col flex-1 h-full">
-        {/* Floating search bar - always visible */}
-        <FloatingSearchBar 
-          onSendMessage={handleSendMessage}
-          superAgentEnabled={superAgentEnabled}
-          onToggleSuperAgent={toggleSuperAgent}
-          isVibrating={isVibrating}
-        />
-        
         {activeChat && activeChat.messages.length > 0 ? (
           <div className="flex flex-col flex-1">
             <ScrollArea className="flex-1 p-4">
@@ -83,6 +137,11 @@ const Chat: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
+            <div className="max-w-3xl mx-auto w-full px-4 py-4">
+              <form onSubmit={handleSendMessage}>
+                <MessageInputBar />
+              </form>
+            </div>
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
@@ -105,6 +164,10 @@ const Chat: React.FC = () => {
               
               <div className="relative max-w-2xl w-full mx-auto mb-8">
                 <div className="flex flex-col gap-4">
+                  <form onSubmit={handleSendMessage}>
+                    <MessageInputBar />
+                  </form>
+                  
                   <div className="w-full p-3 rounded-2xl bg-secondary/30 backdrop-blur-sm border border-border/40 flex items-center">
                     <div className="rounded-xl bg-secondary/70 p-2 mr-3">
                       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
