@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +14,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
@@ -38,7 +36,7 @@ const Login = () => {
     
     try {
       await login(email, password);
-      navigate("/"); // Explicitly navigate to home page after login
+      navigate("/");
     } catch (error) {
       toast({
         title: "Falha no login",
@@ -53,10 +51,8 @@ const Login = () => {
   return (
     <div className="flex min-h-screen bg-black">
       <div className="relative w-full max-w-md m-auto p-0.5 rounded-2xl">
-        {/* Animated border glow effect */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-400 opacity-90 animate-border-glow"></div>
         
-        {/* Inner content container */}
         <div className="relative bg-black/80 backdrop-blur-xl p-8 rounded-2xl z-10">
           <div className="text-center mb-10">
             <img 
@@ -98,7 +94,7 @@ const Login = () => {
             
             <Button
               type="submit"
-              className="w-full bg-transparent text-white border-none hover:bg-white/10 py-4 rounded-lg transition-colors duration-300 ease-in-out"
+              className="inline-flex justify-center items-center px-4 py-2 bg-transparent text-white border-none hover:bg-white/10 rounded-lg transition-colors duration-300 ease-in-out"
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
