@@ -90,7 +90,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         </div>
 
         <div 
-          className={`flex flex-col w-full transition-all duration-300`}
+          className={`flex flex-col w-full transition-all duration-300 px-2`} // Added px-2 for more internal padding
           style={{ 
             opacity: isMinimized ? 0 : 1,
             width: isMinimized ? '0' : 'auto',
@@ -99,7 +99,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
         >
           <form 
             onSubmit={handleSendMessage} 
-            className="flex items-center justify-between flex-1 px-2 gap-2"
+            className="flex items-center justify-between flex-1 gap-2"
           >
             <div className="flex-1 mr-auto">
               <SearchBarInput 
@@ -108,7 +108,8 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
                 onKeyDown={handleKeyDown}
                 isSuperAgentEnabled={superAgentEnabled}
                 onClick={(e) => e.stopPropagation()}
-                inputClassName="floating-search-input"
+                inputClassName="floating-search-input w-full" // Ensure full width
+                containerClassName="w-full" // Ensure full width of container
               />
             </div>
             
@@ -133,3 +134,4 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
 };
 
 export default FloatingSearchBar;
+
