@@ -2,13 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import OrchestratorHeader from "./orchestrator/OrchestratorHeader";
+import AgentSelector from "./orchestrator/AgentSelector";
+import CapabilitiesSection from "./orchestrator/CapabilitiesSection";
+import JsonConfigEditor from "./orchestrator/JsonConfigEditor";
+import SaveButton from "./orchestrator/SaveButton";
 
 const OrchestratorSection: React.FC = () => {
   const { toast } = useToast();
@@ -114,148 +113,38 @@ const OrchestratorSection: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Configuração do Orquestrador Neural</CardTitle>
-          <CardDescription>
-            O orquestrador é o cérebro central que coordena todos os outros componentes do sistema.
-          </CardDescription>
+          <OrchestratorHeader />
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="mainAgent">Agente Principal</Label>
-              <Select
-                value={mainAgent}
-                onValueChange={setMainAgent}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um agente principal" />
-                </SelectTrigger>
-                <SelectContent>
-                  {agents.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-muted-foreground">
-                Este é o agente que será responsável pela tomada de decisões primárias e delegação de tarefas.
-              </p>
-            </div>
+            <AgentSelector 
+              agents={agents}
+              mainAgent={mainAgent}
+              setMainAgent={setMainAgent}
+            />
             
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-medium mb-4">Capacidades Neurais do Orquestrador</h3>
-              
-              <div className="space-y-6">
-                {/* Memória */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Memória</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Permite ao orquestrador lembrar de interações anteriores
-                    </p>
-                  </div>
-                  <Switch 
-                    checked={memoryEnabled}
-                    onCheckedChange={setMemoryEnabled}
-                  />
-                </div>
-                
-                {memoryEnabled && (
-                  <div className="ml-4 space-y-2">
-                    <Label htmlFor="memory-type">Tipo de Memória</Label>
-                    <Select
-                      value={memoryType}
-                      onValueChange={setMemoryType}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de memória" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="buffer">Buffer Simples</SelectItem>
-                        <SelectItem value="vectordb">Banco de Dados Vetorial</SelectItem>
-                        <SelectItem value="summary">Memória com Resumo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                
-                {/* Raciocínio */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Raciocínio</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Permite ao orquestrador raciocinar sobre informações
-                    </p>
-                  </div>
-                  <Switch 
-                    checked={reasoningEnabled}
-                    onCheckedChange={setReasoningEnabled}
-                  />
-                </div>
-                
-                {reasoningEnabled && (
-                  <div className="ml-4 space-y-2">
-                    <Label htmlFor="reasoning-depth">Profundidade de Raciocínio</Label>
-                    <Select
-                      value={reasoningDepth}
-                      onValueChange={setReasoningDepth}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a profundidade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Básico (1 passo)</SelectItem>
-                        <SelectItem value="2">Intermediário (2 passos)</SelectItem>
-                        <SelectItem value="3">Avançado (3+ passos)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                
-                {/* Planejamento */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Planejamento</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Permite ao orquestrador planejar ações futuras
-                    </p>
-                  </div>
-                  <Switch 
-                    checked={planningEnabled}
-                    onCheckedChange={setPlanningEnabled}
-                  />
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                onClick={handleUpdateConfig}
-                className="mt-4"
-              >
-                Atualizar Configuração
-              </Button>
-            </div>
+            <CapabilitiesSection 
+              memoryEnabled={memoryEnabled}
+              setMemoryEnabled={setMemoryEnabled}
+              memoryType={memoryType}
+              setMemoryType={setMemoryType}
+              reasoningEnabled={reasoningEnabled}
+              setReasoningEnabled={setReasoningEnabled}
+              reasoningDepth={reasoningDepth}
+              setReasoningDepth={setReasoningDepth}
+              planningEnabled={planningEnabled}
+              setPlanningEnabled={setPlanningEnabled}
+              handleUpdateConfig={handleUpdateConfig}
+            />
             
-            <div className="border-t pt-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="orchestrator-config">Configuração JSON do Orquestrador</Label>
-                <span className="text-xs text-muted-foreground">Edição avançada</span>
-              </div>
-              <Textarea
-                id="orchestrator-config"
-                value={configJson}
-                onChange={(e) => setConfigJson(e.target.value)}
-                className="font-mono h-64"
-              />
-            </div>
+            <JsonConfigEditor 
+              configJson={configJson}
+              setConfigJson={setConfigJson}
+            />
             
-            <Button 
-              onClick={handleSaveOrchestrator} 
-              className="w-full"
-            >
-              Salvar Configuração do Orquestrador Neural
-            </Button>
+            <SaveButton 
+              handleSaveOrchestrator={handleSaveOrchestrator} 
+            />
           </div>
         </CardContent>
       </Card>
