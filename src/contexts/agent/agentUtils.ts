@@ -61,7 +61,7 @@ export const executeMCPTool = async (tool: MCPTool, params: Record<string, any>)
     };
     
     // Add body for POST, PUT, PATCH requests
-    if (tool.method === 'POST' || tool.method === 'PUT' || tool.method === 'PATCH') {
+    if (['POST', 'PUT', 'PATCH'].includes(tool.method)) {
       options.body = JSON.stringify(params);
     }
     
