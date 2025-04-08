@@ -59,6 +59,8 @@ const ToolsTab = () => {
     name: "",
     description: "",
     endpoint: "",
+    method: "GET", // Default method
+    parameters: "",
     authKey: "",
   });
 
@@ -94,6 +96,8 @@ const ToolsTab = () => {
       name: newTool.name || "Nova Ferramenta",
       description: newTool.description || "Descrição da ferramenta",
       endpoint: newTool.endpoint || "/api/tool",
+      method: newTool.method || "GET", // Add method with default value
+      parameters: newTool.parameters || "",
       authKey: newTool.authKey,
     };
     
@@ -103,6 +107,8 @@ const ToolsTab = () => {
       name: "",
       description: "",
       endpoint: "",
+      method: "GET",
+      parameters: "",
       authKey: "",
     });
     
