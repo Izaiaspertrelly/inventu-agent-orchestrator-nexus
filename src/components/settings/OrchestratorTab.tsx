@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,10 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useAgent } from "@/contexts/AgentContext";
 import { v4 as uuidv4 } from "uuid";
+import { useModelApi } from "@/hooks/use-model-api";
+import { Loader2 } from "lucide-react";
 
 const OrchestratorTab = () => {
   const { toast } = useToast();
-  const { agents, addAgent, updateAgent } = useAgent();
+  const { models, agents, addAgent, updateAgent } = useAgent();
+  const { fetchProviderModels, isLoading } = useModelApi();
   
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -37,7 +40,39 @@ const OrchestratorTab = () => {
     }
   }, null, 2));
   
-  const [isLoading, setIsLoading] = useState(false);
+  // Estado para a seleção de modelos
+  const [selectedProvider, setSelectedProvider] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [availableModels, setAvailableModels] = useState<any[]>([]);
+  
+  const [isFormLoading, setIsFormLoading] = useState(false);
+
+  // Efeito para carregar modelos quando o provedor muda
+  useEffect(() => {
+    if (selectedProvider) {
+      loadModelsForProvider(selectedProvider);
+    }
+  }, [selectedProvider]);
+
+  const loadModelsForProvider = async (providerId: string) => {
+    if (!providerId) return;
+    
+    try {
+      const provider = models.find(m => m.providerId === providerId);
+      const apiKey = provider?.apiKey || "";
+      
+      const providerModels = await fetchProviderModels(providerId, apiKey);
+      setAvailableModels(providerModels);
+    } catch (error) {
+      console.error("Erro ao carregar modelos:", error);
+      toast({
+        title: "Erro ao carregar modelos",
+        description: "Não foi possível carregar os modelos do provedor selecionado",
+        variant: "destructive"
+      });
+      setAvailableModels([]);
+    }
+  };
 
   const handleUpdateConfig = () => {
     try {
@@ -84,7 +119,16 @@ const OrchestratorTab = () => {
       return;
     }
 
-    setIsLoading(true);
+    if (!selectedModel) {
+      toast({
+        title: "Modelo obrigatório",
+        description: "Por favor, selecione um modelo de IA.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsFormLoading(true);
     
     try {
       const configObj = JSON.parse(orchestratorConfig);
@@ -93,11 +137,11 @@ const OrchestratorTab = () => {
         id: uuidv4(),
         name,
         description,
-        modelId: "", // Será preenchido na próxima etapa
+        modelId: selectedModel,
         configJson: JSON.stringify({
           orchestrator: configObj
         }),
-        toolIds: [], // Será preenchido na próxima etapa
+        toolIds: [],
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -106,12 +150,14 @@ const OrchestratorTab = () => {
       
       toast({
         title: "Agente criado",
-        description: "Configuração do orquestrador salva com sucesso. Continue para selecionar o modelo.",
+        description: "Configuração do orquestrador salva com sucesso.",
       });
       
       // Reset form
       setName("");
       setDescription("");
+      setSelectedProvider("");
+      setSelectedModel("");
     } catch (e) {
       toast({
         title: "Erro na configuração",
@@ -119,7 +165,7 @@ const OrchestratorTab = () => {
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setIsFormLoading(false);
     }
   };
 
@@ -153,6 +199,62 @@ const OrchestratorTab = () => {
                 placeholder="Descrição do propósito do agente"
                 rows={2}
               />
+            </div>
+            
+            {/* Seleção de Modelo */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="text-lg font-medium">Modelo de IA</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="provider">Provedor de IA</Label>
+                  <Select
+                    value={selectedProvider}
+                    onValueChange={(value) => {
+                      setSelectedProvider(value);
+                      setSelectedModel("");
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um provedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {models.map((model) => (
+                        <SelectItem key={model.providerId} value={model.providerId}>
+                          {model.provider}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="model">Modelo de IA</Label>
+                  {isLoading[selectedProvider] ? (
+                    <div className="flex items-center space-x-2 h-10 border rounded-md px-3">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm text-muted-foreground">Carregando modelos...</span>
+                    </div>
+                  ) : (
+                    <Select
+                      value={selectedModel}
+                      onValueChange={setSelectedModel}
+                      disabled={!selectedProvider || availableModels.length === 0}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um modelo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableModels.map((model) => (
+                          <SelectItem key={model.id} value={model.id}>
+                            {model.name} {model.description && `(${model.description})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
             </div>
             
             <div className="border-t pt-4">
@@ -264,10 +366,10 @@ const OrchestratorTab = () => {
             
             <Button 
               onClick={handleSaveOrchestrator} 
-              disabled={isLoading}
+              disabled={isFormLoading || !selectedModel || !name}
               className="w-full"
             >
-              {isLoading ? "Salvando..." : "Salvar Configuração do Orquestrador"}
+              {isFormLoading ? "Salvando..." : "Salvar Configuração do Orquestrador"}
             </Button>
           </div>
         </CardContent>

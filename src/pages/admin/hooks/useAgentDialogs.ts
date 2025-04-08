@@ -9,14 +9,13 @@ import { useAgent } from "@/contexts/AgentContext";
 export const useAgentDialogs = () => {
   const { toast } = useToast();
   const { agents, models, addAgent, updateAgent } = useAgent();
-  const { fetchProviderModels } = useModelApi();
+  const { fetchProviderModels, isLoading } = useModelApi();
   
   // Dialog states
   const [agentDialogOpen, setAgentDialogOpen] = useState(false);
   const [editAgentDialogOpen, setEditAgentDialogOpen] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [availableProviderModels, setAvailableProviderModels] = useState<any[]>([]);
-  const [isLoadingModels, setIsLoadingModels] = useState(false);
   
   // Form states
   const [newAgent, setNewAgent] = useState<Partial<Agent>>({
@@ -31,10 +30,18 @@ export const useAgentDialogs = () => {
   const loadModelsForProvider = async (providerId: string) => {
     if (!providerId) return;
     
-    setIsLoadingModels(true);
     try {
-      const models = await fetchProviderModels(providerId, "");
-      setAvailableProviderModels(models);
+      // Encontre o modelo para obter a chave API
+      const provider = models.find(m => m.providerId === providerId);
+      const apiKey = provider?.apiKey || "";
+      
+      // Buscar modelos da API
+      const providerModels = await fetchProviderModels(providerId, apiKey);
+      
+      // Atualizar estado com os modelos disponíveis
+      setAvailableProviderModels(providerModels);
+      
+      console.log(`Modelos carregados para ${providerId}:`, providerModels);
     } catch (error) {
       console.error("Error fetching models:", error);
       toast({
@@ -43,8 +50,6 @@ export const useAgentDialogs = () => {
         variant: "destructive",
       });
       setAvailableProviderModels([]);
-    } finally {
-      setIsLoadingModels(false);
     }
   };
 
@@ -131,7 +136,7 @@ export const useAgentDialogs = () => {
 
   // Open edit agent dialog
   const openEditDialog = (agentId: string) => {
-    // Use agents from the context instead of window.agents
+    // Use agents from the useAgent context
     const agent = agents.find(a => a.id === agentId);
     if (agent) {
       setSelectedAgentId(agentId);
@@ -145,7 +150,7 @@ export const useAgentDialogs = () => {
       
       // If the agent has a model provider, load its models
       if (agent.modelId) {
-        // Use models from the context instead of window.models
+        // Use models from the useAgent context
         const model = models.find(m => m.id === agent.modelId);
         if (model) {
           loadModelsForProvider(model.providerId);
@@ -165,7 +170,7 @@ export const useAgentDialogs = () => {
     setNewAgent,
     selectedAgentId,
     availableProviderModels,
-    isLoadingModels,
+    isLoadingModels: isLoading,
     loadModelsForProvider,
     openAddDialog,
     openEditDialog,

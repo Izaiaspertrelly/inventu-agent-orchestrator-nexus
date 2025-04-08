@@ -35,6 +35,7 @@ const AgentBasicInfo: React.FC<AgentBasicInfoProps> = ({
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           placeholder="Descrição do propósito do agente"
+          rows={3}
         />
       </div>
     </>

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIModel } from "@/types";
@@ -24,6 +24,24 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
   onProviderChange,
   onModelChange
 }) => {
+  // Agrupar modelos por provedor para o selector de provedor
+  const providers = Array.from(new Set(models.map(model => model.providerId)))
+    .map(providerId => {
+      const provider = models.find(m => m.providerId === providerId);
+      return {
+        id: providerId,
+        name: provider?.provider || providerId
+      };
+    });
+
+  // Carregar modelos automaticamente quando o componente montar
+  // se já houver um provider selecionado
+  useEffect(() => {
+    if (providerId && availableProviderModels.length === 0 && !isLoadingModels) {
+      onProviderChange(providerId);
+    }
+  }, [providerId]);
+
   return (
     <>
       {/* Seletor de Provedor */}
@@ -37,9 +55,9 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
             <SelectValue placeholder="Selecione um provedor" />
           </SelectTrigger>
           <SelectContent>
-            {models.map((model) => (
-              <SelectItem key={model.providerId} value={model.providerId}>
-                {model.provider}
+            {providers.map((provider) => (
+              <SelectItem key={provider.id} value={provider.id}>
+                {provider.name}
               </SelectItem>
             ))}
           </SelectContent>

@@ -17,13 +17,14 @@ export const useModelApi = () => {
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
   const fetchProviderModels = async (providerId: string, apiKey: string) => {
+    // Set loading state for this provider
     setIsLoading(prev => ({ ...prev, [providerId]: true }));
     
     try {
       const endpoint = PROVIDER_MODEL_ENDPOINTS[providerId as keyof typeof PROVIDER_MODEL_ENDPOINTS];
       
       if (!endpoint) {
-        throw new Error(`Endpoint não encontrado para o provedor: ${providerId}`);
+        console.log(`Endpoint não encontrado para o provedor: ${providerId}. Usando modelos simulados.`);
       }
       
       // Simular resposta da API enquanto os endpoints reais não estão disponíveis
@@ -64,6 +65,20 @@ export const useModelApi = () => {
           { id: "command-light", name: "Command Light", description: "Versão mais leve e rápida do Command" },
           { id: "command-r", name: "Command R", description: "Versão otimizada para respostas do Command" },
           { id: "embed", name: "Embed", description: "Modelo de embeddings semânticos" }
+        ],
+        "minimax": [
+          { id: "minimax-large", name: "MiniMax Large", description: "Modelo de grande capacidade" },
+          { id: "minimax-medium", name: "MiniMax Medium", description: "Modelo de capacidade média" },
+          { id: "minimax-small", name: "MiniMax Small", description: "Modelo compacto" }
+        ],
+        "deepseek": [
+          { id: "deepseek-r1", name: "DeepSeek R1", description: "Modelo de raciocínio profundo" },
+          { id: "deepseek-coder", name: "DeepSeek Coder", description: "Modelo especializado em código" },
+          { id: "deepseek-math", name: "DeepSeek Math", description: "Modelo especializado em matemática" }
+        ],
+        "ideogram": [
+          { id: "ideogram-v1", name: "Ideogram v1", description: "Geração de imagens" },
+          { id: "ideogram-v2", name: "Ideogram v2", description: "Geração de imagens aprimorada" }
         ]
       };
       
@@ -78,6 +93,7 @@ export const useModelApi = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const models = mockModels[providerId] || defaultModels;
+      console.log(`Modelos retornados para ${providerId}:`, models);
       
       return models;
     } catch (error) {

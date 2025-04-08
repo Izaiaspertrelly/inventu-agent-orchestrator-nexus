@@ -69,7 +69,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     }
   };
 
-  // Get selected provider from models
+  // Get selected provider from models and modelId
   const getSelectedProvider = () => {
     const selectedModel = models.find(model => model.id === agent.modelId);
     return selectedModel?.providerId || "";
