@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,7 +99,7 @@ const Login = () => {
             
             <Button
               type="submit"
-              className="w-full bg-white/40 border-none text-gray-700 hover:bg-white/70 py-4 rounded-xl backdrop-blur-sm font-apple-medium text-apple-sm transition-all shadow-sm mt-4"
+              className="w-full bg-white/40 border-none text-gray-700 hover:bg-white/70 py-3 rounded-xl backdrop-blur-sm font-apple-medium text-apple-sm transition-all shadow-sm mt-4"
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
