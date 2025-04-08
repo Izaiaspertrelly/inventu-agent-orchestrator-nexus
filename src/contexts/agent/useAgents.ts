@@ -16,6 +16,12 @@ export const useAgents = () => {
   };
 
   const addAgent = (agent: Agent) => {
+    // Skip adding if this is an orchestrator agent
+    if (agent.name === "Orquestrador Neural") {
+      console.log("Skipping orchestrator agent addition to agents list");
+      return;
+    }
+    
     setAgents((prev) => {
       const updated = [...prev, agent];
       updateLocalStorage(updated);
@@ -41,8 +47,14 @@ export const useAgents = () => {
     });
   };
 
+  // Get all agents except the orchestrator
+  const getRegularAgents = () => {
+    return agents.filter(agent => agent.name !== "Orquestrador Neural");
+  };
+
   return {
-    agents,
+    agents: getRegularAgents(),
+    rawAgents: agents,
     addAgent,
     updateAgent,
     removeAgent,

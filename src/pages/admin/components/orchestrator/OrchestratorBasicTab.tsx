@@ -32,6 +32,7 @@ const OrchestratorBasicTab: React.FC = () => {
       config.description = "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA.";
       config.mainAgentId = mainAgent;
       
+      // Atualizar o orquestrador sem criar um agente
       updateOrchestratorConfig(config);
       
       toast({

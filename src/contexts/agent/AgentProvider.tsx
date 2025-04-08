@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from "react";
 import { useModels } from "./useModels";
 import { useMCPConfig } from "./useMCPConfig";
@@ -54,6 +55,7 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
   
   const {
     agents,
+    rawAgents,
     addAgent,
     updateAgent,
     removeAgent
@@ -76,7 +78,8 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     
     // Se o orquestrador tem um agente principal configurado, tente usá-lo primeiro
     if (orchestratorConfig && orchestratorConfig.mainAgentId) {
-      const mainAgent = agents.find(a => a.id === orchestratorConfig.mainAgentId);
+      // Buscar no rawAgents para garantir que o orquestrador seja encontrado
+      const mainAgent = rawAgents.find(a => a.id === orchestratorConfig.mainAgentId);
       if (mainAgent && mainAgent.modelId) {
         console.log("Usando agente principal do orquestrador:", mainAgent.name);
         return mainAgent.modelId;
