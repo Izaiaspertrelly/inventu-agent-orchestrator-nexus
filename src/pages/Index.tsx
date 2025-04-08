@@ -15,7 +15,8 @@ const Index: React.FC = () => {
     if (!prompt.trim()) return;
     
     // Navigate to the chat page with the prompt as a query parameter
-    navigate(`/chat?prompt=${encodeURIComponent(prompt)}`);
+    // Adding a clear comment to ensure this change is detected
+    navigate(`/chat?prompt=${encodeURIComponent(prompt.trim())}`);
   };
   
   return (
