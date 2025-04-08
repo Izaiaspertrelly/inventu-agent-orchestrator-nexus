@@ -1,4 +1,3 @@
-
 // User related types
 export interface User {
   id: string;
@@ -77,3 +76,24 @@ export interface Agent {
   updatedAt: Date;
 }
 
+// HTTP Request and Response Types
+export interface ApiError {
+  message: string;
+  status?: number;
+  errors?: Record<string, string[]>;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    currentPage: number;
+    lastPage: number;
+    perPage: number;
+    total: number;
+  };
+}
+
+export interface ApiConfig {
+  baseUrl: string;
+  token?: string;
+}
