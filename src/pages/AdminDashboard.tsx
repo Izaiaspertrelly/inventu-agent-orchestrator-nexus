@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -41,8 +40,18 @@ const AdminDashboard = () => {
   
   // Handle navigation to user application
   const goToUserInterface = () => {
-    // Ensure navigation to the root/home page of the application
-    navigate("/");
+    console.log("Navigating to home page from admin dashboard");
+    try {
+      navigate("/");
+      console.log("Navigation successful");
+    } catch (error) {
+      console.error("Navigation error:", error);
+      toast({
+        title: "Erro de Navegação",
+        description: "Não foi possível navegar para a página inicial.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -60,7 +69,6 @@ const AdminDashboard = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            {/* Botão para ir à interface do usuário */}
             <Button 
               onClick={goToUserInterface} 
               variant="outline"
