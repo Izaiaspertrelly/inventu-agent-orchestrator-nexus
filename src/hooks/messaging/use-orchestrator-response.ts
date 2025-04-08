@@ -109,7 +109,8 @@ export const useOrchestratorResponse = () => {
     });
     
     if (suggestions.length > 0) {
-      setMemorySuggestions(prev => [...prev, ...suggestions]);
+      // Fix #1: Properly type the function parameter
+      setMemorySuggestions((prev: MemoryConfirmation[]) => [...prev, ...suggestions]);
       return true;
     }
     
@@ -124,7 +125,8 @@ export const useOrchestratorResponse = () => {
     // This would typically interact with your knowledge database
     
     // Remove from pending suggestions
-    setMemorySuggestions(prev => prev.filter(s => s.id !== id));
+    // Fix #2: Properly type the function parameter
+    setMemorySuggestions((prev: MemoryConfirmation[]) => prev.filter(s => s.id !== id));
     setPendingMemoryConfirmation(null);
     
     // Check for next suggestion
@@ -136,7 +138,8 @@ export const useOrchestratorResponse = () => {
   
   const declineMemorySuggestion = (id: number) => {
     // Remove from pending suggestions
-    setMemorySuggestions(prev => prev.filter(s => s.id !== id));
+    // Fix #3: Properly type the function parameter
+    setMemorySuggestions((prev: MemoryConfirmation[]) => prev.filter(s => s.id !== id));
     setPendingMemoryConfirmation(null);
     
     // Check for next suggestion
