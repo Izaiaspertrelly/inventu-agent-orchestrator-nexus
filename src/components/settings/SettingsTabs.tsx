@@ -1,42 +1,25 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  UserCog, 
-  Layers, 
-  Code, 
-  SlidersHorizontal, 
-  Menu,
-  Database,
-  FileJson 
-} from "lucide-react";
+import { UserCog, Layers, Code, SlidersHorizontal, Menu, Database, FileJson } from "lucide-react";
 import ProfileTab from "./ProfileTab";
 import OrchestratorTab from "./OrchestratorTab";
 import ModelsTab from "./ModelsTab";
 import ToolsTab from "./ToolsTab";
 import AgentsTab from "./AgentsTab";
 import MCPTab from "./MCPTab";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-
 const SettingsTabs = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const isAdmin = user?.role === "admin";
-  
-  return (
-    <Tabs defaultValue="profile" className="w-full">
+  return <Tabs defaultValue="profile" className="w-full">
       <div className="flex items-center justify-between mb-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Menu className="h-4 w-4" />
-            </Button>
+            
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="profile"]') as HTMLElement)?.click()}>
@@ -55,8 +38,7 @@ const SettingsTabs = () => {
               <Code className="mr-2 h-4 w-4" />
               Ferramentas
             </DropdownMenuItem>
-            {isAdmin && (
-              <>
+            {isAdmin && <>
                 <DropdownMenuItem onSelect={() => (document.querySelector('[data-radix-tabs-trigger="agents"]') as HTMLElement)?.click()}>
                   <UserCog className="mr-2 h-4 w-4" />
                   Agentes
@@ -65,8 +47,7 @@ const SettingsTabs = () => {
                   <Database className="mr-2 h-4 w-4" />
                   Servidor MCP
                 </DropdownMenuItem>
-              </>
-            )}
+              </>}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -87,18 +68,13 @@ const SettingsTabs = () => {
             <Code className="h-4 w-4" />
             Ferramentas
           </TabsTrigger>
-          {isAdmin && (
-            <>
+          {isAdmin && <>
               <TabsTrigger value="agents" className="flex items-center gap-2">
                 <UserCog className="h-4 w-4" />
                 Agentes
               </TabsTrigger>
-              <TabsTrigger value="mcp" className="flex items-center gap-2">
-                <Database className="h-4 w-4" />
-                Servidor MCP
-              </TabsTrigger>
-            </>
-          )}
+              
+            </>}
         </TabsList>
       </div>
 
@@ -118,18 +94,14 @@ const SettingsTabs = () => {
         <ToolsTab />
       </TabsContent>
       
-      {isAdmin && (
-        <>
+      {isAdmin && <>
           <TabsContent value="agents" className="space-y-6">
             <AgentsTab />
           </TabsContent>
           <TabsContent value="mcp" className="space-y-6">
             <MCPTab />
           </TabsContent>
-        </>
-      )}
-    </Tabs>
-  );
+        </>}
+    </Tabs>;
 };
-
 export default SettingsTabs;
