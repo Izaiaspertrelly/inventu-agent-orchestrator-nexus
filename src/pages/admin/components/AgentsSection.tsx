@@ -17,6 +17,9 @@ const AgentsSection: React.FC = () => {
     setEditAgentDialogOpen,
     newAgent,
     setNewAgent,
+    availableProviderModels,
+    isLoadingModels,
+    loadModelsForProvider,
     openAddDialog,
     openEditDialog,
     handleAddAgent,
@@ -53,6 +56,9 @@ const AgentsSection: React.FC = () => {
         isEditing={false}
         models={models}
         mcpTools={mcpConfig.tools}
+        availableProviderModels={availableProviderModels}
+        isLoadingModels={isLoadingModels}
+        loadModelsForProvider={loadModelsForProvider}
       />
       
       {/* Edit Agent Dialog */}
@@ -65,6 +71,9 @@ const AgentsSection: React.FC = () => {
         isEditing={true}
         models={models}
         mcpTools={mcpConfig.tools}
+        availableProviderModels={availableProviderModels}
+        isLoadingModels={isLoadingModels}
+        loadModelsForProvider={loadModelsForProvider}
       />
     </>
   );

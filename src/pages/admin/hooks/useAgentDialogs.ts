@@ -1,64 +1,72 @@
 
 import { useState } from "react";
 import { Agent } from "@/types";
-import { v4 as uuidv4 } from "uuid";
-import { useAgent } from "@/contexts/AgentContext";
 import { useToast } from "@/hooks/use-toast";
-
-// Default empty agent state
-const defaultAgentState: Partial<Agent> = {
-  name: "",
-  description: "",
-  modelId: "",
-  configJson: "{\n  \"parameters\": {},\n  \"instructions\": \"\"\n}",
-  toolIds: [],
-};
+import { v4 as uuidv4 } from "uuid";
+import { useModelApi } from "@/hooks/use-model-api";
+import { useAgent } from "@/contexts/AgentContext";
 
 export const useAgentDialogs = () => {
   const { toast } = useToast();
-  const { addAgent, updateAgent, agents } = useAgent();
+  const { addAgent, updateAgent } = useAgent();
+  const { fetchProviderModels } = useModelApi();
   
   // Dialog states
   const [agentDialogOpen, setAgentDialogOpen] = useState(false);
   const [editAgentDialogOpen, setEditAgentDialogOpen] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [availableProviderModels, setAvailableProviderModels] = useState<any[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
   
-  // Form state
-  const [newAgent, setNewAgent] = useState<Partial<Agent>>(defaultAgentState);
+  // Form states
+  const [newAgent, setNewAgent] = useState<Partial<Agent>>({
+    name: "",
+    description: "",
+    modelId: "",
+    configJson: "{\n  \"parameters\": {},\n  \"instructions\": \"\"\n}",
+    toolIds: [],
+  });
 
-  // Reset form to default state
-  const resetFormState = () => {
-    setNewAgent(defaultAgentState);
-  };
-
-  // Open add agent dialog
-  const openAddDialog = () => {
-    resetFormState();
-    setAgentDialogOpen(true);
-  };
-
-  // Open edit agent dialog
-  const openEditDialog = (agentId: string) => {
-    const agent = agents.find(a => a.id === agentId);
-    if (agent) {
-      setSelectedAgentId(agentId);
-      setNewAgent({
-        name: agent.name,
-        description: agent.description,
-        modelId: agent.modelId,
-        configJson: agent.configJson,
-        toolIds: agent.toolIds,
+  // Handle loading models for a specific provider
+  const loadModelsForProvider = async (providerId: string) => {
+    if (!providerId) return;
+    
+    setIsLoadingModels(true);
+    try {
+      const models = await fetchProviderModels(providerId, "");
+      setAvailableProviderModels(models);
+    } catch (error) {
+      console.error("Error fetching models:", error);
+      toast({
+        title: "Erro ao carregar modelos",
+        description: "Não foi possível carregar os modelos do provedor selecionado.",
+        variant: "destructive",
       });
-      setEditAgentDialogOpen(true);
+      setAvailableProviderModels([]);
+    } finally {
+      setIsLoadingModels(false);
     }
+  };
+
+  // Reset form state
+  const resetFormState = () => {
+    setNewAgent({
+      name: "",
+      description: "",
+      modelId: "",
+      configJson: "{\n  \"parameters\": {},\n  \"instructions\": \"\"\n}",
+      toolIds: [],
+    });
+    setAvailableProviderModels([]);
   };
 
   // Handle adding a new agent
   const handleAddAgent = () => {
     try {
+      // Create agent object
       const agent: Agent = {
         id: uuidv4(),
-        name: newAgent.name || "",
+        name: newAgent.name || "Novo Agente",
         description: newAgent.description || "",
         modelId: newAgent.modelId || "",
         configJson: newAgent.configJson || "{}",
@@ -84,7 +92,7 @@ export const useAgentDialogs = () => {
     }
   };
 
-  // Handle updating an existing agent
+  // Handle updating an agent
   const handleUpdateAgent = () => {
     if (!selectedAgentId) return;
     
@@ -100,6 +108,7 @@ export const useAgentDialogs = () => {
       
       setEditAgentDialogOpen(false);
       setSelectedAgentId(null);
+      resetFormState();
       
       toast({
         title: "Agente atualizado",
@@ -114,14 +123,48 @@ export const useAgentDialogs = () => {
     }
   };
 
+  // Open add agent dialog
+  const openAddDialog = () => {
+    resetFormState();
+    setAgentDialogOpen(true);
+  };
+
+  // Open edit agent dialog
+  const openEditDialog = (agentId: string) => {
+    const agent = window.agents?.find((a: Agent) => a.id === agentId);
+    if (agent) {
+      setSelectedAgentId(agentId);
+      setNewAgent({
+        name: agent.name,
+        description: agent.description,
+        modelId: agent.modelId,
+        configJson: agent.configJson,
+        toolIds: agent.toolIds,
+      });
+      
+      // If the agent has a model provider, load its models
+      if (agent.modelId) {
+        const model = window.models?.find((m: any) => m.id === agent.modelId);
+        if (model) {
+          loadModelsForProvider(model.providerId);
+        }
+      }
+      
+      setEditAgentDialogOpen(true);
+    }
+  };
+
   return {
     agentDialogOpen,
     setAgentDialogOpen,
     editAgentDialogOpen,
     setEditAgentDialogOpen,
-    selectedAgentId,
     newAgent,
     setNewAgent,
+    selectedAgentId,
+    availableProviderModels,
+    isLoadingModels,
+    loadModelsForProvider,
     openAddDialog,
     openEditDialog,
     handleAddAgent,

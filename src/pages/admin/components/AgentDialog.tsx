@@ -1,8 +1,7 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Agent } from "@/types";
-import { v4 as uuidv4 } from "uuid";
+import { Agent, AIModel, MCPTool } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AIModel, MCPTool } from "@/types";
+import { Loader2 } from "lucide-react";
 
 interface AgentDialogProps {
   open: boolean;
@@ -27,6 +26,9 @@ interface AgentDialogProps {
   setAgent: React.Dispatch<React.SetStateAction<Partial<Agent>>>;
   onSave: () => void;
   isEditing: boolean;
+  availableProviderModels: any[];
+  isLoadingModels: boolean;
+  loadModelsForProvider: (providerId: string) => void;
 }
 
 const AgentDialog: React.FC<AgentDialogProps> = ({
@@ -38,6 +40,9 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
   setAgent,
   onSave,
   isEditing,
+  availableProviderModels,
+  isLoadingModels,
+  loadModelsForProvider
 }) => {
   const { toast } = useToast();
   
@@ -62,6 +67,12 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
         variant: "destructive",
       });
     }
+  };
+
+  // Get selected provider from models
+  const getSelectedProvider = () => {
+    const selectedModel = models.find(model => model.id === agent.modelId);
+    return selectedModel?.providerId || "";
   };
 
   return (
@@ -100,24 +111,59 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
               placeholder="Descrição do propósito do agente"
             />
           </div>
+          
+          {/* Seletor de Provedor */}
           <div className="space-y-2">
-            <Label htmlFor="agentModel">Modelo de IA</Label>
+            <Label htmlFor="providerSelect">Provedor de IA</Label>
             <Select 
-              value={agent.modelId} 
-              onValueChange={(value) => setAgent({ ...agent, modelId: value })}
+              value={getSelectedProvider()}
+              onValueChange={(providerId) => {
+                loadModelsForProvider(providerId);
+                // Limpar o modelo atual já que estamos trocando de provedor
+                setAgent({ ...agent, modelId: "" });
+              }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um modelo" />
+                <SelectValue placeholder="Selecione um provedor" />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.name} ({model.provider})
+                  <SelectItem key={model.providerId} value={model.providerId}>
+                    {model.provider}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+          
+          {/* Seletor de Modelo */}
+          <div className="space-y-2">
+            <Label htmlFor="agentModel">Modelo de IA</Label>
+            {isLoadingModels ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-sm text-muted-foreground">Carregando modelos...</span>
+              </div>
+            ) : (
+              <Select 
+                value={agent.modelId} 
+                onValueChange={(value) => setAgent({ ...agent, modelId: value })}
+                disabled={availableProviderModels.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um modelo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableProviderModels.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.name} {model.description && `(${model.description})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="agentTools">Ferramentas MCP</Label>
             <div className="border rounded-md p-4">
