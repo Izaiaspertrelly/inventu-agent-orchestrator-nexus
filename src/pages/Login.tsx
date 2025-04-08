@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,8 +54,8 @@ const Login = () => {
         {/* Animated border gradient effect */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#0EA5E9] via-[#33C3F0] to-[#1EAEDB] opacity-80 animate-border-glow"></div>
         
-        {/* Frosted glass container - enhanced */}
-        <div className="relative bg-white/30 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/40">
+        {/* Frosted glass container - enhanced with more neutral tone */}
+        <div className="relative bg-gray-900/30 backdrop-blur-xl p-10 rounded-3xl z-10 shadow-lg border border-white/20">
           <div className="text-center mb-10">
             <div className="flex justify-center mb-4">
               <img 
