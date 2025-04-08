@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -21,6 +22,7 @@ const Chat: React.FC = () => {
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
   const [showFloatingBar, setShowFloatingBar] = useState(false);
+  const [showFixedInputBar, setShowFixedInputBar] = useState(true);
   const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -35,6 +37,12 @@ const Chat: React.FC = () => {
     if (hour < 12) setGreeting("Bom dia");
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
+    
+    // Reset floating bar state when returning to home screen
+    if (activeChat && activeChat.messages.length === 0) {
+      setShowFloatingBar(false);
+      setShowFixedInputBar(true);
+    }
   }, [activeChat, createNewChat]);
   
   const handleSendMessage = (e: React.FormEvent) => {
@@ -51,7 +59,13 @@ const Chat: React.FC = () => {
     sendMessage(message);
     setMessage("");
     
-    setShowFloatingBar(true);
+    // Show floating bar and hide fixed input after sending a message
+    if (activeChat && activeChat.messages.length === 0) {
+      setTimeout(() => {
+        setShowFloatingBar(true);
+        setShowFixedInputBar(false);
+      }, 1000); // Small delay to ensure message is processed first
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -130,6 +144,9 @@ const Chat: React.FC = () => {
     );
   };
   
+  // Determine if we should show active conversation UI
+  const isActiveConversation = activeChat && activeChat.messages.length > 0;
+  
   return (
     <div className="flex h-screen bg-background dark">
       <ChatSidebar />
@@ -142,7 +159,7 @@ const Chat: React.FC = () => {
       )}
       
       <div className="flex flex-col flex-1 h-full">
-        {activeChat && activeChat.messages.length > 0 ? (
+        {isActiveConversation ? (
           <div className="flex flex-col flex-1">
             <ScrollArea className="flex-1 p-4">
               <div className="max-w-3xl mx-auto w-full py-4">
@@ -151,11 +168,13 @@ const Chat: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
-            <div className="max-w-3xl mx-auto w-full px-4 py-4">
-              <form onSubmit={handleSendMessage}>
-                <MessageInputBar />
-              </form>
-            </div>
+            {showFixedInputBar && (
+              <div className="max-w-3xl mx-auto w-full px-4 py-4">
+                <form onSubmit={handleSendMessage}>
+                  <MessageInputBar />
+                </form>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
