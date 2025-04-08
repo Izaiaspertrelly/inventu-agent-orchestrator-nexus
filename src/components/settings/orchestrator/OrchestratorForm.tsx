@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Brain, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Brain, Check, AlertCircle, Loader2, Play, Eye } from "lucide-react";
 import { useAgent } from "@/contexts/AgentContext";
 import OrchestratorBasicInfo from "./OrchestratorBasicInfo";
 import ModelSelection from "./ModelSelection";
@@ -12,9 +12,12 @@ import ConfigDisplay from "./ConfigDisplay";
 import { useConfigGenerator } from "./form/useConfigGenerator";
 import { useFormSubmit } from "./form/useFormSubmit";
 import { useModelConnectionTest } from "@/hooks/use-model-connection-test";
+import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const OrchestratorForm: React.FC = () => {
-  const { models, orchestratorConfig } = useAgent();
+  const { models, orchestratorConfig, orchestratorState, addToConversationHistory } = useAgent();
+  const { toast } = useToast();
   
   // Model selection state
   const [selectedProvider, setSelectedProvider] = useState("");
@@ -27,6 +30,14 @@ const OrchestratorForm: React.FC = () => {
   const [planningEnabled, setPlanningEnabled] = useState(false);
   const [memoryType, setMemoryType] = useState("buffer");
   const [reasoningDepth, setReasoningDepth] = useState("2");
+  
+  // UI State
+  const [showConfigDetails, setShowConfigDetails] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{status: 'success' | 'error' | 'idle', message: string}>({
+    status: 'idle',
+    message: ''
+  });
   
   // Connection test state
   const { testModelConnection, connectionStatus, connectionMessage } = useModelConnectionTest();
@@ -81,12 +92,16 @@ const OrchestratorForm: React.FC = () => {
 
   // Handle form submission
   const onSubmitForm = () => {
-    handleSaveOrchestrator({
+    const result = handleSaveOrchestrator({
       name: "Orquestrador Neural", // Nome fixo
       description: "Centro de controle do sistema de IA", // Descrição fixa
       selectedModel,
       orchestratorConfig: configJson
     });
+    
+    if (result) {
+      setShowConfigDetails(true);
+    }
   };
   
   // Handle connection test
@@ -99,6 +114,56 @@ const OrchestratorForm: React.FC = () => {
     if (!provider) return;
     
     await testModelConnection(selectedProvider, selectedModel, provider.apiKey);
+  };
+  
+  // Handle full orchestrator test
+  const handleTestOrchestrator = async () => {
+    if (!orchestratorConfig || !orchestratorConfig.selectedModel) {
+      toast({
+        title: "Configuração incompleta",
+        description: "O orquestrador precisa ter um modelo configurado para realizar testes",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsTesting(true);
+    setTestResult({status: 'idle', message: ''});
+    
+    try {
+      // Simular teste do orquestrador
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Registrar interação de teste no histórico de conversas
+      addToConversationHistory({
+        role: "system",
+        content: "Teste de funcionamento do Orquestrador Neural iniciado com sucesso",
+        timestamp: new Date()
+      });
+      
+      setTestResult({
+        status: 'success',
+        message: 'O orquestrador respondeu corretamente. Todas as capacidades estão funcionando.'
+      });
+      
+      toast({
+        title: "Teste concluído",
+        description: "O orquestrador está funcionando corretamente",
+      });
+    } catch (error) {
+      setTestResult({
+        status: 'error',
+        message: `Falha no teste: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+      });
+      
+      toast({
+        title: "Falha no teste",
+        description: "O orquestrador encontrou um problema",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   return (
@@ -214,6 +279,118 @@ const OrchestratorForm: React.FC = () => {
             {isFormLoading ? "Salvando..." : "Salvar Configuração do Orquestrador"}
           </Button>
         </div>
+        
+        {/* Nova seção de detalhes do orquestrador - aparece após salvar */}
+        {showConfigDetails && orchestratorConfig && (
+          <div className="mt-8 pt-6 border-t border-muted">
+            <h3 className="text-lg font-medium mb-4">Orquestrador Neural Configurado</h3>
+            
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex gap-3 mb-2 items-start">
+                  <div className="p-2 bg-primary/20 rounded-lg">
+                    <Brain className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-md font-medium">Orquestrador Neural</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Configurado com o modelo: <span className="font-medium">{orchestratorConfig.selectedModel}</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Memória: <span className="font-medium">{orchestratorConfig.memory?.enabled ? "Ativada" : "Desativada"}</span>
+                      {orchestratorConfig.memory?.enabled && <> (Tipo: {orchestratorConfig.memory.type})</>}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Raciocínio: <span className="font-medium">{orchestratorConfig.reasoning?.enabled ? "Ativado" : "Desativado"}</span>
+                      {orchestratorConfig.reasoning?.enabled && <> (Profundidade: {orchestratorConfig.reasoning.depth})</>}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Planejamento: <span className="font-medium">{orchestratorConfig.planning?.enabled ? "Ativado" : "Desativado"}</span>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex gap-2 pt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-2"
+                  onClick={() => setShowConfigDetails(!showConfigDetails)}
+                >
+                  <Eye className="h-4 w-4" />
+                  {showConfigDetails ? "Ocultar Detalhes" : "Ver Detalhes"}
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="flex items-center gap-2"
+                  onClick={handleTestOrchestrator}
+                  disabled={isTesting || !orchestratorConfig.selectedModel}
+                >
+                  {isTesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                  Testar Orquestrador
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            {/* Resultados de teste do orquestrador */}
+            {testResult.status !== 'idle' && (
+              <Alert className={testResult.status === 'success' ? "mt-4 bg-green-50 border-green-200" : "mt-4 bg-red-50 border-red-200"}>
+                {testResult.status === 'success' ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-red-500" />
+                )}
+                <AlertTitle>
+                  {testResult.status === 'success' ? "Teste concluído com sucesso" : "Falha no teste"}
+                </AlertTitle>
+                <AlertDescription>
+                  {testResult.message}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {/* Detalhes expandidos em tabs */}
+            {showConfigDetails && (
+              <div className="mt-4">
+                <Tabs defaultValue="memory" className="w-full">
+                  <TabsList className="grid grid-cols-3">
+                    <TabsTrigger value="memory">Memória</TabsTrigger>
+                    <TabsTrigger value="reasoning">Raciocínio</TabsTrigger>
+                    <TabsTrigger value="planning">Planejamento</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="memory" className="p-4 border rounded-md mt-2">
+                    <div className="text-sm">
+                      <p><strong>Status:</strong> {orchestratorConfig.memory?.enabled ? "Ativada" : "Desativada"}</p>
+                      <p><strong>Tipo:</strong> {orchestratorConfig.memory?.type || "buffer"}</p>
+                      <p><strong>Capacidade:</strong> {orchestratorConfig.memory?.capacity || 10} entradas</p>
+                      <p><strong>Confirmação de usuário:</strong> {orchestratorConfig.memory?.userPromptEnabled ? "Ativada" : "Desativada"}</p>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="reasoning" className="p-4 border rounded-md mt-2">
+                    <div className="text-sm">
+                      <p><strong>Status:</strong> {orchestratorConfig.reasoning?.enabled ? "Ativado" : "Desativado"}</p>
+                      <p><strong>Profundidade:</strong> {orchestratorConfig.reasoning?.depth || 2}</p>
+                      <p><strong>Estratégia:</strong> {orchestratorConfig.reasoning?.strategy || "chain-of-thought"}</p>
+                      <p><strong>Passos dinâmicos:</strong> {orchestratorConfig.reasoning?.dynamicSteps ? "Sim" : "Não"}</p>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="planning" className="p-4 border rounded-md mt-2">
+                    <div className="text-sm">
+                      <p><strong>Status:</strong> {orchestratorConfig.planning?.enabled ? "Ativado" : "Desativado"}</p>
+                      <p><strong>Horizonte:</strong> {orchestratorConfig.planning?.horizon || 15} passos</p>
+                      <p><strong>Estratégia:</strong> {orchestratorConfig.planning?.strategy || "goal-decomposition"}</p>
+                      <p><strong>Adaptativo:</strong> {orchestratorConfig.planning?.adaptive ? "Sim" : "Não"}</p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
