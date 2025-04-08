@@ -13,35 +13,60 @@ interface Task {
   subtasks?: Array<any>;
 }
 
+// Define a structure for metrics to improve type safety
+interface MetricItem {
+  value: number;
+  timestamp?: string | Date;
+}
+
+// Define a structure for orchestrator state to improve type safety
+interface OrchestrationState {
+  conversations?: Array<any>;
+  tasks?: Array<Task>;
+  users?: Record<string, { memory?: Array<any>; [key: string]: any }>;
+  metrics?: {
+    responseTime?: Array<MetricItem>;
+    tokenUsage?: Array<MetricItem>;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 const OrchestratorMonitoring: React.FC = () => {
   const { orchestratorState, orchestratorConfig } = useAgent();
   
-  // Contadores
-  const messageCount = orchestratorState?.conversations?.length || 0;
-  const taskCount = orchestratorState?.tasks?.length || 0;
-  const memoryCount = Object.values(orchestratorState?.users || {}).reduce(
+  const typedState = orchestratorState as OrchestrationState || {};
+  
+  // Contadores com verificações de tipo seguras
+  const messageCount = typedState?.conversations?.length || 0;
+  const taskCount = typedState?.tasks?.length || 0;
+  const memoryCount = Object.values(typedState?.users || {}).reduce(
     (total: number, user: any) => total + (user?.memory?.length || 0), 
     0
   );
-  const userCount = Object.keys(orchestratorState?.users || {}).length;
+  const userCount = Object.keys(typedState?.users || {}).length;
   
-  // Métricas
-  const responseTimeMetrics = orchestratorState?.metrics?.responseTime || [];
-  const tokenUsageMetrics = orchestratorState?.metrics?.tokenUsage || [];
+  // Métricas com verificações de tipo seguras
+  const responseTimeMetrics: MetricItem[] = typedState?.metrics?.responseTime || [];
+  const tokenUsageMetrics: MetricItem[] = typedState?.metrics?.tokenUsage || [];
   
   const avgResponseTime = responseTimeMetrics.length > 0
-    ? responseTimeMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / responseTimeMetrics.length
+    ? responseTimeMetrics.reduce((sum: number, metric: MetricItem) => sum + metric.value, 0) / responseTimeMetrics.length
     : 0;
     
   const avgTokenUsage = tokenUsageMetrics.length > 0
-    ? tokenUsageMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / tokenUsageMetrics.length
+    ? tokenUsageMetrics.reduce((sum: number, metric: MetricItem) => sum + metric.value, 0) / tokenUsageMetrics.length
     : 0;
   
   // Helper function to safely format dates with proper typing
   const formatDate = (date: Date | string | undefined): string => {
     if (!date) return '';
-    const d = new Date(date);
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+    try {
+      const d = new Date(date);
+      return isNaN(d.getTime()) ? '' : d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+    } catch (error) {
+      return '';
+    }
   };
   
   // Renderiza as informações da data da tarefa de forma segura
@@ -65,8 +90,12 @@ const OrchestratorMonitoring: React.FC = () => {
   };
   
   // Ensure tasks is an array or provide fallback
-  const recentTasks: Task[] = Array.isArray(orchestratorState?.tasks) 
-    ? orchestratorState.tasks.slice(-3).reverse() 
+  const recentTasks: Task[] = Array.isArray(typedState?.tasks) 
+    ? typedState.tasks.slice(-3).reverse().map((task): Task => ({
+        id: task?.id || `unknown-${Date.now()}`,
+        task: task?.task,
+        subtasks: Array.isArray(task?.subtasks) ? task.subtasks : []
+      }))
     : [];
   
   return (
@@ -174,7 +203,7 @@ const OrchestratorMonitoring: React.FC = () => {
                           'Tarefa sem descrição'}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Subtasks: {task && task.subtasks ? task.subtasks.length : 0} • {renderTaskDate(task)}
+                        Subtasks: {Array.isArray(task?.subtasks) ? task.subtasks.length : 0} • {renderTaskDate(task)}
                       </div>
                     </div>
                   ))}
