@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 const DEFAULT_ORCHESTRATOR_CONFIG = {
   name: "Orquestrador Neural",
   description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA.",
+  selectedModel: "",
   memory: {
     enabled: true,
     type: "buffer",
@@ -27,8 +28,20 @@ const DEFAULT_ORCHESTRATOR_CONFIG = {
 export const useOrchestrator = () => {
   // Orchestrator config
   const [orchestratorConfig, setOrchestratorConfig] = useState<any>(() => {
-    const savedConfig = localStorage.getItem("inventu_orchestrator_config");
-    return savedConfig ? JSON.parse(savedConfig) : DEFAULT_ORCHESTRATOR_CONFIG;
+    try {
+      const savedConfig = localStorage.getItem("inventu_orchestrator_config");
+      if (savedConfig) {
+        const parsedConfig = JSON.parse(savedConfig);
+        if (parsedConfig && typeof parsedConfig === 'object' && Object.keys(parsedConfig).length > 0) {
+          console.log("Configuração do orquestrador carregada:", parsedConfig);
+          return parsedConfig;
+        }
+      }
+    } catch (e) {
+      console.error("Erro ao carregar configuração do orquestrador:", e);
+    }
+    console.log("Usando configuração padrão do orquestrador");
+    return DEFAULT_ORCHESTRATOR_CONFIG;
   });
   
   // Orchestrator state for runtime information
@@ -66,12 +79,14 @@ export const useOrchestrator = () => {
   }, []);
 
   const updateOrchestratorConfig = (config: any) => {
+    // Garantir que as propriedades obrigatórias estão presentes
     const updatedConfig = {
       ...config,
-      name: "Orquestrador Neural", // Ensure name is fixed
-      description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA." // Ensure description is fixed
+      name: "Orquestrador Neural", // Nome fixo
+      description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA." // Descrição fixa
     };
     
+    console.log("Salvando configuração do orquestrador:", updatedConfig);
     localStorage.setItem("inventu_orchestrator_config", JSON.stringify(updatedConfig));
     setOrchestratorConfig(updatedConfig);
   };

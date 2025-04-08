@@ -6,7 +6,7 @@ import AgentSelector from "./AgentSelector";
 import JsonConfigEditor from "./JsonConfigEditor";
 import SaveButton from "./SaveButton";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
-import { Brain, Check } from "lucide-react";
+import { Brain, Check, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const OrchestratorBasicTab: React.FC = () => {
@@ -81,7 +81,7 @@ const OrchestratorBasicTab: React.FC = () => {
         </Alert>
       )}
       
-      {orchestratorConfig && Object.keys(orchestratorConfig).length > 0 && (
+      {orchestratorConfig && Object.keys(orchestratorConfig).length > 0 ? (
         <Alert className="bg-blue-50 border-blue-200">
           <Brain className="h-4 w-4 text-blue-500" />
           <AlertTitle>Orquestrador Neural ativo</AlertTitle>
@@ -91,6 +91,14 @@ const OrchestratorBasicTab: React.FC = () => {
             ) : (
               <>Configurado, mas sem agente principal definido</>
             )}
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <Alert className="bg-amber-50 border-amber-200">
+          <AlertCircle className="h-4 w-4 text-amber-500" />
+          <AlertTitle>Orquestrador não configurado</AlertTitle>
+          <AlertDescription>
+            Configure e salve o orquestrador para ativá-lo
           </AlertDescription>
         </Alert>
       )}

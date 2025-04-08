@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Brain, Check } from "lucide-react";
+import { Brain, Check, AlertCircle } from "lucide-react";
 import { useAgent } from "@/contexts/AgentContext";
 import OrchestratorBasicInfo from "./OrchestratorBasicInfo";
 import ModelSelection from "./ModelSelection";
@@ -89,12 +89,24 @@ const OrchestratorForm: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {orchestratorConfig && Object.keys(orchestratorConfig).length > 0 && (
+          {orchestratorConfig && Object.keys(orchestratorConfig).length > 0 ? (
             <Alert className="bg-blue-50 border-blue-200">
               <Brain className="h-4 w-4 text-blue-500" />
               <AlertTitle>Orquestrador Neural ativo</AlertTitle>
               <AlertDescription>
-                O Orquestrador Neural já está configurado e disponível no sistema
+                {orchestratorConfig.selectedModel ? (
+                  <>Configurado usando o modelo {orchestratorConfig.selectedModel}</>
+                ) : (
+                  <>Configurado, mas sem modelo definido</>
+                )}
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Alert className="bg-amber-50 border-amber-200">
+              <AlertCircle className="h-4 w-4 text-amber-500" />
+              <AlertTitle>Orquestrador não configurado</AlertTitle>
+              <AlertDescription>
+                Configure e salve o orquestrador para ativá-lo
               </AlertDescription>
             </Alert>
           )}
