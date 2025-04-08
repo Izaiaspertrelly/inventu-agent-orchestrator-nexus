@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, UseMutationOptions, UseQueryOptions } from "@tanstack/react-query";
 import { api, useApi } from "@/services/api";
+import { ApiService } from "@/services/api";
 
 // Hook para consultar dados com React Query
 export const useGet = <TData = unknown, TError = unknown>(
@@ -84,7 +85,7 @@ export const useDelete = <TData = unknown, TVariables = unknown, TError = unknow
 // Função para inicializar configurações da API
 export const initializeApi = (baseUrl: string, token?: string) => {
   if (baseUrl) {
-    const apiInstance = new (api.constructor as any)(baseUrl);
+    const apiInstance = new ApiService(baseUrl);
     if (token) {
       apiInstance.setAuthToken(token);
     }
