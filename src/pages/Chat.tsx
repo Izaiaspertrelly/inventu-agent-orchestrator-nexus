@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
@@ -19,6 +20,7 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState("");
   const [superAgentEnabled, setSuperAgentEnabled] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
+  const [showLightning, setShowLightning] = useState(false);
   const animationRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -34,10 +36,6 @@ const Chat: React.FC = () => {
     else if (hour < 18) setGreeting("Boa tarde");
     else setGreeting("Boa noite");
   }, [activeChat, createNewChat]);
-  
-  useEffect(() => {
-    // This is intentionally left empty to remove the previous custom animation
-  }, []);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +63,14 @@ const Chat: React.FC = () => {
   const toggleSuperAgent = () => {
     // Set vibrating state to trigger animation
     setIsVibrating(true);
+    
+    // Show lightning effect when toggling
+    setShowLightning(true);
+    
+    // Hide lightning after animation completes
+    setTimeout(() => {
+      setShowLightning(false);
+    }, 1000);
     
     // Toggle the state after a brief delay to ensure animation completes
     setSuperAgentEnabled(!superAgentEnabled);
@@ -135,6 +141,14 @@ const Chat: React.FC = () => {
   
   return (
     <div className="flex h-screen bg-background dark">
+      {/* Lightning effect */}
+      {showLightning && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none">
+          <div className="w-1 bg-blue-500 animate-lightning shadow-[0_0_15px_5px_rgba(59,130,246,0.7)] origin-top absolute" 
+               style={{ maxHeight: '100vh' }}></div>
+        </div>
+      )}
+      
       <ChatSidebar />
       
       <div className="flex flex-col flex-1 h-full">
