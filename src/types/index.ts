@@ -1,3 +1,4 @@
+
 // User related types
 export interface User {
   id: string;
@@ -49,6 +50,8 @@ export interface MCPTool {
   name: string;
   description: string;
   endpoint: string;
+  method: "GET" | "POST" | "PUT" | "DELETE"; // Added HTTP method
+  parameters?: string; // Added parameters field
   authKey?: string;
 }
 

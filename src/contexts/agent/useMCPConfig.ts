@@ -27,10 +27,17 @@ export const useMCPConfig = () => {
   };
 
   const addMCPTool = (tool: MCPTool) => {
+    // Ensure all required fields are present
+    const completeToken = {
+      ...tool,
+      method: tool.method || "GET",
+      parameters: tool.parameters || ""
+    };
+    
     setMCPConfig((prev) => {
       const updated = { 
         ...prev, 
-        tools: [...prev.tools, tool] 
+        tools: [...prev.tools, completeToken] 
       };
       updateLocalStorage(updated);
       return updated;

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ToolDialogProps {
   open: boolean;
@@ -33,10 +34,10 @@ const ToolDialog: React.FC<ToolDialogProps> = ({
   const { toast } = useToast();
   
   const handleSave = () => {
-    if (!tool.name || !tool.endpoint) {
+    if (!tool.name || !tool.endpoint || !tool.method) {
       toast({
         title: "Campos obrigatórios",
-        description: "Nome e endpoint são obrigatórios",
+        description: "Nome, endpoint e método HTTP são obrigatórios",
         variant: "destructive",
       });
       return;
@@ -66,6 +67,51 @@ const ToolDialog: React.FC<ToolDialogProps> = ({
               placeholder="Ex: Web Search"
             />
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="toolMethod">Método HTTP</Label>
+            <Select
+              value={tool.method || "GET"}
+              onValueChange={(value) => 
+                setTool({ ...tool, method: value as "GET" | "POST" | "PUT" | "DELETE" })
+              }
+            >
+              <SelectTrigger id="toolMethod">
+                <SelectValue placeholder="Selecione o método HTTP" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+                <SelectItem value="PUT">PUT</SelectItem>
+                <SelectItem value="DELETE">DELETE</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="toolEndpoint">Endpoint/Path</Label>
+            <Input
+              id="toolEndpoint"
+              value={tool.endpoint}
+              onChange={(e) =>
+                setTool({ ...tool, endpoint: e.target.value })
+              }
+              placeholder="/api/ferramentas/pesquisa"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="toolParameters">Parâmetros</Label>
+            <Textarea
+              id="toolParameters"
+              value={tool.parameters}
+              onChange={(e) =>
+                setTool({ ...tool, parameters: e.target.value })
+              }
+              placeholder="{&quot;param1&quot;: &quot;value1&quot;, &quot;param2&quot;: &quot;value2&quot;}"
+            />
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="toolDescription">Descrição</Label>
             <Textarea
@@ -77,17 +123,7 @@ const ToolDialog: React.FC<ToolDialogProps> = ({
               placeholder="Descreva o que esta ferramenta faz"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="toolEndpoint">Endpoint</Label>
-            <Input
-              id="toolEndpoint"
-              value={tool.endpoint}
-              onChange={(e) =>
-                setTool({ ...tool, endpoint: e.target.value })
-              }
-              placeholder="/api/ferramentas/pesquisa"
-            />
-          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="toolAuthKey">Chave de Autenticação</Label>
             <Input

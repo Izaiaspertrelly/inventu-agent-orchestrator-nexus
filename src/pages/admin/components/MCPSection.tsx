@@ -27,6 +27,8 @@ const MCPSection: React.FC = () => {
     name: "",
     description: "",
     endpoint: "",
+    method: "GET", // Default method
+    parameters: "",
     authKey: "",
   });
 
@@ -48,6 +50,8 @@ const MCPSection: React.FC = () => {
       name: newTool.name || "Nova Ferramenta",
       description: newTool.description || "Descrição da ferramenta",
       endpoint: newTool.endpoint || "/api/tool",
+      method: newTool.method || "GET",
+      parameters: newTool.parameters || "",
       authKey: newTool.authKey,
     };
     
@@ -57,6 +61,8 @@ const MCPSection: React.FC = () => {
       name: "",
       description: "",
       endpoint: "",
+      method: "GET",
+      parameters: "",
       authKey: "",
     });
     
@@ -143,9 +149,19 @@ const MCPSection: React.FC = () => {
                 <CardContent>
                   <div className="text-sm space-y-2">
                     <div className="flex justify-between">
+                      <span className="text-muted-foreground">Método:</span>
+                      <span>{tool.method}</span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Endpoint:</span>
                       <span>{tool.endpoint}</span>
                     </div>
+                    {tool.parameters && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Parâmetros:</span>
+                        <span className="truncate max-w-[200px]">{tool.parameters}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Chave:</span>
                       <span>{tool.authKey ? "••••••••" : "Não configurada"}</span>
