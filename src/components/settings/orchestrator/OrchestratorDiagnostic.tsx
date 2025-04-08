@@ -10,6 +10,7 @@ interface DiagnosticResult {
   test: string;
   status: 'success' | 'error' | 'warning' | 'pending';
   message: string;
+  suggestion?: string;
 }
 
 const OrchestratorDiagnostic: React.FC = () => {
@@ -30,7 +31,8 @@ const OrchestratorDiagnostic: React.FC = () => {
       results.push({
         test: 'Configuração do Orquestrador',
         status: 'error',
-        message: 'O orquestrador não está configurado.'
+        message: 'O orquestrador não está configurado.',
+        suggestion: 'Adicione uma configuração básica do orquestrador na aba de configuração.'
       });
       
       setDiagnosticResults(results);
@@ -52,17 +54,43 @@ const OrchestratorDiagnostic: React.FC = () => {
       results.push({
         test: 'Seleção de Modelo',
         status: 'error',
-        message: 'Nenhum modelo de IA selecionado para o orquestrador.'
+        message: 'Nenhum modelo de IA selecionado para o orquestrador.',
+        suggestion: 'Selecione um modelo de IA na configuração do orquestrador.'
       });
     } else {
       const modelInfo = models.find(m => m.id === orchestratorConfig.selectedModel);
       
       if (!modelInfo) {
-        results.push({
-          test: 'Seleção de Modelo',
-          status: 'warning',
-          message: `Modelo ${orchestratorConfig.selectedModel} selecionado, mas não encontrado na lista de modelos disponíveis.`
-        });
+        // Verifica se o modelo existe em algum provedor conhecido
+        const allProviders = ['openai', 'anthropic', 'google', 'mistral', 'cohere', 'minimax', 'deepseek', 'ideogram'];
+        let modelFound = false;
+        let suggestedProvider = '';
+        
+        for (const providerId of allProviders) {
+          // Verifica se o nome do modelo contém o nome do provedor
+          if (orchestratorConfig.selectedModel.toLowerCase().includes(providerId) ||
+              (providerId === 'openai' && orchestratorConfig.selectedModel.toLowerCase().includes('gpt'))) {
+            modelFound = true;
+            suggestedProvider = providerId;
+            break;
+          }
+        }
+        
+        if (modelFound) {
+          results.push({
+            test: 'Seleção de Modelo',
+            status: 'warning',
+            message: `Modelo ${orchestratorConfig.selectedModel} selecionado, mas não encontrado na lista de modelos disponíveis.`,
+            suggestion: `Adicione o provedor "${suggestedProvider}" na seção de Modelos e configure sua chave de API.`
+          });
+        } else {
+          results.push({
+            test: 'Seleção de Modelo',
+            status: 'error',
+            message: `Modelo ${orchestratorConfig.selectedModel} selecionado, mas não encontrado na lista de modelos disponíveis.`,
+            suggestion: 'Adicione um provedor que ofereça este modelo ou selecione um modelo disponível.'
+          });
+        }
       } else {
         results.push({
           test: 'Seleção de Modelo',
@@ -143,7 +171,8 @@ const OrchestratorDiagnostic: React.FC = () => {
           results.push({
             test: 'Chave de API',
             status: 'error',
-            message: `Chave de API não configurada para o provedor ${providerId}.`
+            message: `Chave de API não configurada para o provedor ${providerId}.`,
+            suggestion: `Configure uma chave de API para o provedor ${providerId} na seção de Modelos.`
           });
           
           setDiagnosticResults([...results]);
@@ -153,7 +182,8 @@ const OrchestratorDiagnostic: React.FC = () => {
         results.push({
           test: 'Informação do Modelo',
           status: 'error',
-          message: `Não foi possível encontrar informações para o modelo ${selectedModel}.`
+          message: `Não foi possível encontrar informações para o modelo ${selectedModel}.`,
+          suggestion: 'Verifique se o modelo está correto e adicione o provedor correspondente na seção de Modelos.'
         });
         
         setDiagnosticResults([...results]);
@@ -205,11 +235,16 @@ const OrchestratorDiagnostic: React.FC = () => {
                   <div className="mt-0.5">
                     {getStatusIcon(result.status)}
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <h4 className="font-medium">{result.test}</h4>
                     <p className="text-sm text-muted-foreground">
                       {result.message}
                     </p>
+                    {result.suggestion && (
+                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        Sugestão: {result.suggestion}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
