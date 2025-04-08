@@ -46,7 +46,7 @@ const OrchestratorForm: React.FC = () => {
 
   // Handle form submission
   const onSubmitForm = () => {
-    const result = handleSaveOrchestrator({
+    const success = handleSaveOrchestrator({
       name,
       description,
       selectedModel,
@@ -54,7 +54,7 @@ const OrchestratorForm: React.FC = () => {
     });
     
     // Reset form if submission was successful
-    if (result) {
+    if (success) {
       setName("");
       setDescription("");
       setSelectedProvider("");
