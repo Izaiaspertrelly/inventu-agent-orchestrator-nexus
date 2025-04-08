@@ -25,8 +25,8 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
       <Input 
         className={`w-full py-3 px-4 pl-10 rounded-full text-base backdrop-blur-sm border-0 
           ${isSuperAgentEnabled 
-            ? 'bg-blue-500 text-white placeholder:text-white/70' 
-            : 'bg-secondary/30 placeholder:text-muted-foreground/70'}`}
+            ? 'bg-primary text-primary-foreground placeholder:text-primary-foreground/70' 
+            : 'bg-transparent placeholder:text-foreground/50'}`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -35,7 +35,7 @@ const SearchBarInput: React.FC<SearchBarInputProps> = ({
       />
       <Search 
         className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 
-          ${isSuperAgentEnabled ? 'text-white/70' : 'text-muted-foreground/70'}`} 
+          ${isSuperAgentEnabled ? 'text-primary-foreground/70' : 'text-foreground/50'}`} 
       />
     </div>
   );

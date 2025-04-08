@@ -16,22 +16,22 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
   onSubmit
 }) => {
   return (
-    <div className="flex items-center gap-1.5 pl-2">
+    <div className="flex items-center gap-2 pl-2">
       <div 
-        className={`flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs ${isSuperAgentEnabled ? 'text-blue-500 font-semibold' : ''}`}
+        className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors cursor-pointer text-xs bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md ${isSuperAgentEnabled ? 'text-primary font-semibold' : ''}`}
         onClick={(e) => { e.stopPropagation(); onToggleSuperAgent(e); }}
         title="Ativar/Desativar God Mode"
       >
         {isSuperAgentEnabled ? 
-          <ToggleRight className="h-3 w-3" /> : 
-          <ToggleLeft className="h-3 w-3" />
+          <ToggleRight className="h-3.5 w-3.5" /> : 
+          <ToggleLeft className="h-3.5 w-3.5" />
         }
         <span className="font-medium">God Mode</span>
       </div>
       
       <button 
         type="button"
-        className="bg-secondary/50 hover:bg-secondary/70 text-foreground p-1.5 rounded-full transition-colors"
+        className="bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md text-foreground p-2 rounded-full transition-colors"
         title="Anexar arquivo"
         onClick={(e) => e.stopPropagation()}
       >
@@ -40,7 +40,7 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
       
       <button 
         type="submit"
-        className="bg-primary hover:bg-primary/90 text-primary-foreground p-1.5 rounded-full transition-colors"
+        className="bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-full transition-colors shadow-sm"
         onClick={(e) => onSubmit(e)}
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,7 +51,7 @@ const SearchBarActions: React.FC<SearchBarActionsProps> = ({
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onClose(e); }}
-        className="bg-secondary/50 hover:bg-secondary/90 text-foreground p-1.5 rounded-full transition-colors"
+        className="bg-foreground/10 hover:bg-foreground/20 backdrop-blur-md text-foreground p-2 rounded-full transition-colors"
         title="Minimizar barra de pesquisa"
       >
         <Minimize className="h-4 w-4" />

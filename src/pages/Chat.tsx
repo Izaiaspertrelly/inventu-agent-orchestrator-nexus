@@ -44,21 +44,27 @@ const Chat: React.FC = () => {
       
       <div className="flex flex-col flex-1 h-full">
         <div className="flex flex-col flex-1">
-          <ScrollArea className="flex-1 p-4">
-            <div className="max-w-3xl mx-auto w-full py-4">
-              {activeChat && activeChat.messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
-              ))}
-              {(!activeChat || activeChat.messages.length === 0) && (
-                <div className="flex justify-center items-center h-32 opacity-70">
-                  <p className="text-muted-foreground text-center">
-                    Envie uma mensagem para iniciar a conversa
+          <ScrollArea className="flex-1 px-4 py-6">
+            <div className="max-w-3xl mx-auto w-full py-4 space-y-6">
+              {activeChat && activeChat.messages.length > 0 ? (
+                activeChat.messages.map((message) => (
+                  <ChatMessage key={message.id} message={message} />
+                ))
+              ) : (
+                <div className="flex flex-col justify-center items-center h-[60vh] text-center">
+                  <div className="w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-medium text-foreground mb-2">Iniciar nova conversa</h3>
+                  <p className="text-muted-foreground max-w-sm">
+                    Use a barra de pesquisa flutuante para enviar uma mensagem e começar a conversar
                   </p>
                 </div>
               )}
             </div>
           </ScrollArea>
-          {/* No fixed input bar in chat view */}
         </div>
       </div>
     </div>

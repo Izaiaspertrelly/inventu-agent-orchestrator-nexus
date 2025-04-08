@@ -63,7 +63,7 @@ const FloatingSearchBar: React.FC<FloatingSearchBarProps> = ({
   return (
     <DraggableContainer isMinimized={isMinimized}>
       <div 
-        className={`bg-secondary/50 backdrop-blur-md rounded-full border border-border/40 p-1 transition-all duration-300 flex items-center`}
+        className={`neo-blur rounded-full p-1 transition-all duration-300 flex items-center shadow-lg`}
         style={{ 
           width: isMinimized ? '50px' : '600px',
           overflow: 'hidden'
