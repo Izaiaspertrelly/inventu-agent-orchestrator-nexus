@@ -29,15 +29,43 @@ export const useFormSubmit = () => {
     setIsFormLoading(true);
     
     try {
-      const configObj = JSON.parse(orchestratorConfig);
+      let configObj;
+      try {
+        configObj = JSON.parse(orchestratorConfig);
+      } catch (e) {
+        console.error("Erro ao parsear JSON:", e);
+        toast({
+          title: "Erro na configuração",
+          description: "O JSON de configuração é inválido.",
+          variant: "destructive"
+        });
+        setIsFormLoading(false);
+        return false;
+      }
       
-      // Atualizar configuração do orquestrador
-      updateOrchestratorConfig({
+      // Garantir que as configurações essenciais estejam presentes
+      const updatedConfig = {
         ...configObj,
         name: "Orquestrador Neural",
         description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA.",
         selectedModel
-      });
+      };
+      
+      // Garantir que as flags enabled sejam preservadas corretamente
+      if (updatedConfig.memory) {
+        updatedConfig.memory.enabled = updatedConfig.memory.enabled !== false;
+      }
+      
+      if (updatedConfig.reasoning) {
+        updatedConfig.reasoning.enabled = updatedConfig.reasoning.enabled !== false;
+      }
+      
+      if (updatedConfig.planning) {
+        updatedConfig.planning.enabled = updatedConfig.planning.enabled === true;
+      }
+      
+      // Atualizar configuração do orquestrador
+      updateOrchestratorConfig(updatedConfig);
       
       toast({
         title: "Orquestrador atualizado",
@@ -45,13 +73,13 @@ export const useFormSubmit = () => {
       });
       
       setIsFormSubmitted(true);
-      setTimeout(() => setIsFormSubmitted(false), 3000);
+      setTimeout(() => setIsFormSubmitted(false), 5000);
       
       return true;
     } catch (e) {
       toast({
         title: "Erro na configuração",
-        description: "O JSON de configuração é inválido.",
+        description: "Não foi possível atualizar a configuração do orquestrador.",
         variant: "destructive"
       });
       return false;

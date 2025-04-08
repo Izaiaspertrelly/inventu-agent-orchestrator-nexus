@@ -76,8 +76,11 @@ const OrchestratorForm: React.FC = () => {
       if (orchestratorConfig.planning) {
         setPlanningEnabled(orchestratorConfig.planning.enabled === true);
       }
+      
+      // Atualizar o JSON de configuração
+      setOrchestratorConfig(JSON.stringify(orchestratorConfig, null, 2));
     }
-  }, [orchestratorConfig, models]);
+  }, [orchestratorConfig, models, setOrchestratorConfig]);
 
   // Handle config update
   const onUpdateConfig = () => {
@@ -281,7 +284,7 @@ const OrchestratorForm: React.FC = () => {
         </div>
         
         {/* Nova seção de detalhes do orquestrador - aparece após salvar */}
-        {showConfigDetails && orchestratorConfig && (
+        {isFormSubmitted && orchestratorConfig && (
           <div className="mt-8 pt-6 border-t border-muted">
             <h3 className="text-lg font-medium mb-4">Orquestrador Neural Configurado</h3>
             
@@ -297,15 +300,15 @@ const OrchestratorForm: React.FC = () => {
                       Configurado com o modelo: <span className="font-medium">{orchestratorConfig.selectedModel}</span>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Memória: <span className="font-medium">{orchestratorConfig.memory?.enabled ? "Ativada" : "Desativada"}</span>
-                      {orchestratorConfig.memory?.enabled && <> (Tipo: {orchestratorConfig.memory.type})</>}
+                      Memória: <span className="font-medium">{orchestratorConfig.memory?.enabled !== false ? "Ativada" : "Desativada"}</span>
+                      {orchestratorConfig.memory?.enabled !== false && <> (Tipo: {orchestratorConfig.memory.type})</>}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Raciocínio: <span className="font-medium">{orchestratorConfig.reasoning?.enabled ? "Ativado" : "Desativado"}</span>
-                      {orchestratorConfig.reasoning?.enabled && <> (Profundidade: {orchestratorConfig.reasoning.depth})</>}
+                      Raciocínio: <span className="font-medium">{orchestratorConfig.reasoning?.enabled !== false ? "Ativado" : "Desativado"}</span>
+                      {orchestratorConfig.reasoning?.enabled !== false && <> (Profundidade: {orchestratorConfig.reasoning.depth})</>}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Planejamento: <span className="font-medium">{orchestratorConfig.planning?.enabled ? "Ativado" : "Desativado"}</span>
+                      Planejamento: <span className="font-medium">{orchestratorConfig.planning?.enabled === true ? "Ativado" : "Desativado"}</span>
                     </p>
                   </div>
                 </div>
@@ -362,7 +365,7 @@ const OrchestratorForm: React.FC = () => {
                   
                   <TabsContent value="memory" className="p-4 border rounded-md mt-2">
                     <div className="text-sm">
-                      <p><strong>Status:</strong> {orchestratorConfig.memory?.enabled ? "Ativada" : "Desativada"}</p>
+                      <p><strong>Status:</strong> {orchestratorConfig.memory?.enabled !== false ? "Ativada" : "Desativada"}</p>
                       <p><strong>Tipo:</strong> {orchestratorConfig.memory?.type || "buffer"}</p>
                       <p><strong>Capacidade:</strong> {orchestratorConfig.memory?.capacity || 10} entradas</p>
                       <p><strong>Confirmação de usuário:</strong> {orchestratorConfig.memory?.userPromptEnabled ? "Ativada" : "Desativada"}</p>
@@ -371,7 +374,7 @@ const OrchestratorForm: React.FC = () => {
                   
                   <TabsContent value="reasoning" className="p-4 border rounded-md mt-2">
                     <div className="text-sm">
-                      <p><strong>Status:</strong> {orchestratorConfig.reasoning?.enabled ? "Ativado" : "Desativado"}</p>
+                      <p><strong>Status:</strong> {orchestratorConfig.reasoning?.enabled !== false ? "Ativado" : "Desativado"}</p>
                       <p><strong>Profundidade:</strong> {orchestratorConfig.reasoning?.depth || 2}</p>
                       <p><strong>Estratégia:</strong> {orchestratorConfig.reasoning?.strategy || "chain-of-thought"}</p>
                       <p><strong>Passos dinâmicos:</strong> {orchestratorConfig.reasoning?.dynamicSteps ? "Sim" : "Não"}</p>
@@ -380,7 +383,7 @@ const OrchestratorForm: React.FC = () => {
                   
                   <TabsContent value="planning" className="p-4 border rounded-md mt-2">
                     <div className="text-sm">
-                      <p><strong>Status:</strong> {orchestratorConfig.planning?.enabled ? "Ativado" : "Desativado"}</p>
+                      <p><strong>Status:</strong> {orchestratorConfig.planning?.enabled === true ? "Ativado" : "Desativado"}</p>
                       <p><strong>Horizonte:</strong> {orchestratorConfig.planning?.horizon || 15} passos</p>
                       <p><strong>Estratégia:</strong> {orchestratorConfig.planning?.strategy || "goal-decomposition"}</p>
                       <p><strong>Adaptativo:</strong> {orchestratorConfig.planning?.adaptive ? "Sim" : "Não"}</p>

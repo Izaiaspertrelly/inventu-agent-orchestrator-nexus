@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,7 +19,7 @@ const DEFAULT_ORCHESTRATOR_CONFIG = {
     dynamicSteps: true
   },
   planning: {
-    enabled: true,
+    enabled: false,
     horizon: 15,
     strategy: "goal-decomposition",
     adaptive: true
@@ -42,6 +41,20 @@ export const useOrchestrator = () => {
         const parsedConfig = JSON.parse(savedConfig);
         if (parsedConfig && typeof parsedConfig === 'object' && Object.keys(parsedConfig).length > 0) {
           console.log("Configuração do orquestrador carregada:", parsedConfig);
+          
+          // Garantir que as flags enabled sejam interpretadas corretamente
+          if (parsedConfig.memory) {
+            parsedConfig.memory.enabled = parsedConfig.memory.enabled !== false;
+          }
+          
+          if (parsedConfig.reasoning) {
+            parsedConfig.reasoning.enabled = parsedConfig.reasoning.enabled !== false;
+          }
+          
+          if (parsedConfig.planning) {
+            parsedConfig.planning.enabled = parsedConfig.planning.enabled === true;
+          }
+          
           return parsedConfig;
         }
       }
@@ -109,6 +122,19 @@ export const useOrchestrator = () => {
       name: "Orquestrador Neural", // Nome fixo
       description: "O Orquestrador Neural é a camada central e inteligente responsável por comandar, direcionar e conectar todos os fluxos de raciocínio, ação e execução de um ecossistema de agentes de IA." // Descrição fixa
     };
+    
+    // Garantir que as flags enabled sejam tratadas corretamente
+    if (updatedConfig.memory) {
+      updatedConfig.memory.enabled = updatedConfig.memory.enabled !== false;
+    }
+    
+    if (updatedConfig.reasoning) {
+      updatedConfig.reasoning.enabled = updatedConfig.reasoning.enabled !== false;
+    }
+    
+    if (updatedConfig.planning) {
+      updatedConfig.planning.enabled = updatedConfig.planning.enabled === true;
+    }
     
     console.log("Salvando configuração do orquestrador:", updatedConfig);
     localStorage.setItem("inventu_orchestrator_config", JSON.stringify(updatedConfig));
