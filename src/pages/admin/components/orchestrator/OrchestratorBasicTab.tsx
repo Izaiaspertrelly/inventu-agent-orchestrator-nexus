@@ -1,12 +1,13 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAgent } from "@/contexts/AgentContext";
 import AgentSelector from "./AgentSelector";
 import JsonConfigEditor from "./JsonConfigEditor";
 import SaveButton from "./SaveButton";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
-import { Brain } from "lucide-react";
+import { Brain, Check } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const OrchestratorBasicTab: React.FC = () => {
   const { toast } = useToast();
@@ -14,9 +15,10 @@ const OrchestratorBasicTab: React.FC = () => {
   
   const [mainAgent, setMainAgent] = React.useState(orchestratorConfig?.mainAgentId || "");
   const [configJson, setConfigJson] = React.useState(JSON.stringify(orchestratorConfig || {}, null, 2));
+  const [isSaved, setIsSaved] = React.useState(false);
   
   // Effect to update state when orchestratorConfig changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (orchestratorConfig) {
       setMainAgent(orchestratorConfig.mainAgentId || "");
       setConfigJson(JSON.stringify(orchestratorConfig, null, 2));
@@ -39,6 +41,10 @@ const OrchestratorBasicTab: React.FC = () => {
         title: "Orquestrador salvo",
         description: "Configuração do orquestrador salva com sucesso.",
       });
+      
+      // Show saved alert
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
     } catch (e) {
       console.error("Erro ao salvar configuração do orquestrador:", e);
       toast({
@@ -64,6 +70,30 @@ const OrchestratorBasicTab: React.FC = () => {
           </CardDescription>
         </CardContent>
       </Card>
+      
+      {isSaved && (
+        <Alert className="bg-green-50 border-green-200">
+          <Check className="h-4 w-4 text-green-500" />
+          <AlertTitle>Orquestrador configurado com sucesso</AlertTitle>
+          <AlertDescription>
+            O Orquestrador Neural foi configurado e está pronto para uso
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {orchestratorConfig && Object.keys(orchestratorConfig).length > 0 && (
+        <Alert className="bg-blue-50 border-blue-200">
+          <Brain className="h-4 w-4 text-blue-500" />
+          <AlertTitle>Orquestrador Neural ativo</AlertTitle>
+          <AlertDescription>
+            {orchestratorConfig.mainAgentId ? (
+              <>Configurado com agente principal selecionado</>
+            ) : (
+              <>Configurado, mas sem agente principal definido</>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
       
       <AgentSelector 
         agents={agents}

@@ -1,7 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Brain, Check } from "lucide-react";
 import { useAgent } from "@/contexts/AgentContext";
 import OrchestratorBasicInfo from "./OrchestratorBasicInfo";
 import ModelSelection from "./ModelSelection";
@@ -11,7 +13,7 @@ import { useConfigGenerator } from "./form/useConfigGenerator";
 import { useFormSubmit } from "./form/useFormSubmit";
 
 const OrchestratorForm: React.FC = () => {
-  const { models } = useAgent();
+  const { models, orchestratorConfig } = useAgent();
   
   // Model selection state
   const [selectedProvider, setSelectedProvider] = useState("");
@@ -26,8 +28,35 @@ const OrchestratorForm: React.FC = () => {
   const [reasoningDepth, setReasoningDepth] = useState("2");
   
   // Custom hooks for form functionality
-  const { orchestratorConfig, setOrchestratorConfig, handleUpdateConfig } = useConfigGenerator();
-  const { handleSaveOrchestrator, isFormLoading } = useFormSubmit();
+  const { orchestratorConfig: configJson, setOrchestratorConfig, handleUpdateConfig } = useConfigGenerator();
+  const { handleSaveOrchestrator, isFormLoading, isFormSubmitted } = useFormSubmit();
+
+  // Effect to update selections based on existing config
+  useEffect(() => {
+    if (orchestratorConfig) {
+      if (orchestratorConfig.selectedModel) {
+        setSelectedModel(orchestratorConfig.selectedModel);
+      }
+      
+      if (orchestratorConfig.memory) {
+        setMemoryEnabled(orchestratorConfig.memory.enabled !== false);
+        if (orchestratorConfig.memory.type) {
+          setMemoryType(orchestratorConfig.memory.type);
+        }
+      }
+      
+      if (orchestratorConfig.reasoning) {
+        setReasoningEnabled(orchestratorConfig.reasoning.enabled !== false);
+        if (orchestratorConfig.reasoning.depth) {
+          setReasoningDepth(orchestratorConfig.reasoning.depth.toString());
+        }
+      }
+      
+      if (orchestratorConfig.planning) {
+        setPlanningEnabled(orchestratorConfig.planning.enabled === true);
+      }
+    }
+  }, [orchestratorConfig]);
 
   // Handle config update
   const onUpdateConfig = () => {
@@ -46,14 +75,8 @@ const OrchestratorForm: React.FC = () => {
       name: "Orquestrador Neural", // Nome fixo
       description: "Centro de controle do sistema de IA", // Descrição fixa
       selectedModel,
-      orchestratorConfig
+      orchestratorConfig: configJson
     });
-    
-    // Reset form if submission was successful
-    if (success) {
-      setSelectedProvider("");
-      setSelectedModel("");
-    }
   };
 
   return (
@@ -66,6 +89,26 @@ const OrchestratorForm: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
+          {orchestratorConfig && Object.keys(orchestratorConfig).length > 0 && (
+            <Alert className="bg-blue-50 border-blue-200">
+              <Brain className="h-4 w-4 text-blue-500" />
+              <AlertTitle>Orquestrador Neural ativo</AlertTitle>
+              <AlertDescription>
+                O Orquestrador Neural já está configurado e disponível no sistema
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {isFormSubmitted && (
+            <Alert className="bg-green-50 border-green-200">
+              <Check className="h-4 w-4 text-green-500" />
+              <AlertTitle>Orquestrador salvo com sucesso</AlertTitle>
+              <AlertDescription>
+                As configurações foram salvas e aplicadas ao Orquestrador Neural
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <OrchestratorBasicInfo />
           
           <ModelSelection 
@@ -93,7 +136,7 @@ const OrchestratorForm: React.FC = () => {
           />
           
           <ConfigDisplay 
-            configJson={orchestratorConfig}
+            configJson={configJson}
             setConfigJson={setOrchestratorConfig}
           />
           

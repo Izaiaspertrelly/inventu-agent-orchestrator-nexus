@@ -16,6 +16,7 @@ export const useFormSubmit = () => {
   const { updateOrchestratorConfig } = useAgent();
   const { validateForm } = useFormValidation();
   const [isFormLoading, setIsFormLoading] = useState(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   
   const handleSaveOrchestrator = (formData: FormData): boolean => {
     const { selectedModel, orchestratorConfig } = formData;
@@ -43,6 +44,9 @@ export const useFormSubmit = () => {
         description: "Configuração do orquestrador salva com sucesso.",
       });
       
+      setIsFormSubmitted(true);
+      setTimeout(() => setIsFormSubmitted(false), 3000);
+      
       return true;
     } catch (e) {
       toast({
@@ -56,5 +60,9 @@ export const useFormSubmit = () => {
     }
   };
   
-  return { handleSaveOrchestrator, isFormLoading };
+  return { 
+    handleSaveOrchestrator, 
+    isFormLoading,
+    isFormSubmitted 
+  };
 };
