@@ -43,10 +43,10 @@ const Chat: React.FC = () => {
     e.preventDefault();
     if (!message.trim()) return;
     
-    // If superAgent is enabled, we can handle the message differently
+    // If God Mode is enabled, we can handle the message differently
     if (superAgentEnabled) {
       toast({
-        title: "Super Agent Ativado",
+        title: "God Mode Ativado",
         description: "Usando modelo avançado para processar sua mensagem",
       });
     }
@@ -65,7 +65,7 @@ const Chat: React.FC = () => {
   const toggleSuperAgent = () => {
     setSuperAgentEnabled(!superAgentEnabled);
     toast({
-      title: superAgentEnabled ? "Super Agent Desativado" : "Super Agent Ativado",
+      title: superAgentEnabled ? "God Mode Desativado" : "God Mode Ativado",
       description: superAgentEnabled 
         ? "Voltando ao modelo padrão" 
         : "Usando o modelo avançado para respostas melhores",
@@ -73,30 +73,33 @@ const Chat: React.FC = () => {
   };
   
   // Define MessageInputBar as a React component that returns JSX
-  const MessageInputBar = () => {
+  const MessageInputBar: React.FC = () => {
     return (
       <div className="relative">
         <Input 
-          className="w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg bg-secondary/30 backdrop-blur-sm border border-border/40 placeholder:text-muted-foreground/70"
+          className={`w-full py-3.5 px-4 pl-12 pr-4 rounded-full text-lg backdrop-blur-sm border border-border/40 transition-all duration-300 
+            ${superAgentEnabled 
+              ? 'bg-blue-500 text-white placeholder:text-white/70 animate-[vibrate_0.3s_ease-in-out_infinite]' 
+              : 'bg-secondary/30 placeholder:text-muted-foreground/70'}`}
           placeholder="Dê uma tarefa para Inventor trabalhar..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           autoFocus
         />
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+        <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${superAgentEnabled ? 'text-white/70' : 'text-muted-foreground/70'}`} />
         
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
           <div 
-            className={`flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs ${superAgentEnabled ? 'text-primary' : ''}`}
+            className={`flex items-center gap-1 bg-secondary/50 hover:bg-secondary/70 px-2 py-1 rounded-full transition-colors cursor-pointer text-xs ${superAgentEnabled ? 'text-blue-500 font-semibold' : ''}`}
             onClick={toggleSuperAgent} 
-            title="Ativar/Desativar Super Agent"
+            title="Ativar/Desativar God Mode"
           >
             {superAgentEnabled ? 
               <ToggleRight className="h-3 w-3" /> : 
               <ToggleLeft className="h-3 w-3" />
             }
-            <span className="font-medium ml-1">Super Agent</span>
+            <span className="font-medium ml-1">God Mode</span>
           </div>
           
           <button 
