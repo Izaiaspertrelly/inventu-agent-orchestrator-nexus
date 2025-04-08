@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/services/api";
-import { Save, CheckCircle } from "lucide-react";
+import { Save, CheckCircle, AlertCircle } from "lucide-react";
 
 const ApiConfigTab = () => {
   const { toast } = useToast();
@@ -34,7 +34,12 @@ const ApiConfigTab = () => {
   // Salvar configurações
   const handleSaveConfig = () => {
     try {
-      localStorage.setItem("inventu_api_base_url", baseUrl);
+      // Normalize the URL (remove trailing slash)
+      const normalizedUrl = baseUrl.trim().endsWith('/')
+        ? baseUrl.trim().slice(0, -1)
+        : baseUrl.trim();
+        
+      localStorage.setItem("inventu_api_base_url", normalizedUrl);
       if (token) {
         localStorage.setItem("inventu_api_token", token);
         api.setAuthToken(token);
@@ -68,14 +73,24 @@ const ApiConfigTab = () => {
     setTestStatus("loading");
     
     try {
-      const response = await fetch(baseUrl, {
+      // Normalize URL for testing
+      const testUrl = baseUrl.trim().endsWith('/')
+        ? baseUrl.trim().slice(0, -1)
+        : baseUrl.trim();
+      
+      console.log(`Testing API connection to: ${testUrl}`);
+      
+      const response = await fetch(testUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
           ...(token && { "Authorization": `Bearer ${token}` }),
         },
+        mode: 'cors',
       });
+      
+      console.log(`API test response status: ${response.status}`);
       
       if (response.ok) {
         setTestStatus("success");
@@ -85,6 +100,9 @@ const ApiConfigTab = () => {
         });
       } else {
         setTestStatus("error");
+        const errorText = await response.text();
+        console.log(`API error response: ${errorText}`);
+        
         toast({
           title: "Erro na conexão",
           description: `Status: ${response.status} - ${response.statusText}`,
@@ -121,6 +139,9 @@ const ApiConfigTab = () => {
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder="https://api.exemplo.com/v1"
               />
+              <p className="text-xs text-muted-foreground">
+                Exemplo: https://server.smithery.ai/@seu-usuario/seu-servidor
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="apiToken">Token de Autenticação</Label>
@@ -138,12 +159,15 @@ const ApiConfigTab = () => {
                 Salvar Configuração
               </Button>
               <Button 
-                variant="outline" 
+                variant={testStatus === "error" ? "destructive" : "outline"} 
                 onClick={handleTestConnection}
                 disabled={testStatus === "loading"}
               >
                 {testStatus === "success" && (
                   <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                )}
+                {testStatus === "error" && (
+                  <AlertCircle className="mr-2 h-4 w-4" />
                 )}
                 {testStatus === "loading" ? "Testando..." : "Testar Conexão"}
               </Button>

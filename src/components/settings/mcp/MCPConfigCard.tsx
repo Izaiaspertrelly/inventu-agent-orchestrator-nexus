@@ -46,6 +46,9 @@ const MCPConfigCard: React.FC<MCPConfigCardProps> = ({
               onChange={(e) => setServerUrl(e.target.value)}
               placeholder="https://seu-servidor-mcp.com"
             />
+            <p className="text-xs text-muted-foreground">
+              Exemplo: https://server.smithery.ai/@seu-usuario/seu-servidor
+            </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="mcpApiKey">Chave de API do MCP</Label>
@@ -56,6 +59,9 @@ const MCPConfigCard: React.FC<MCPConfigCardProps> = ({
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Chave de acesso ao servidor MCP"
             />
+            <p className="text-xs text-muted-foreground">
+              A chave definida no arquivo smithery.yaml (campo apiKey)
+            </p>
           </div>
           <Button className="inventu-btn" onClick={onSave}>
             <Save className="mr-2 h-4 w-4" />

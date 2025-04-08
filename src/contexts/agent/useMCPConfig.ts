@@ -1,21 +1,55 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MCPServerConfig, MCPTool } from "@/types";
 
 // Default MCP configuration
 const DEFAULT_MCP_CONFIG: MCPServerConfig = {
   serverUrl: "",
+  apiKey: "",
   tools: [],
 };
 
 export const useMCPConfig = () => {
   const [mcpConfig, setMCPConfig] = useState<MCPServerConfig>(() => {
     const savedConfig = localStorage.getItem("inventu_mcp_config");
-    return savedConfig ? JSON.parse(savedConfig) : DEFAULT_MCP_CONFIG;
+    
+    // Check for older storage format where only serverUrl was stored directly
+    const legacyServerUrl = localStorage.getItem("mcpServerUrl");
+    const legacyApiKey = localStorage.getItem("mcpApiKey");
+    
+    if (savedConfig) {
+      return JSON.parse(savedConfig);
+    } else if (legacyServerUrl) {
+      // Migrate from old format
+      const config = { 
+        ...DEFAULT_MCP_CONFIG, 
+        serverUrl: legacyServerUrl,
+        apiKey: legacyApiKey || "" 
+      };
+      localStorage.setItem("inventu_mcp_config", JSON.stringify(config));
+      
+      // Clean up legacy items
+      localStorage.removeItem("mcpServerUrl");
+      localStorage.removeItem("mcpApiKey");
+      
+      return config;
+    }
+    
+    return DEFAULT_MCP_CONFIG;
   });
+
+  // Sync with localStorage for backward compatibility
+  useEffect(() => {
+    localStorage.setItem("mcpServerUrl", mcpConfig.serverUrl || "");
+    localStorage.setItem("mcpApiKey", mcpConfig.apiKey || "");
+  }, [mcpConfig.serverUrl, mcpConfig.apiKey]);
 
   const updateLocalStorage = (config: MCPServerConfig) => {
     localStorage.setItem("inventu_mcp_config", JSON.stringify(config));
+    
+    // Update legacy items for backward compatibility
+    localStorage.setItem("mcpServerUrl", config.serverUrl || "");
+    localStorage.setItem("mcpApiKey", config.apiKey || "");
   };
 
   const updateMCPConfig = (config: Partial<MCPServerConfig>) => {
