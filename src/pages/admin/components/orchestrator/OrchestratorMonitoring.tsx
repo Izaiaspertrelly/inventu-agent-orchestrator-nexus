@@ -30,7 +30,7 @@ const OrchestratorMonitoring: React.FC = () => {
     ? tokenUsageMetrics.reduce((sum: number, metric: any) => sum + metric.value, 0) / tokenUsageMetrics.length
     : 0;
   
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string | undefined) => {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');

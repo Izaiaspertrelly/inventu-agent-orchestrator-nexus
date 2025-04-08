@@ -12,7 +12,7 @@ import { Brain } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const OrchestratorSection: React.FC = () => {
-  const { orchestratorConfig, orchestratorState } = useAgent();
+  const { orchestratorConfig, orchestratorState, agents } = useAgent();
   const isOrchestrator = orchestratorConfig && Object.keys(orchestratorConfig).length > 0;
 
   // Efeito para exibir status do orquestrador no console para debugging
