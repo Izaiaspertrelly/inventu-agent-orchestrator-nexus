@@ -13,7 +13,7 @@ interface MemoryConfirmationDialogProps {
     entry: {
       key: string;
       value: any;
-      label: string;
+      label?: string; // Made optional to match the interface in use-orchestrator-response.ts
       source: string;
     };
     timestamp: Date;
@@ -57,7 +57,9 @@ const MemoryConfirmationDialog: React.FC<MemoryConfirmationDialogProps> = ({
           <div className="space-y-2">
             <p className="text-sm font-medium">Informação detectada:</p>
             <div className="bg-secondary/20 p-3 rounded-md">
-              <p className="text-sm"><span className="font-medium">{pendingConfirmation.entry.label}:</span> {pendingConfirmation.entry.value}</p>
+              <p className="text-sm">
+                <span className="font-medium">{pendingConfirmation.entry.label || pendingConfirmation.entry.key}:</span> {pendingConfirmation.entry.value}
+              </p>
             </div>
           </div>
         </div>
