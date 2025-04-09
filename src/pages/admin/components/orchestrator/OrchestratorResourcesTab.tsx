@@ -6,10 +6,22 @@ import ResourcesConfiguration from "./ResourcesConfiguration";
 
 const OrchestratorResourcesTab: React.FC = () => {
   const { toast } = useToast();
-  const { updateOrchestratorConfig, orchestratorConfig } = useAgent();
+  const { 
+    updateOrchestratorConfig, 
+    orchestratorConfig, 
+    configureOptimization, 
+    optimizationConfig 
+  } = useAgent();
   
-  const [optimizeResources, setOptimizeResources] = React.useState(orchestratorConfig?.resources?.optimizeUsage || true);
-  const [maxTokens, setMaxTokens] = React.useState(orchestratorConfig?.resources?.maxTokens?.toString() || "4000");
+  const [optimizeResources, setOptimizeResources] = React.useState(
+    orchestratorConfig?.resources?.optimizeUsage || true
+  );
+  const [maxTokens, setMaxTokens] = React.useState(
+    orchestratorConfig?.resources?.maxTokens?.toString() || "4000"
+  );
+  const [optimizationStrategy, setOptimizationStrategy] = React.useState(
+    optimizationConfig?.strategy || "balanced"
+  );
   
   // Effect to update state when orchestratorConfig changes
   React.useEffect(() => {
@@ -17,7 +29,11 @@ const OrchestratorResourcesTab: React.FC = () => {
       setOptimizeResources(orchestratorConfig.resources?.optimizeUsage || true);
       setMaxTokens(orchestratorConfig.resources?.maxTokens?.toString() || "4000");
     }
-  }, [orchestratorConfig]);
+    
+    if (optimizationConfig) {
+      setOptimizationStrategy(optimizationConfig.strategy);
+    }
+  }, [orchestratorConfig, optimizationConfig]);
 
   const handleUpdateConfig = () => {
     try {
@@ -31,7 +47,14 @@ const OrchestratorResourcesTab: React.FC = () => {
         resources: resourcesConfig
       };
       
+      // Update orchestrator configuration
       updateOrchestratorConfig(updatedConfig);
+      
+      // Configure optimization strategy
+      configureOptimization({
+        strategy: optimizationStrategy as 'conservative' | 'balanced' | 'aggressive',
+        autoOptimize: optimizeResources
+      });
       
       toast({
         title: "Configuração atualizada",
@@ -54,6 +77,8 @@ const OrchestratorResourcesTab: React.FC = () => {
         maxTokens={maxTokens}
         setMaxTokens={setMaxTokens}
         handleUpdateConfig={handleUpdateConfig}
+        optimizationStrategy={optimizationStrategy}
+        setOptimizationStrategy={setOptimizationStrategy}
       />
     </div>
   );

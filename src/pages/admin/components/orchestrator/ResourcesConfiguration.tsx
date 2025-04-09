@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ResourcesConfigurationProps {
   optimizeResources: boolean;
@@ -12,6 +13,8 @@ interface ResourcesConfigurationProps {
   maxTokens: string;
   setMaxTokens: (value: string) => void;
   handleUpdateConfig: () => void;
+  optimizationStrategy?: string;
+  setOptimizationStrategy?: (value: string) => void;
 }
 
 const ResourcesConfiguration: React.FC<ResourcesConfigurationProps> = ({
@@ -20,6 +23,8 @@ const ResourcesConfiguration: React.FC<ResourcesConfigurationProps> = ({
   maxTokens,
   setMaxTokens,
   handleUpdateConfig,
+  optimizationStrategy = 'balanced',
+  setOptimizationStrategy = () => {},
 }) => {
   return (
     <div className="space-y-6">
@@ -43,6 +48,28 @@ const ResourcesConfiguration: React.FC<ResourcesConfigurationProps> = ({
           onCheckedChange={setOptimizeResources}
         />
       </div>
+      
+      {optimizeResources && (
+        <div className="ml-4 space-y-2">
+          <Label htmlFor="optimization-strategy">Estratégia de Otimização</Label>
+          <Select
+            value={optimizationStrategy}
+            onValueChange={setOptimizationStrategy}
+          >
+            <SelectTrigger id="optimization-strategy" className="w-full">
+              <SelectValue placeholder="Selecione uma estratégia" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="conservative">Conservadora (3-10%)</SelectItem>
+              <SelectItem value="balanced">Balanceada (5-20%)</SelectItem>
+              <SelectItem value="aggressive">Agressiva (10-25%)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground mt-1">
+            Defina quão agressivamente o orquestrador deve otimizar o uso de recursos
+          </p>
+        </div>
+      )}
       
       <div className="space-y-2">
         <Label htmlFor="max-tokens">Limite Máximo de Tokens ({maxTokens})</Label>

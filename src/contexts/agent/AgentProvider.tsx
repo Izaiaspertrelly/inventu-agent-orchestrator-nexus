@@ -7,6 +7,7 @@ import { useOrchestrator } from "./orchestrator/useOrchestrator";
 import { AIModel, MCPServerConfig, MCPTool, Agent } from "@/types";
 import { selectModelForTask, executeMCPTool } from "./agentUtils";
 import { useToast } from "@/hooks/use-toast";
+import { ResourceOptimizationConfig } from "./orchestrator/useResourceOptimization";
 
 interface AgentContextType {
   models: AIModel[];
@@ -35,6 +36,11 @@ interface AgentContextType {
   processMemoryConfirmation: (confirmationId: number, approved: boolean) => void;
   createUserDatabase: (userId: string, userData?: any) => boolean;
   addMemoryEntry: (userId: string, entry: { key: string, value: any, source: string, timestamp: Date }) => void;
+  // New functions for resource optimization
+  configureOptimization: (config: Partial<ResourceOptimizationConfig>) => void;
+  getOptimizationHistory: () => any[];
+  clearOptimizationHistory: () => void;
+  optimizationConfig: ResourceOptimizationConfig;
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
@@ -77,7 +83,11 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
     processMemoryConfirmation,
     createUserDatabase,
     addMemoryEntry,
-    optimizeResources
+    optimizeResources,
+    configureOptimization,
+    getOptimizationHistory,
+    clearOptimizationHistory,
+    optimizationConfig
   } = useOrchestrator();
 
   const handleSelectModelForTask = async (taskDescription: string): Promise<string> => {
@@ -148,7 +158,12 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({
         processMemoryConfirmation,
         createUserDatabase,
         addMemoryEntry,
-        optimizeResources
+        optimizeResources,
+        // Add new resource optimization functions
+        configureOptimization,
+        getOptimizationHistory,
+        clearOptimizationHistory,
+        optimizationConfig
       }}
     >
       {children}

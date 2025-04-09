@@ -18,7 +18,13 @@ export const useOrchestrator = () => {
   } = useOrchestratorState();
   const { requestMemoryConfirmation, processMemoryConfirmation, addMemoryEntry } = useMemoryManagement();
   const { createUserDatabase } = useUserManagement();
-  const { optimizeResources } = useResourceOptimization();
+  const { 
+    optimizeResources, 
+    configureOptimization, 
+    getOptimizationHistory, 
+    clearOptimizationHistory, 
+    config: optimizationConfig 
+  } = useResourceOptimization();
 
   // Efeito para verificar se há um orquestrador salvo na lista de agentes
   // e remover qualquer referência para evitar duplicação
@@ -54,6 +60,11 @@ export const useOrchestrator = () => {
     processMemoryConfirmation,
     createUserDatabase,
     addMemoryEntry,
-    optimizeResources
+    // Updated resource optimization exports
+    optimizeResources,
+    configureOptimization,
+    getOptimizationHistory,
+    clearOptimizationHistory,
+    optimizationConfig
   };
 };

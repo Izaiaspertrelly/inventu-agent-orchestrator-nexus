@@ -31,7 +31,15 @@ export interface OrchestratorConfig {
   resources?: {
     maxTokens: number;
     optimizeUsage: boolean;
+    optimizationHistory?: OptimizationResult[];
+    lastOptimization?: OptimizationResult;
   };
+}
+
+export interface OptimizationResult {
+  percentage: number;
+  timestamp: Date;
+  strategy: string;
 }
 
 export interface OrchestratorState {
@@ -55,6 +63,10 @@ export interface OrchestratorState {
     }>;
   };
   users: Record<string, UserData>;
+  resources?: {
+    optimizationHistory: OptimizationResult[];
+    lastOptimization?: OptimizationResult;
+  };
 }
 
 export interface UserData {
