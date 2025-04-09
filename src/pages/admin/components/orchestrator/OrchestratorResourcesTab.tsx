@@ -13,13 +13,14 @@ const OrchestratorResourcesTab: React.FC = () => {
     optimizationConfig 
   } = useAgent();
   
+  // Fix the type issue by making the state accept string
   const [optimizeResources, setOptimizeResources] = React.useState(
     orchestratorConfig?.resources?.optimizeUsage || true
   );
   const [maxTokens, setMaxTokens] = React.useState(
     orchestratorConfig?.resources?.maxTokens?.toString() || "4000"
   );
-  const [optimizationStrategy, setOptimizationStrategy] = React.useState(
+  const [optimizationStrategy, setOptimizationStrategy] = React.useState<string>(
     optimizationConfig?.strategy || "balanced"
   );
   
@@ -78,7 +79,7 @@ const OrchestratorResourcesTab: React.FC = () => {
         setMaxTokens={setMaxTokens}
         handleUpdateConfig={handleUpdateConfig}
         optimizationStrategy={optimizationStrategy}
-        setOptimizationStrategy={setOptimizationStrategy}
+        setOptimizationStrategy={(value: string) => setOptimizationStrategy(value)}
       />
     </div>
   );

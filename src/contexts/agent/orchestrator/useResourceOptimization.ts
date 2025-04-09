@@ -1,12 +1,7 @@
 
 import { useState } from "react";
 import { useOrchestratorState } from "./useOrchestratorState";
-
-export interface OptimizationResult {
-  percentage: number;
-  timestamp: Date;
-  strategy: string;
-}
+import { OptimizationResult } from "./types";
 
 export interface ResourceOptimizationConfig {
   strategy: 'conservative' | 'balanced' | 'aggressive';
