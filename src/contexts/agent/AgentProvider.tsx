@@ -3,7 +3,7 @@ import React, { createContext, useContext } from "react";
 import { useModels } from "./useModels";
 import { useMCPConfig } from "./useMCPConfig";
 import { useAgents } from "./useAgents";
-import { useOrchestrator } from "./useOrchestrator";
+import { useOrchestrator } from "./orchestrator/useOrchestrator";
 import { AIModel, MCPServerConfig, MCPTool, Agent } from "@/types";
 import { selectModelForTask, executeMCPTool } from "./agentUtils";
 import { useToast } from "@/hooks/use-toast";
