@@ -111,8 +111,11 @@ const ProcessingSteps = ({ content }: { content: string }) => {
             p: ({ node, ...props }) => <p className="my-2" {...props} />,
             hr: ({ node, ...props }) => <hr className="my-3 border-muted" {...props} />,
             strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-            code: ({ node, inline, className, children, ...props }) => {
-              if (inline) {
+            code: ({ node, className, children, ...props }) => {
+              // Check if this is an inline code block by checking the parent type
+              const isInline = !className;
+              
+              if (isInline) {
                 return <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono" {...props}>{children}</code>;
               }
               return (
@@ -177,8 +180,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 p: ({ node, ...props }) => <p className="my-2" {...props} />,
                 hr: ({ node, ...props }) => <hr className="my-3 border-muted" {...props} />,
                 strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                code: ({ node, inline, className, children, ...props }) => {
-                  if (inline) {
+                code: ({ node, className, children, ...props }) => {
+                  // Check if this is an inline code block by checking the className
+                  const isInline = !className;
+                  
+                  if (isInline) {
                     return <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono" {...props}>{children}</code>;
                   }
                   return (
