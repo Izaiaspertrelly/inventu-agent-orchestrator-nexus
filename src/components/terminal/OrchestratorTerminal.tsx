@@ -82,34 +82,37 @@ const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
     return (
       <DraggableContainer 
         isMinimized={minimized}
-        className="bg-black/90 backdrop-blur-sm rounded-lg w-72 h-40 border border-gray-700"
+        className="bg-black/90 backdrop-blur-sm rounded-lg w-36 h-20 border border-gray-700" // Reduced width and height
       >
         <div className="w-full h-full flex flex-col">
-          <div className="h-6 rounded-t-lg flex items-center justify-between px-2 bg-gray-800/90 border-b border-gray-700">
+          <div className="h-5 rounded-t-lg flex items-center justify-between px-1 bg-gray-800/90 border-b border-gray-700">
             <div className="flex items-center gap-1">
-              <Terminal className="h-3 w-3 text-green-500" />
-              <span className="text-xs font-mono text-gray-300 truncate">terminal@shell4:</span>
+              <Terminal className="h-2 w-2 text-green-500" /> {/* Smaller icon */}
+              <span className="text-[0.5rem] font-mono text-gray-300 truncate">terminal:</span>
             </div>
             <button 
               onClick={onMinimize}
-              className="p-1 hover:bg-gray-700/60 rounded-sm transition-colors"
+              className="p-0.5 hover:bg-gray-700/60 rounded-sm transition-colors"
             >
-              <Maximize2 className="h-2.5 w-2.5 text-gray-400" />
+              <Maximize2 className="h-1.5 w-1.5 text-gray-400" /> {/* Smaller icon */}
             </button>
           </div>
-          <div className="bg-black/90 flex-1 rounded-b-lg p-1.5 overflow-hidden">
+          <div className="bg-black/90 flex-1 rounded-b-lg p-1 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="font-mono text-[0.65rem] text-green-500 font-medium space-y-0.5">
+              <div className="font-mono text-[0.5rem] text-green-500 font-medium space-y-0.5">
                 {linesArray.length > 0 ? (
-                  linesArray.slice(-5).map((line) => (
-                    <div key={line.id} className={cn(
-                      "truncate",
-                      line.type === 'command' && "text-blue-400",
-                      line.type === 'output' && "text-green-400",
-                      line.type === 'error' && "text-red-400",
-                      line.type === 'info' && "text-yellow-300",
-                      line.type === 'success' && "text-emerald-400",
-                    )}>
+                  linesArray.slice(-3).map((line) => ( // Reduced number of lines
+                    <div 
+                      key={line.id} 
+                      className={cn(
+                        "truncate",
+                        line.type === 'command' && "text-blue-400",
+                        line.type === 'output' && "text-green-400",
+                        line.type === 'error' && "text-red-400",
+                        line.type === 'info' && "text-yellow-300",
+                        line.type === 'success' && "text-emerald-400",
+                      )}
+                    >
                       {line.type === 'command' && (
                         <span className="text-gray-400">$ </span>
                       )}
@@ -117,16 +120,16 @@ const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
                     </div>
                   ))
                 ) : (
-                  <div className="text-gray-500">
+                  <div className="text-gray-500 text-[0.5rem]">
                     <span className="text-gray-400">$ </span>
                     Terminal pronto
                   </div>
                 )}
                 {isProcessing && (
-                  <div className="flex gap-1 text-green-400 items-center">
+                  <div className="flex gap-0.5 text-green-400 items-center text-[0.5rem]">
                     <span className="text-gray-400">$ </span>
                     <span>processing</span>
-                    <span className="inline-block w-1 h-3 bg-green-400 animate-pulse ml-0.5"></span>
+                    <span className="inline-block w-0.5 h-1 bg-green-400 animate-pulse ml-0.5"></span>
                   </div>
                 )}
               </div>

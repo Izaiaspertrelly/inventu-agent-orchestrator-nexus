@@ -34,19 +34,19 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
         const barWidth = containerRef.current.offsetWidth;
         const barHeight = containerRef.current.offsetHeight;
         
-        // For minimized terminal, position it in the top corner
+        // For minimized terminal, position it in the top right corner near search bar
         if (isMinimized) {
-          const topX = 20; // 20px from the left edge
-          const topY = 20; // 20px from the top edge
+          const topRightX = windowWidth - barWidth - 20; // 20px from right edge
+          const topY = windowHeight - 120; // Positioned above search bar
           
           setPosition({
-            x: topX,
+            x: topRightX,
             y: topY
           });
         } else {
           // Default center position for non-minimized elements
           const centerX = (windowWidth - barWidth) / 2;
-          const bottomY = windowHeight - barHeight - 60; // 60px from bottom for better visibility
+          const bottomY = windowHeight - barHeight - 60;
           
           setPosition({
             x: centerX,
