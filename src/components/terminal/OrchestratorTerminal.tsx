@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Terminal, Minimize2, Maximize2 } from 'lucide-react';
@@ -83,25 +82,55 @@ const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
     return (
       <DraggableContainer 
         isMinimized={minimized}
-        className="bg-secondary/90 backdrop-blur-sm rounded-lg w-24 h-16 border border-border"
+        className="bg-black/90 backdrop-blur-sm rounded-lg w-72 h-40 border border-gray-700"
       >
         <div className="w-full h-full flex flex-col">
-          <div className="h-8 rounded-t-lg flex items-center justify-between px-2 bg-secondary/90">
+          <div className="h-6 rounded-t-lg flex items-center justify-between px-2 bg-gray-800/90 border-b border-gray-700">
             <div className="flex items-center gap-1">
-              <Terminal className="h-3.5 w-3.5 text-primary" />
-              <span className="text-xs font-medium truncate">Terminal</span>
+              <Terminal className="h-3 w-3 text-green-500" />
+              <span className="text-xs font-mono text-gray-300 truncate">terminal@shell4:</span>
             </div>
             <button 
               onClick={onMinimize}
-              className="p-1 hover:bg-background/60 rounded-md transition-colors"
+              className="p-1 hover:bg-gray-700/60 rounded-sm transition-colors"
             >
-              <Maximize2 className="h-3 w-3" />
+              <Maximize2 className="h-2.5 w-2.5 text-gray-400" />
             </button>
           </div>
-          <div className="bg-black/90 backdrop-blur-md flex-1 rounded-b-lg p-1">
-            <div className="h-full text-[0.6rem] font-mono text-green-400 overflow-hidden flex items-center justify-center">
-              <span className="animate-pulse">●</span>
-            </div>
+          <div className="bg-black/90 flex-1 rounded-b-lg p-1.5 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="font-mono text-[0.65rem] text-green-500 font-medium space-y-0.5">
+                {linesArray.length > 0 ? (
+                  linesArray.slice(-5).map((line) => (
+                    <div key={line.id} className={cn(
+                      "truncate",
+                      line.type === 'command' && "text-blue-400",
+                      line.type === 'output' && "text-green-400",
+                      line.type === 'error' && "text-red-400",
+                      line.type === 'info' && "text-yellow-300",
+                      line.type === 'success' && "text-emerald-400",
+                    )}>
+                      {line.type === 'command' && (
+                        <span className="text-gray-400">$ </span>
+                      )}
+                      {line.content}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-gray-500">
+                    <span className="text-gray-400">$ </span>
+                    Terminal pronto
+                  </div>
+                )}
+                {isProcessing && (
+                  <div className="flex gap-1 text-green-400 items-center">
+                    <span className="text-gray-400">$ </span>
+                    <span>processing</span>
+                    <span className="inline-block w-1 h-3 bg-green-400 animate-pulse ml-0.5"></span>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         </div>
       </DraggableContainer>

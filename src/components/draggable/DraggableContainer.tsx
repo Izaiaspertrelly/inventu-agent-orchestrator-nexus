@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 
 interface Position {
@@ -33,13 +34,25 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
         const barWidth = containerRef.current.offsetWidth;
         const barHeight = containerRef.current.offsetHeight;
         
-        const centerX = (windowWidth - barWidth) / 2;
-        const bottomY = windowHeight - barHeight - 60; // 60px from bottom for better visibility
-        
-        setPosition({
-          x: centerX,
-          y: bottomY
-        });
+        // For minimized terminal, position it in the top corner
+        if (isMinimized) {
+          const topX = 20; // 20px from the left edge
+          const topY = 20; // 20px from the top edge
+          
+          setPosition({
+            x: topX,
+            y: topY
+          });
+        } else {
+          // Default center position for non-minimized elements
+          const centerX = (windowWidth - barWidth) / 2;
+          const bottomY = windowHeight - barHeight - 60; // 60px from bottom for better visibility
+          
+          setPosition({
+            x: centerX,
+            y: bottomY
+          });
+        }
       }
     };
     
@@ -49,7 +62,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
     return () => {
       window.removeEventListener('resize', centerPosition);
     };
-  }, []);
+  }, [isMinimized]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (containerRef.current) {
@@ -65,8 +78,8 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
     
-    const newX = Math.max(0, Math.min(window.innerWidth - (isMinimized ? 50 : 600), e.clientX - offset.x));
-    const newY = Math.max(0, Math.min(window.innerHeight - (isMinimized ? 50 : 60), e.clientY - offset.y));
+    const newX = Math.max(0, Math.min(window.innerWidth - (containerRef.current?.offsetWidth || 300), e.clientX - offset.x));
+    const newY = Math.max(0, Math.min(window.innerHeight - (containerRef.current?.offsetHeight || 60), e.clientY - offset.y));
     
     setPosition({
       x: newX,
@@ -88,7 +101,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, isMinimized]);
+  }, [isDragging]);
 
   return (
     <div 
