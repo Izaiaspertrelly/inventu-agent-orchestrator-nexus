@@ -110,7 +110,17 @@ const ProcessingSteps = ({ content }: { content: string }) => {
             li: ({ node, ...props }) => <li className="my-1" {...props} />,
             p: ({ node, ...props }) => <p className="my-2" {...props} />,
             hr: ({ node, ...props }) => <hr className="my-3 border-muted" {...props} />,
-            strong: ({ node, ...props }) => <strong className="font-bold" {...props} />
+            strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+            code: ({ node, inline, className, children, ...props }) => {
+              if (inline) {
+                return <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono" {...props}>{children}</code>;
+              }
+              return (
+                <pre className="bg-muted p-3 rounded-md overflow-x-auto">
+                  <code className="text-sm font-mono" {...props}>{children}</code>
+                </pre>
+              );
+            }
           }}
         >
           {displayContent}
@@ -120,10 +130,19 @@ const ProcessingSteps = ({ content }: { content: string }) => {
   );
 };
 
+// Check if message is from Orchestrator
+const isOrchestratorMessage = (message: Message) => {
+  return message.content.includes("💭 **Pensando...**") || 
+         message.content.includes("🔍 **Buscando informações") ||
+         message.content.includes("🧠 **Processando com raciocínio") ||
+         (message.modelUsed && message.modelUsed.toLowerCase().includes("orchestrator"));
+};
+
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === "user";
   const isProcessing = message.content.includes("💭 **Pensando...**") || 
                        message.content.includes("🔍 **Buscando informações");
+  const isOrchestrator = !isUser && isOrchestratorMessage(message);
 
   return (
     <div
@@ -137,7 +156,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           "rounded-2xl p-4 shadow-sm",
           isUser
             ? "bg-primary text-primary-foreground rounded-tr-sm"
-            : "apple-blur rounded-tl-sm"
+            : isOrchestrator
+              ? "bg-gradient-to-br from-violet-500/10 to-blue-500/10 border border-violet-500/20 rounded-tl-sm"
+              : "apple-blur rounded-tl-sm"
         )}
       >
         <div className="text-sm leading-relaxed">
@@ -155,7 +176,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 li: ({ node, ...props }) => <li className="my-1" {...props} />,
                 p: ({ node, ...props }) => <p className="my-2" {...props} />,
                 hr: ({ node, ...props }) => <hr className="my-3 border-muted" {...props} />,
-                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />
+                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+                code: ({ node, inline, className, children, ...props }) => {
+                  if (inline) {
+                    return <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono" {...props}>{children}</code>;
+                  }
+                  return (
+                    <pre className="bg-muted p-3 rounded-md overflow-x-auto">
+                      <code className="text-sm font-mono" {...props}>{children}</code>
+                    </pre>
+                  );
+                }
               }}
             >
               {message.content}
@@ -167,8 +198,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       <div className={cn("flex mt-1.5 text-xs", isUser ? "justify-end" : "justify-start")}>
         <div className="flex items-center gap-2">
           {!isUser && message.modelUsed && (
-            <Badge variant="outline" className="text-xs font-normal bg-background/40 backdrop-blur-sm">
-              Modelo: {message.modelUsed}
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-xs font-normal bg-background/40 backdrop-blur-sm",
+                isOrchestrator && "bg-violet-500/10 text-violet-500 border-violet-500/30"
+              )}
+            >
+              {isOrchestrator ? "Orquestrador Neural" : `Modelo: ${message.modelUsed}`}
             </Badge>
           )}
           

@@ -5,16 +5,28 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatSidebar from "@/components/ChatSidebar";
 import { useChat } from "@/contexts/ChatContext";
 import FloatingSearchBar from "@/components/FloatingSearchBar";
-import { Loader2, Brain, Plus } from "lucide-react";
+import { Loader2, Brain, Plus, Terminal } from "lucide-react";
 import MemoryConfirmationDialog from "@/components/orchestrator/MemoryConfirmationDialog";
 import { useOrchestratorResponse } from "@/hooks/messaging/use-orchestrator-response";
 import { useAgent } from "@/contexts/AgentContext";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import OrchestratorTerminal from "@/components/terminal/OrchestratorTerminal";
 
 const Chat: React.FC = () => {
-  const { activeChat, createNewChat, sendMessage, isProcessing } = useChat();
+  const { 
+    activeChat, 
+    createNewChat, 
+    sendMessage, 
+    isProcessing, 
+    // Terminal related
+    terminalOpen,
+    terminalMinimized,
+    terminalLines,
+    toggleTerminal,
+    closeTerminal
+  } = useChat();
   const { orchestratorConfig } = useAgent();
   const [showFloatingBar, setShowFloatingBar] = useState(false);
   const navigate = useNavigate();
@@ -86,6 +98,15 @@ const Chat: React.FC = () => {
                   <span className="bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">
                     {orchestratorConfig.memory?.enabled !== false ? "Memória Ativa" : "Memória Desativada"}
                   </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleTerminal}
+                    className="ml-auto flex items-center gap-1.5 text-xs h-7 px-2"
+                  >
+                    <Terminal className="h-3.5 w-3.5" />
+                    {terminalOpen ? (terminalMinimized ? "Expandir" : "Minimizar") : "Terminal"}
+                  </Button>
                 </AlertTitle>
               </Alert>
             </div>
@@ -139,6 +160,16 @@ const Chat: React.FC = () => {
         open={memoryDialogOpen}
         setOpen={setMemoryDialogOpen}
         pendingConfirmation={pendingMemoryConfirmation}
+      />
+      
+      {/* Orchestrator Terminal */}
+      <OrchestratorTerminal
+        isOpen={terminalOpen}
+        onClose={closeTerminal}
+        onMinimize={toggleTerminal}
+        lines={terminalLines}
+        isProcessing={isProcessing}
+        minimized={terminalMinimized}
       />
     </div>
   );
