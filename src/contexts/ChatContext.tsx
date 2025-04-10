@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Chat, Message } from "../types";
 import { ChatContextType } from "../types/chat";
@@ -25,7 +24,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   
   const [activeChat, setActiveChatState] = useState<Chat | null>(null);
   
-  // Terminal state
   const [terminalOpen, setTerminalOpen] = useState<boolean>(false);
   const [terminalMinimized, setTerminalMinimized] = useState<boolean>(false);
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
@@ -74,7 +72,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Terminal functions
   const addTerminalLine = (content: string, type: 'command' | 'output' | 'error' | 'info' | 'success') => {
     const newLine: TerminalLine = {
       id: uuidv4(),
@@ -104,15 +101,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const sendMessage = async (content: string, file?: File | null) => {
-    // Always create a new chat if sending a message without an active chat
     if (!activeChat) {
       const newChat = createNewChat();
-      await new Promise(resolve => setTimeout(resolve, 50)); // Small delay to ensure chat is created
+      await new Promise(resolve => setTimeout(resolve, 50));
       sendMessageToChat(newChat.id, content, file);
       return;
     }
     
-    // If there's an active chat, use it
     sendMessageToChat(activeChat.id, content, file);
   };
   
@@ -129,17 +124,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     
-    // Create user message
     let messageContent = content;
     
-    // If there's a file, add information about it to the message
     if (file) {
       messageContent += `\n\n[Arquivo anexado: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
     }
     
     const userMessage = createUserMessage(messageContent);
     
-    // Update chat with user message
     const chat = chats.find(c => c.id === chatId);
     if (!chat) return;
     
@@ -150,10 +142,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     
     try {
-      // Check if this is the first message in the chat
       const isFirstMessage = chat.messages.length === 0;
       
-      // Open terminal for orchestrator if it's the first message and orchestrator is active
       if (isFirstMessage && orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
         setTerminalOpen(true);
         setTerminalMinimized(false);
@@ -162,8 +152,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         addTerminalLine("Inicializando Orquestrador Neural...", 'info');
       }
       
-      // Use orchestrator's selected model if available, otherwise use default selection
-      console.log("Selecting model for task...");
       let selectedModelId;
       
       if (orchestratorConfig && orchestratorConfig.selectedModel) {
@@ -182,7 +170,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
       
-      // Terminal updates for orchestrator
       if (terminalOpen) {
         if (orchestratorConfig?.memory?.enabled) {
           addTerminalLine("Buscando informações na memória...", 'info');
@@ -203,12 +190,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
       
-      // Generate AI response using the orchestrator
       console.log("Generating response with model:", selectedModelId);
       const botMessage = await generateBotResponse(content, selectedModelId, file);
       console.log("Response generated:", botMessage);
       
-      // Update terminal with results
       if (terminalOpen) {
         addTerminalLine("Resposta gerada com sucesso", 'success');
         if (botMessage.toolsUsed && botMessage.toolsUsed.length > 0) {
@@ -217,12 +202,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         addTerminalLine("Processamento concluído", 'success');
       }
       
-      // Update chat with AI response
       const finalMessages = [...updatedMessages, botMessage];
       updateChat(chatId, {
         messages: finalMessages,
         updatedAt: new Date(),
-        // Update title for new chats after first exchange
         title: chat.messages.length === 0 
           ? createChatTitle(content)
           : chat.title,
@@ -250,12 +233,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         createNewChat,
         sendMessage,
         removeChat,
-        // Terminal related
         terminalOpen,
         terminalMinimized,
         terminalLines,
         toggleTerminal,
-        closeTerminal,
+        closeTerminal: toggleTerminal,
         addTerminalLine,
         clearTerminal
       }}

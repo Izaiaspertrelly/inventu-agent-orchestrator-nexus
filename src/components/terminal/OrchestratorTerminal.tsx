@@ -1,9 +1,10 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, X, Minimize2, Maximize2 } from 'lucide-react';
+import { Loader2, Terminal, Minimize2, Maximize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
+import DraggableContainer from '../draggable/DraggableContainer';
 
 export interface TerminalLine {
   id: string;
@@ -14,7 +15,6 @@ export interface TerminalLine {
 
 interface OrchestratorTerminalProps {
   isOpen: boolean;
-  onClose: () => void;
   onMinimize: () => void;
   lines: TerminalLine[];
   isProcessing: boolean;
@@ -24,7 +24,6 @@ interface OrchestratorTerminalProps {
 
 const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
   isOpen,
-  onClose,
   onMinimize,
   lines: propLines,
   isProcessing,
@@ -78,14 +77,39 @@ const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
   }, [linesArray, minimized]);
 
   if (!isOpen) return null;
+  
+  // Render a small floating terminal when minimized
+  if (minimized) {
+    return (
+      <DraggableContainer 
+        isMinimized={minimized}
+        className="bg-secondary/90 backdrop-blur-sm rounded-lg w-24 h-16 border border-border"
+      >
+        <div className="w-full h-full flex flex-col">
+          <div className="h-8 rounded-t-lg flex items-center justify-between px-2 bg-secondary/90">
+            <div className="flex items-center gap-1">
+              <Terminal className="h-3.5 w-3.5 text-primary" />
+              <span className="text-xs font-medium truncate">Terminal</span>
+            </div>
+            <button 
+              onClick={onMinimize}
+              className="p-1 hover:bg-background/60 rounded-md transition-colors"
+            >
+              <Maximize2 className="h-3 w-3" />
+            </button>
+          </div>
+          <div className="bg-black/90 backdrop-blur-md flex-1 rounded-b-lg p-1">
+            <div className="h-full text-[0.6rem] font-mono text-green-400 overflow-hidden flex items-center justify-center">
+              <span className="animate-pulse">●</span>
+            </div>
+          </div>
+        </div>
+      </DraggableContainer>
+    );
+  }
 
   return (
-    <div 
-      className={cn(
-        "fixed bottom-20 left-1/2 transform -translate-x-1/2 w-[80%] max-w-3xl z-50 transition-all duration-200 ease-in-out shadow-2xl border border-border",
-        minimized ? "h-12 rounded-t-lg" : "h-80 rounded-lg"
-      )}
-    >
+    <div className="h-full flex flex-col bg-secondary/10 border-l border-border">
       {/* Terminal Header */}
       <div className="bg-secondary/90 backdrop-blur-sm h-12 rounded-t-lg flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
@@ -100,53 +124,45 @@ const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
             onClick={onMinimize}
             className="p-1.5 hover:bg-background/60 rounded-md transition-colors"
           >
-            {minimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
-          </button>
-          <button 
-            onClick={onClose}
-            className="p-1.5 hover:bg-destructive/10 hover:text-destructive rounded-md transition-colors"
-          >
-            <X className="h-4 w-4" />
+            <Minimize2 className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Terminal Content */}
-      {!minimized && (
-        <div className="bg-black/90 backdrop-blur-md h-[calc(100%-3rem)] rounded-b-lg" ref={scrollRef}>
-          <ScrollArea className="h-full p-4 font-mono text-sm">
-            {linesArray.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                Terminal pronto para execução
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                {linesArray.map((line) => (
-                  <div key={line.id} className={cn(
-                    line.type === 'command' && "text-blue-400",
-                    line.type === 'output' && "text-green-300",
-                    line.type === 'error' && "text-red-400",
-                    line.type === 'info' && "text-yellow-300",
-                    line.type === 'success' && "text-emerald-400",
-                  )}>
-                    {line.type === 'command' && (
-                      <span className="text-gray-400">$ </span>
-                    )}
-                    {line.content}
-                  </div>
-                ))}
-                {isProcessing && (
-                  <div className="flex gap-1 text-green-300 mt-1 items-center">
+      <div className="bg-black/90 backdrop-blur-md flex-1 h-[calc(100%-3rem)]" ref={scrollRef}>
+        <ScrollArea className="h-full p-4 font-mono text-sm">
+          {linesArray.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              Terminal pronto para execução
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {linesArray.map((line) => (
+                <div key={line.id} className={cn(
+                  line.type === 'command' && "text-blue-400",
+                  line.type === 'output' && "text-green-300",
+                  line.type === 'error' && "text-red-400",
+                  line.type === 'info' && "text-yellow-300",
+                  line.type === 'success' && "text-emerald-400",
+                )}>
+                  {line.type === 'command' && (
                     <span className="text-gray-400">$ </span>
-                    <span>Processando</span>
-                    <span className="inline-block w-1.5 h-4 bg-green-300 animate-pulse ml-0.5"></span>
-                  </div>
-                )}
-              </div>
-            )}
-          </ScrollArea>
-        </div>
-      )}
+                  )}
+                  {line.content}
+                </div>
+              ))}
+              {isProcessing && (
+                <div className="flex gap-1 text-green-300 mt-1 items-center">
+                  <span className="text-gray-400">$ </span>
+                  <span>Processando</span>
+                  <span className="inline-block w-1.5 h-4 bg-green-300 animate-pulse ml-0.5"></span>
+                </div>
+              )}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
     </div>
   );
 };

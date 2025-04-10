@@ -24,8 +24,7 @@ const Chat: React.FC = () => {
     terminalOpen,
     terminalMinimized,
     terminalLines,
-    toggleTerminal,
-    closeTerminal
+    toggleTerminal
   } = useChat();
   const { orchestratorConfig } = useAgent();
   const [showFloatingBar, setShowFloatingBar] = useState(false);
@@ -87,8 +86,9 @@ const Chat: React.FC = () => {
         />
       )}
       
-      <div className="flex flex-col flex-1 h-full">
-        <div className="flex flex-col flex-1">
+      <div className="flex flex-1 h-full">
+        {/* Chat Messages Section */}
+        <div className="flex flex-col flex-1 h-full">
           {isOrchestratorActive && (
             <div className="px-4 py-2">
               <Alert className="bg-primary/5 border-primary/20">
@@ -153,6 +153,19 @@ const Chat: React.FC = () => {
             </div>
           </ScrollArea>
         </div>
+        
+        {/* Terminal Section - Only show when open and not minimized */}
+        {terminalOpen && !terminalMinimized && (
+          <div className="w-1/3 min-w-80 max-w-md h-full">
+            <OrchestratorTerminal
+              isOpen={terminalOpen}
+              onMinimize={toggleTerminal}
+              lines={terminalLines}
+              isProcessing={isProcessing}
+              minimized={terminalMinimized}
+            />
+          </div>
+        )}
       </div>
       
       {/* Memory Confirmation Dialog */}
@@ -162,15 +175,16 @@ const Chat: React.FC = () => {
         pendingConfirmation={pendingMemoryConfirmation}
       />
       
-      {/* Orchestrator Terminal */}
-      <OrchestratorTerminal
-        isOpen={terminalOpen}
-        onClose={closeTerminal}
-        onMinimize={toggleTerminal}
-        lines={terminalLines}
-        isProcessing={isProcessing}
-        minimized={terminalMinimized}
-      />
+      {/* Minimized Terminal */}
+      {terminalOpen && terminalMinimized && (
+        <OrchestratorTerminal
+          isOpen={terminalOpen}
+          onMinimize={toggleTerminal}
+          lines={terminalLines}
+          isProcessing={isProcessing}
+          minimized={terminalMinimized}
+        />
+      )}
     </div>
   );
 };
