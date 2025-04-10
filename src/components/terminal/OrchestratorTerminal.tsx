@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Terminal, Minimize2, Maximize2 } from 'lucide-react';
@@ -83,6 +84,7 @@ const OrchestratorTerminal: React.FC<OrchestratorTerminalProps> = ({
       <DraggableContainer 
         isMinimized={minimized}
         className="bg-black/90 backdrop-blur-sm rounded-lg w-36 h-20 border border-gray-700" // Reduced width and height
+        attachToSearchBar={true} // Attach to search bar
       >
         <div className="w-full h-full flex flex-col">
           <div className="h-5 rounded-t-lg flex items-center justify-between px-1 bg-gray-800/90 border-b border-gray-700">

@@ -12,6 +12,7 @@ interface DraggableContainerProps {
   initialPosition?: Position;
   className?: string;
   style?: React.CSSProperties;
+  attachToSearchBar?: boolean; // New prop to indicate if it should be attached to search bar
 }
 
 const DraggableContainer: React.FC<DraggableContainerProps> = ({
@@ -20,6 +21,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
   initialPosition = { x: 0, y: 0 },
   className = "",
   style = {},
+  attachToSearchBar = false, // Default is not attached
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState<Position>(initialPosition);
@@ -56,13 +58,55 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
       }
     };
     
-    centerPosition();
-    
-    window.addEventListener('resize', centerPosition);
-    return () => {
-      window.removeEventListener('resize', centerPosition);
-    };
-  }, [isMinimized]);
+    // Only center position if not attached to search bar
+    if (!attachToSearchBar) {
+      centerPosition();
+      
+      window.addEventListener('resize', centerPosition);
+      return () => {
+        window.removeEventListener('resize', centerPosition);
+      };
+    }
+  }, [isMinimized, attachToSearchBar]);
+
+  // Find the search bar element and position relative to it when attached
+  useEffect(() => {
+    if (attachToSearchBar && isMinimized) {
+      const positionRelativeToSearchBar = () => {
+        const searchBarElement = document.querySelector('.neo-blur') as HTMLElement;
+        if (searchBarElement && containerRef.current) {
+          const searchBarRect = searchBarElement.getBoundingClientRect();
+          const terminalWidth = containerRef.current.offsetWidth;
+          
+          // Position the terminal at the bottom right of the search bar
+          setPosition({
+            x: searchBarRect.right - terminalWidth - 10,
+            y: searchBarRect.bottom + 5
+          });
+        }
+      };
+      
+      positionRelativeToSearchBar();
+      
+      // Observe search bar position changes
+      const observer = new MutationObserver(positionRelativeToSearchBar);
+      const searchBarElement = document.querySelector('.neo-blur');
+      if (searchBarElement) {
+        observer.observe(searchBarElement, { 
+          attributes: true, 
+          attributeFilter: ['style'] 
+        });
+      }
+      
+      // Also reposition on resize
+      window.addEventListener('resize', positionRelativeToSearchBar);
+      
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('resize', positionRelativeToSearchBar);
+      };
+    }
+  }, [attachToSearchBar, isMinimized]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (containerRef.current) {
@@ -76,7 +120,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || attachToSearchBar) return; // Don't allow dragging when attached
     
     const newX = Math.max(0, Math.min(window.innerWidth - (containerRef.current?.offsetWidth || 300), e.clientX - offset.x));
     const newY = Math.max(0, Math.min(window.innerHeight - (containerRef.current?.offsetHeight || 60), e.clientY - offset.y));
@@ -92,7 +136,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
   };
 
   useEffect(() => {
-    if (isDragging) {
+    if (isDragging && !attachToSearchBar) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
     }
@@ -101,7 +145,7 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging]);
+  }, [isDragging, attachToSearchBar]);
 
   return (
     <div 
@@ -115,9 +159,9 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({
       }}
     >
       <div 
-        onMouseDown={handleMouseDown}
+        onMouseDown={attachToSearchBar ? undefined : handleMouseDown}
         style={{ 
-          cursor: isDragging ? "grabbing" : "grab",
+          cursor: attachToSearchBar ? "default" : isDragging ? "grabbing" : "grab",
         }}
       >
         {children}
