@@ -55,6 +55,17 @@ export const orchestrateAgentResponse = async (
     const planning = orchestratorSettings.planning || { enabled: false };
     const monitoring = orchestratorSettings.monitoring || { enabled: false };
     
+    // Análise do conteúdo da mensagem para processamento inteligente
+    emitTerminalEvent("Analisando conteúdo da mensagem...", 'info');
+    
+    // Categorizar a mensagem
+    const category = categorizeMessage(userMessage);
+    emitTerminalEvent(`Categoria da mensagem: ${category}`, 'output');
+    
+    // Verificar intenção do usuário
+    const intent = detectUserIntent(userMessage);
+    emitTerminalEvent(`Intenção detectada: ${intent}`, 'output');
+    
     // Mostrar acesso à memória no terminal
     if (memory.enabled) {
       emitTerminalEvent("Acessando memória de contexto...", 'info');
@@ -86,12 +97,8 @@ export const orchestrateAgentResponse = async (
       const taskId = `task-${Date.now()}`;
       emitTerminalEvent("Planejando execução da tarefa...", 'info');
       
-      // Exemplo simplificado de decomposição de tarefas
-      const subtasks = [
-        `Understand the query: "${userMessage.substring(0, 30)}..."`,
-        "Retrieve relevant information from context",
-        "Formulate response based on available information"
-      ];
+      // Adaptar subtarefas com base na intenção detectada
+      const subtasks = generateSubtasksBasedOnIntent(intent, userMessage);
       
       // Mostrar subtarefas no terminal
       emitTerminalEvent(`Decompondo tarefa em ${subtasks.length} subtarefas:`, 'output');
@@ -138,5 +145,105 @@ export const orchestrateAgentResponse = async (
     console.error("Error in agent orchestration:", errorMessage);
     emitTerminalEvent(`Erro: ${errorMessage}`, 'error');
     return `Erro ao processar com o agente: ${errorMessage}`;
+  }
+};
+
+// Funções auxiliares para o processador
+const categorizeMessage = (message: string): string => {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes("?")) return "pergunta";
+  if (lowerMessage.startsWith("como") || lowerMessage.startsWith("qual") || lowerMessage.startsWith("quem") || 
+      lowerMessage.startsWith("onde") || lowerMessage.startsWith("quando") || lowerMessage.startsWith("por que")) 
+    return "pergunta";
+    
+  if (lowerMessage.includes("obrigado") || lowerMessage.includes("obrigada") || 
+      lowerMessage.includes("agradec") || lowerMessage.includes("valeu"))
+    return "agradecimento";
+    
+  if (lowerMessage.includes("ajuda") || lowerMessage.includes("auxílio") || 
+      lowerMessage.includes("preciso") || lowerMessage.includes("necessito"))
+    return "pedido_ajuda";
+    
+  if (lowerMessage.includes("oi") || lowerMessage.includes("olá") || 
+      lowerMessage.includes("bom dia") || lowerMessage.includes("boa tarde") || 
+      lowerMessage.includes("boa noite"))
+    return "saudação";
+    
+  return "declaração";
+};
+
+const detectUserIntent = (message: string): string => {
+  const lowerMessage = message.toLowerCase();
+  
+  // Detecção de intenções comuns
+  if (lowerMessage.includes("melhor") || 
+      lowerMessage.includes("qual") || 
+      lowerMessage.includes("compare") || 
+      lowerMessage.includes("comparar")) 
+    return "comparação_avaliação";
+    
+  if (lowerMessage.includes("como fazer") || 
+      lowerMessage.includes("como posso") || 
+      lowerMessage.includes("como devo")) 
+    return "instrução_procedimento";
+    
+  if (lowerMessage.includes("significa") || 
+      lowerMessage.includes("definição") || 
+      lowerMessage.includes("o que é") || 
+      lowerMessage.includes("explique")) 
+    return "definição_explicação";
+    
+  if (lowerMessage.includes("preço") || 
+      lowerMessage.includes("custo") || 
+      lowerMessage.includes("valor") || 
+      lowerMessage.includes("quanto custa")) 
+    return "informação_preço";
+    
+  if (lowerMessage.includes("onde") || 
+      lowerMessage.includes("local") || 
+      lowerMessage.includes("endereço")) 
+    return "informação_localização";
+    
+  return "informação_geral";
+};
+
+const generateSubtasksBasedOnIntent = (intent: string, message: string): string[] => {
+  switch (intent) {
+    case "comparação_avaliação":
+      return [
+        "Identificar os itens a serem comparados",
+        "Levantar critérios relevantes para comparação",
+        "Avaliar cada item segundo os critérios",
+        "Gerar conclusão comparativa"
+      ];
+    case "instrução_procedimento":
+      return [
+        "Identificar o procedimento solicitado",
+        "Levantar pré-requisitos necessários",
+        "Estruturar passos em ordem lógica",
+        "Complementar com dicas e observações importantes"
+      ];
+    case "definição_explicação":
+      return [
+        "Identificar o termo ou conceito a ser definido",
+        "Elaborar definição clara e concisa",
+        "Adicionar contexto e exemplos",
+        "Oferecer informações complementares relevantes"
+      ];
+    case "informação_preço":
+      return [
+        "Identificar o produto ou serviço",
+        "Buscar faixas de preço atualizadas",
+        "Adicionar informações sobre variações de preço",
+        "Incluir fatores que influenciam o preço"
+      ];
+    default:
+      return [
+        "Analisar a solicitação do usuário",
+        "Identificar informações relevantes",
+        "Estruturar resposta coerente",
+        "Verificar completude da resposta"
+      ];
   }
 };

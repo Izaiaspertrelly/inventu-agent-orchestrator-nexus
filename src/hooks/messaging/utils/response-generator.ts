@@ -11,128 +11,116 @@ export const generateDynamicResponse = (
     monitoring?: { enabled: boolean };
   }
 ): string => {
-  // Extract features from user message
+  // Extract topics from user message
   const lowerCaseMessage = userMessage.toLowerCase();
-  const containsQuestion = lowerCaseMessage.includes("?");
-  const mentionsData = 
-    lowerCaseMessage.includes("data") || 
-    lowerCaseMessage.includes("information") || 
-    lowerCaseMessage.includes("stats");
-  const mentionsTime = 
-    lowerCaseMessage.includes("time") || 
-    lowerCaseMessage.includes("when") ||
-    lowerCaseMessage.includes("date");
-  const mentionsAction = 
-    lowerCaseMessage.includes("do") || 
-    lowerCaseMessage.includes("make") || 
-    lowerCaseMessage.includes("create") || 
-    lowerCaseMessage.includes("update");
-  const mentionsHelp = 
-    lowerCaseMessage.includes("help") || 
-    lowerCaseMessage.includes("assist");
   
-  // Build response
+  // Analyze the message content
+  const isQuestion = lowerCaseMessage.includes("?");
+  const topics = extractTopicsFromMessage(lowerCaseMessage);
+  
+  // Generate a relevant response based on the message content
   let response = "";
   
-  // Add greeting
-  response += getRandomGreeting() + " ";
+  // Handle different types of messages
+  if (lowerCaseMessage.startsWith("qual") || lowerCaseMessage.startsWith("quais")) {
+    // Questions starting with "qual" or "quais" in Portuguese
+    if (lowerCaseMessage.includes("plano de saude") || lowerCaseMessage.includes("plano de saúde")) {
+      response = `Para determinar o melhor plano de saúde no Brasil, é necessário considerar diversos fatores como:
+
+1. **Cobertura**: Diferentes operadoras oferecem coberturas distintas para procedimentos médicos.
+2. **Rede credenciada**: A disponibilidade de hospitais e médicos na sua região é essencial.
+3. **Custo-benefício**: O preço deve ser compatível com os serviços oferecidos.
+4. **Reputação**: O histórico de atendimento e satisfação dos clientes é um indicador importante.
+
+Algumas operadoras bem avaliadas incluem Amil, Bradesco Saúde, SulAmérica, Unimed e Notre Dame Intermédica, mas a "melhor" depende das suas necessidades específicas como localização, orçamento, e necessidades médicas particulares.`;
+    } else if (lowerCaseMessage.includes("carro")) {
+      response = "Determinar o melhor carro depende muito do seu propósito, orçamento e preferências pessoais. Carros populares no Brasil incluem modelos da Fiat, Volkswagen, Chevrolet e Toyota, cada um com seus pontos fortes em economia, conforto, desempenho ou tecnologia.";
+    } else {
+      response = `Para responder à sua pergunta sobre "${extractMainTopic(userMessage)}", preciso considerar vários fatores para fornecer uma recomendação adequada. Posso ajudar com mais detalhes se você especificar seu orçamento, necessidades principais e outras prioridades.`;
+    }
+  } else if (isQuestion) {
+    response = generateAnswerBasedOnTopic(topics);
+  } else {
+    // For statements or commands
+    response = `Entendi sua mensagem sobre "${extractMainTopic(userMessage)}". ${generateRelevantFollowup(topics)}`;
+  }
   
   // Add memory context if enabled
   if (capabilities.memory?.enabled) {
-    response += getMemoryContext(capabilities.memory.type, userMessage) + " ";
-  }
-  
-  // Add main response content
-  if (containsQuestion) {
-    response += getQuestionResponse(userMessage);
-  } else if (mentionsAction) {
-    response += getActionResponse(userMessage);
-  } else if (mentionsData) {
-    response += getDataResponse(userMessage);
-  } else if (mentionsHelp) {
-    response += getHelpResponse();
-  } else {
-    response += getGeneralResponse(userMessage);
+    response += " Baseio esta resposta nas informações que tenho disponíveis no momento.";
   }
   
   // Add reasoning if enabled
   if (capabilities.reasoning?.enabled) {
-    response += " " + getReasoningContext(capabilities.reasoning.depth || 1);
-  }
-  
-  // Add planning context if enabled
-  if (capabilities.planning?.enabled && mentionsAction) {
-    response += " " + getPlanningContext(userMessage);
-  }
-  
-  // Add monitoring information if enabled
-  if (capabilities.monitoring?.enabled) {
-    response += " " + getMonitoringContext();
+    const depth = capabilities.reasoning.depth || 1;
+    if (depth >= 2) {
+      response += " Esta análise considera múltiplos fatores e suas interrelações para uma resposta mais completa.";
+    }
   }
   
   return response;
 };
 
-// Helper functions for response building
-const getRandomGreeting = (): string => {
-  const greetings = [
-    "I understand your request.",
-    "Thank you for your message.",
-    "I've processed your input.",
-    "Based on your request,"
+// Helper functions
+const extractTopicsFromMessage = (message: string): string[] => {
+  // Extract potential topics from the message
+  const commonTopics = [
+    "saúde", "plano", "carro", "viagem", "educação", "investimento", 
+    "celular", "computador", "casa", "apartamento", "alimentação", 
+    "esporte", "lazer", "trabalho", "carreira"
   ];
-  return greetings[Math.floor(Math.random() * greetings.length)];
+  
+  return commonTopics.filter(topic => message.includes(topic));
 };
 
-const getMemoryContext = (memoryType: string = 'buffer', userMessage: string): string => {
-  if (memoryType === 'vectordb') {
-    return "Based on our previous conversations, I recall we discussed similar topics.";
-  } else if (memoryType === 'summary') {
-    return "According to the conversation summary, we're discussing this in the context of our previous interactions.";
-  } else {
-    return "I've taken your recent messages into account.";
+const extractMainTopic = (message: string): string => {
+  // Simple logic to extract what seems to be the main topic
+  const words = message.split(" ");
+  
+  // Remove common question words in Portuguese
+  const filteredWords = words.filter(word => 
+    !["qual", "quais", "como", "onde", "quando", "por", "que", "o", "a", "os", "as", "é", "são", "do", "da", "dos", "das"].includes(word.toLowerCase())
+  );
+  
+  // Return a few words that might represent the topic
+  if (filteredWords.length > 2) {
+    return filteredWords.slice(0, 3).join(" ");
   }
+  return filteredWords.join(" ") || "seu assunto";
 };
 
-const getQuestionResponse = (userMessage: string): string => {
-  // Generate a generic response for questions
-  return "I've analyzed your question and can provide you with the information you need. The answer depends on several factors, but here's what I can tell you based on available information.";
-};
-
-const getActionResponse = (userMessage: string): string => {
-  // Generate a generic response for action requests
-  return "I can help you with this task. Let me outline what needs to be done to accomplish this goal effectively.";
-};
-
-const getDataResponse = (userMessage: string): string => {
-  // Generate a generic response for data-related queries
-  return "I've analyzed the relevant data points regarding your request. Here's a summary of the key information that addresses your inquiry.";
-};
-
-const getHelpResponse = (): string => {
-  // Generate a generic help response
-  return "I'm here to help. You can ask me questions, request actions, or inquire about data. Just let me know what you need assistance with, and I'll do my best to support you.";
-};
-
-const getGeneralResponse = (userMessage: string): string => {
-  // Generate a generic response for general messages
-  return "I've processed your message and am ready to assist you with your request. Please let me know if you need any clarification or have additional questions.";
-};
-
-const getReasoningContext = (depth: number): string => {
-  if (depth >= 3) {
-    return "My answer incorporates deep multi-step reasoning across various domains and perspectives to ensure comprehensive accuracy.";
-  } else if (depth >= 2) {
-    return "I've thought through this with a two-step reasoning process to ensure accuracy.";
-  } else {
-    return "I've applied basic reasoning to provide you with a reliable answer.";
+const generateAnswerBasedOnTopic = (topics: string[]): string => {
+  if (topics.includes("saúde") || topics.includes("plano")) {
+    return "Os melhores planos de saúde dependem de diversos fatores como região, orçamento, e necessidades médicas específicas. Operadoras como Amil, Bradesco Saúde, SulAmérica, Unimed e Notre Dame Intermédica são bem avaliadas no mercado brasileiro.";
   }
+  
+  if (topics.includes("carro")) {
+    return "A escolha do melhor carro varia conforme suas necessidades. Para economia, modelos como HB20 e Mobi são populares. Para famílias, SUVs como T-Cross e Creta oferecem mais espaço. Marcas como Toyota e Honda destacam-se em confiabilidade.";
+  }
+  
+  if (topics.includes("investimento")) {
+    return "Estratégias de investimento devem considerar seu perfil de risco, objetivos financeiros e horizonte de tempo. Opções populares no Brasil incluem Tesouro Direto, CDBs, fundos de investimento, e ações para perfis mais arrojados.";
+  }
+  
+  return "Sua pergunta requer uma análise específica. Para uma resposta mais precisa, poderia fornecer mais detalhes sobre o que está procurando?";
 };
 
-const getPlanningContext = (userMessage: string): string => {
-  return "To implement this effectively, I recommend breaking this down into manageable steps that can be tackled sequentially.";
-};
-
-const getMonitoringContext = (): string => {
-  return "System performance is optimal, and all orchestration functions are operating as expected.";
+const generateRelevantFollowup = (topics: string[]): string => {
+  if (topics.length === 0) {
+    return "Como posso ajudá-lo com mais informações sobre esse assunto?";
+  }
+  
+  if (topics.includes("saúde") || topics.includes("plano")) {
+    return "Posso ajudar com informações sobre coberturas, redes credenciadas, ou comparações entre diferentes operadoras de saúde?";
+  }
+  
+  if (topics.includes("carro")) {
+    return "Gostaria de saber mais sobre modelos específicos, comparações de preço, ou dicas para compra de carros novos ou usados?";
+  }
+  
+  if (topics.includes("investimento")) {
+    return "Posso fornecer mais detalhes sobre tipos específicos de investimentos ou estratégias para diferentes objetivos financeiros?";
+  }
+  
+  return "Gostaria de obter informações mais específicas sobre esse tema?";
 };
