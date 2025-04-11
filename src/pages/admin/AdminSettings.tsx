@@ -1,69 +1,55 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
+import AdminSystemSettings from "@/components/admin/AdminSystemSettings";
+import SettingsLayout from "@/components/layouts/SettingsLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, UserCog, Layers, Code, Brain } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import AgentsSection from "./components/AgentsSection";
-import ModelsSection from "./components/ModelsSection";
-import MCPSection from "./components/MCPSection";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import OpenAIMultiAgentPanel from "./components/openai/OpenAIMultiAgentPanel";
 import OrchestratorSection from "./components/OrchestratorSection";
+import { Bot, Brain } from "lucide-react";
 
 const AdminSettings = () => {
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("system");
   
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate("/")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-3xl font-bold">Configurações do Administrador</h1>
-        </div>
+    <SettingsLayout>
+      <div className="container max-w-6xl py-6 space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Admin Settings</CardTitle>
+            <CardDescription>
+              Configure system settings, agents, and integrations
+            </CardDescription>
+          </CardHeader>
+        </Card>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="system">System</TabsTrigger>
+            <TabsTrigger value="orchestrator" className="flex items-center justify-center gap-1.5">
+              <Brain className="h-4 w-4" />
+              Neural Orchestrator
+            </TabsTrigger>
+            <TabsTrigger value="openai" className="flex items-center justify-center gap-1.5">
+              <Bot className="h-4 w-4" />
+              OpenAI Multi-Agent
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="system" className="pt-4">
+            <AdminSystemSettings />
+          </TabsContent>
+          
+          <TabsContent value="orchestrator" className="pt-4">
+            <OrchestratorSection />
+          </TabsContent>
+          
+          <TabsContent value="openai" className="pt-4">
+            <OpenAIMultiAgentPanel />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="orchestrator" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="orchestrator" className="flex items-center gap-2">
-            <Brain className="h-4 w-4" />
-            Orquestrador
-          </TabsTrigger>
-          <TabsTrigger value="agents" className="flex items-center gap-2">
-            <UserCog className="h-4 w-4" />
-            Agentes
-          </TabsTrigger>
-          <TabsTrigger value="models" className="flex items-center gap-2">
-            <Layers className="h-4 w-4" />
-            Modelos de IA
-          </TabsTrigger>
-          <TabsTrigger value="mcp" className="flex items-center gap-2">
-            <Code className="h-4 w-4" />
-            Servidor MCP
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="orchestrator" className="space-y-6">
-          <OrchestratorSection />
-        </TabsContent>
-
-        <TabsContent value="agents" className="space-y-6">
-          <AgentsSection />
-        </TabsContent>
-
-        <TabsContent value="models" className="space-y-6">
-          <ModelsSection />
-        </TabsContent>
-
-        <TabsContent value="mcp" className="space-y-6">
-          <MCPSection />
-        </TabsContent>
-      </Tabs>
-    </div>
+    </SettingsLayout>
   );
 };
 

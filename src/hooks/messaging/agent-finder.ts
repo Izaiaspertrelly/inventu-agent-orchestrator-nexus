@@ -2,41 +2,58 @@
 import { AgentInfo } from "./types/orchestrator-types";
 
 /**
- * Functions to find and select appropriate agents
+ * Find an agent by model ID
  */
-export const findAgentByModel = (agents: Array<any>, modelId: string) => {
-  return agents.find(agent => agent.modelId === modelId);
+export const findAgentByModel = (agents: any[], modelId: string): AgentInfo | null => {
+  if (!agents || !modelId) return null;
+  
+  const agent = agents.find(agent => agent.modelId === modelId);
+  if (!agent) return null;
+  
+  return {
+    id: agent.id,
+    name: agent.name,
+    description: agent.description,
+    configJson: agent.configJson,
+    modelId: agent.modelId,
+    role: agent.role || 'assistant'
+  };
 };
 
 /**
- * Find orchestrator agent based on configured ID or selected model
+ * Get the orchestrator agent based on orchestratorConfig
  */
-export const getOrchestratorAgent = (agents: Array<any>, orchestratorConfig: any): AgentInfo | null => {
-  if (orchestratorConfig && orchestratorConfig.mainAgentId) {
-    const agent = agents.find(agent => agent.id === orchestratorConfig.mainAgentId);
-    if (agent) {
-      console.log("Found orchestrator agent by ID:", agent.name);
-      return agent;
-    }
-    console.log("Configured agent ID not found, trying by model ID");
-  }
-  
-  if (orchestratorConfig && orchestratorConfig.selectedModel) {
-    const agent = agents.find(agent => agent.modelId === orchestratorConfig.selectedModel);
-    if (agent) {
-      console.log("Found orchestrator agent by model ID:", agent.name);
-      return agent;
-    }
-    
-    console.log("No agent found for this model, creating virtual agent");
+export const getOrchestratorAgent = (agents: any[], orchestratorConfig: any): AgentInfo => {
+  // Create a virtual orchestrator agent if no mainAgentId is specified
+  if (!orchestratorConfig || !orchestratorConfig.mainAgentId) {
     return {
       id: "virtual-orchestrator",
-      name: "Orquestrador Neural",
-      modelId: orchestratorConfig.selectedModel,
-      configJson: JSON.stringify(orchestratorConfig)
+      name: "Neural Orchestrator",
+      description: "Virtual orchestration layer",
+      configJson: orchestratorConfig ? JSON.stringify(orchestratorConfig) : "{}",
+      role: "orchestrator"
     };
   }
   
-  console.log("No orchestrator agent configuration found");
-  return null;
+  // Try to find the specified main agent
+  const mainAgent = agents?.find(a => a.id === orchestratorConfig.mainAgentId);
+  if (mainAgent) {
+    return {
+      id: mainAgent.id,
+      name: mainAgent.name,
+      description: mainAgent.description,
+      configJson: orchestratorConfig ? JSON.stringify(orchestratorConfig) : "{}",
+      modelId: mainAgent.modelId,
+      role: "orchestrator"
+    };
+  }
+  
+  // Fallback to virtual orchestrator if the main agent is not found
+  return {
+    id: "virtual-orchestrator",
+    name: "Neural Orchestrator",
+    description: "Virtual orchestration layer (main agent not found)",
+    configJson: orchestratorConfig ? JSON.stringify(orchestratorConfig) : "{}",
+    role: "orchestrator"
+  };
 };
