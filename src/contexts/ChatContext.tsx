@@ -1,251 +1,28 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { Chat, Message } from "../types";
-import { ChatContextType } from "../types/chat";
-import { createChat, createUserMessage, createChatTitle } from "../utils/chatUtils";
-import { useChatMessageProcessor } from "../hooks/use-chat-message-processor";
-import { useToast } from "@/hooks/use-toast";
+
+import React, { createContext, useContext, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Message, Chat } from "../types";
+import { createUserMessage, createBotMessage } from "../utils/chatUtils";
+import { useChatMessageProcessor } from "@/hooks/use-chat-message-processor";
 import { useAgent } from "./AgentContext";
 import { TerminalLine } from "@/components/terminal/OrchestratorTerminal";
-import { v4 as uuidv4 } from 'uuid';
+
+interface ChatContextType {
+  activeChat: Chat | null;
+  chats: Chat[];
+  createNewChat: () => void;
+  loadChat: (id: string) => void;
+  sendMessage: (content: string, file?: File | null) => Promise<void>;
+  isProcessing: boolean;
+  // Terminal related props
+  terminalOpen: boolean;
+  terminalMinimized: boolean; 
+  terminalLines: TerminalLine[];
+  toggleTerminal: () => void;
+  setTerminalMinimized: (minimized: boolean) => void;
+}
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
-
-export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { toast } = useToast();
-  const { generateBotResponse, selectModelForTask, isProcessing } = useChatMessageProcessor();
-  const { orchestratorConfig } = useAgent();
-  
-  const [chats, setChats] = useState<Chat[]>(() => {
-    const savedChats = localStorage.getItem("inventu_chats");
-    return savedChats ? JSON.parse(savedChats) : [];
-  });
-  
-  const [activeChat, setActiveChatState] = useState<Chat | null>(null);
-  
-  const [terminalOpen, setTerminalOpen] = useState<boolean>(false);
-  const [terminalMinimized, setTerminalMinimized] = useState<boolean>(false);
-  const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
-
-  useEffect(() => {
-    localStorage.setItem("inventu_chats", JSON.stringify(chats));
-  }, [chats]);
-
-  useEffect(() => {
-    if (chats.length > 0 && !activeChat) {
-      setActiveChatState(chats[0]);
-    }
-  }, [chats, activeChat]);
-
-  const createNewChat = () => {
-    const newChat = createChat();
-    setChats((prev) => [newChat, ...prev]);
-    setActiveChatState(newChat);
-    return newChat;
-  };
-
-  const setActiveChat = (chatId: string) => {
-    const chat = chats.find((c) => c.id === chatId);
-    if (chat) {
-      setActiveChatState(chat);
-    }
-  };
-
-  const updateChat = (chatId: string, updates: Partial<Chat>) => {
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat.id === chatId ? { ...chat, ...updates } : chat
-      )
-    );
-
-    if (activeChat?.id === chatId) {
-      setActiveChatState((prev) => (prev ? { ...prev, ...updates } : prev));
-    }
-  };
-
-  const removeChat = (chatId: string) => {
-    setChats((prev) => prev.filter((chat) => chat.id !== chatId));
-    
-    if (activeChat?.id === chatId) {
-      setActiveChatState(chats.length > 1 ? chats.filter(c => c.id !== chatId)[0] : null);
-    }
-  };
-
-  const addTerminalLine = (content: string, type: 'command' | 'output' | 'error' | 'info' | 'success') => {
-    const newLine: TerminalLine = {
-      id: uuidv4(),
-      content,
-      type,
-      timestamp: new Date()
-    };
-    setTerminalLines(prev => [...prev, newLine]);
-  };
-
-  const clearTerminal = () => {
-    setTerminalLines([]);
-  };
-
-  const toggleTerminal = () => {
-    if (terminalOpen) {
-      setTerminalMinimized(prev => !prev);
-    } else {
-      setTerminalOpen(true);
-      setTerminalMinimized(false);
-    }
-  };
-
-  const closeTerminal = () => {
-    setTerminalOpen(false);
-    // We don't clear the terminal lines here so they're still available if the user reopens it
-  };
-
-  const sendMessage = async (content: string, file?: File | null) => {
-    if (!activeChat) {
-      const newChat = createNewChat();
-      await new Promise(resolve => setTimeout(resolve, 50));
-      sendMessageToChat(newChat.id, content, file);
-      return;
-    }
-    
-    sendMessageToChat(activeChat.id, content, file);
-  };
-  
-  const sendMessageToChat = async (chatId: string, content: string, file?: File | null) => {
-    console.log("Sending message to chat:", chatId);
-    console.log("Content:", content);
-    console.log("Attached file:", file?.name || "none");
-    
-    if (!content.trim() && !file) {
-      toast({
-        description: "Por favor, digite uma mensagem ou anexe um arquivo",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    let messageContent = content;
-    
-    if (file) {
-      messageContent += `\n\n[Arquivo anexado: ${file.name} (${Math.round(file.size / 1024)} KB)]`;
-    }
-    
-    const userMessage = createUserMessage(messageContent);
-    
-    const chat = chats.find(c => c.id === chatId);
-    if (!chat) return;
-    
-    const updatedMessages = [...chat.messages, userMessage];
-    updateChat(chatId, {
-      messages: updatedMessages,
-      updatedAt: new Date(),
-    });
-    
-    try {
-      const isFirstMessage = chat.messages.length === 0;
-      
-      if (isFirstMessage && orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
-        setTerminalOpen(true);
-        setTerminalMinimized(false);
-        clearTerminal();
-        addTerminalLine(`Processando mensagem: "${content}"`, 'command');
-        addTerminalLine("Inicializando Orquestrador Neural...", 'info');
-      }
-      
-      let selectedModelId;
-      
-      if (orchestratorConfig && orchestratorConfig.selectedModel) {
-        console.log("Using orchestrator's selected model:", orchestratorConfig.selectedModel);
-        selectedModelId = orchestratorConfig.selectedModel;
-        
-        if (isFirstMessage) {
-          addTerminalLine(`Modelo selecionado: ${orchestratorConfig.selectedModel}`, 'info');
-        }
-      } else {
-        selectedModelId = await selectModelForTask(content);
-        console.log("Selected model using standard selection:", selectedModelId);
-        
-        if (isFirstMessage && terminalOpen) {
-          addTerminalLine(`Modelo selecionado: ${selectedModelId}`, 'info');
-        }
-      }
-      
-      if (terminalOpen) {
-        if (orchestratorConfig?.memory?.enabled) {
-          addTerminalLine("Buscando informações na memória...", 'info');
-          setTimeout(() => {
-            addTerminalLine("Memória acessada com sucesso", 'success');
-          }, 800);
-        }
-        
-        if (orchestratorConfig?.reasoning?.enabled) {
-          addTerminalLine(`Iniciando raciocínio (profundidade: ${orchestratorConfig.reasoning.depth || 2})...`, 'info');
-          setTimeout(() => {
-            addTerminalLine("Processamento de raciocínio concluído", 'success');
-          }, 1500);
-        }
-        
-        if (file) {
-          addTerminalLine(`Processando arquivo: ${file.name}`, 'info');
-        }
-      }
-      
-      console.log("Generating response with model:", selectedModelId);
-      const botMessage = await generateBotResponse(content, selectedModelId, file);
-      console.log("Response generated:", botMessage);
-      
-      if (terminalOpen) {
-        addTerminalLine("Resposta gerada com sucesso", 'success');
-        if (botMessage.toolsUsed && botMessage.toolsUsed.length > 0) {
-          addTerminalLine(`Ferramentas utilizadas: ${botMessage.toolsUsed.join(", ")}`, 'output');
-        }
-        addTerminalLine("Processamento concluído", 'success');
-      }
-      
-      const finalMessages = [...updatedMessages, botMessage];
-      updateChat(chatId, {
-        messages: finalMessages,
-        updatedAt: new Date(),
-        title: chat.messages.length === 0 
-          ? createChatTitle(content)
-          : chat.title,
-      });
-    } catch (error) {
-      console.error("Failed to process message:", error);
-      if (terminalOpen) {
-        addTerminalLine(`Erro: ${error.message}`, 'error');
-      }
-      toast({
-        title: "Erro",
-        description: "Não foi possível processar sua mensagem. Tente novamente.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  return (
-    <ChatContext.Provider
-      value={{
-        chats,
-        activeChat,
-        isProcessing,
-        setActiveChat,
-        createNewChat,
-        sendMessage,
-        removeChat,
-        terminalOpen,
-        terminalMinimized,
-        terminalLines,
-        toggleTerminal,
-        closeTerminal: toggleTerminal,
-        addTerminalLine,
-        clearTerminal
-      }}
-    >
-      {children}
-    </ChatContext.Provider>
-  );
-};
 
 export const useChat = () => {
   const context = useContext(ChatContext);
@@ -253,4 +30,232 @@ export const useChat = () => {
     throw new Error("useChat must be used within a ChatProvider");
   }
   return context;
+};
+
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { orchestratorConfig, selectModelForTask } = useAgent();
+  const { generateBotResponse } = useChatMessageProcessor();
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChat, setActiveChat] = useState<Chat | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Terminal state
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [terminalMinimized, setTerminalMinimized] = useState(false);
+  const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
+  
+  // Ouvir eventos do terminal
+  React.useEffect(() => {
+    const handleTerminalEvent = (event: CustomEvent<{content: string, type: TerminalLine['type']}>) => {
+      const { content, type } = event.detail;
+      
+      setTerminalLines(prev => [
+        ...prev,
+        {
+          id: uuidv4(),
+          content,
+          type,
+          timestamp: new Date()
+        }
+      ]);
+      
+      // Abrir terminal automaticamente quando há atividade do orquestrador
+      if (!terminalOpen) {
+        setTerminalOpen(true);
+        setTerminalMinimized(false);
+      }
+    };
+    
+    document.addEventListener('terminal-update', handleTerminalEvent as EventListener);
+    
+    return () => {
+      document.removeEventListener('terminal-update', handleTerminalEvent as EventListener);
+    };
+  }, [terminalOpen]);
+  
+  const createNewChat = () => {
+    const newChat: Chat = {
+      id: uuidv4(),
+      name: "Nova conversa",
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setChats((prevChats) => [...prevChats, newChat]);
+    setActiveChat(newChat);
+    console.log("Nova conversa criada com ID:", newChat.id);
+  };
+
+  const loadChat = (id: string) => {
+    const chat = chats.find((c) => c.id === id);
+    if (chat) {
+      setActiveChat(chat);
+    }
+  };
+
+  const sendMessage = async (content: string, file: File | null = null) => {
+    if (!activeChat) {
+      createNewChat();
+    }
+
+    if (!content.trim() && !file) return;
+    
+    console.log("Sending message to chat:", activeChat?.id);
+    console.log("Content:", content);
+    console.log("Attached file:", file ? file.name : "none");
+
+    // Add user message to chat
+    const userMessage = createUserMessage(content);
+    
+    // Using main chat id instead of messages[0]
+    const updatedChat: Chat = {
+      ...activeChat!,
+      messages: [...activeChat!.messages, userMessage],
+      updatedAt: new Date(),
+    };
+
+    setChats((prevChats) =>
+      prevChats.map((c) => (c.id === updatedChat.id ? updatedChat : c))
+    );
+    setActiveChat(updatedChat);
+
+    // Process the message to generate a response
+    setIsProcessing(true);
+    
+    // Ativar o terminal se temos o orquestrador configurado
+    if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
+      setTerminalOpen(true);
+      setTerminalMinimized(false);
+      
+      // Adicionar eventos iniciais do terminal
+      setTerminalLines(prev => [
+        ...prev,
+        {
+          id: uuidv4(),
+          content: "Enviando mensagem para processamento",
+          type: "command",
+          timestamp: new Date()
+        },
+        {
+          id: uuidv4(),
+          content: `Prompt do usuário: "${content}"`,
+          type: "info",
+          timestamp: new Date()
+        }
+      ]);
+    }
+    
+    try {
+      // Determinar qual modelo usar
+      const selectedModel = orchestratorConfig && orchestratorConfig.selectedModel 
+        ? orchestratorConfig.selectedModel 
+        : await selectModelForTask(content);
+      
+      console.log("Using model:", selectedModel);
+      
+      if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
+        setTerminalLines(prev => [
+          ...prev,
+          {
+            id: uuidv4(),
+            content: `Usando modelo do orquestrador: ${selectedModel}`,
+            type: "info",
+            timestamp: new Date()
+          }
+        ]);
+      }
+
+      const botResponse = await generateBotResponse(content, selectedModel, file);
+
+      const updatedChatWithResponse: Chat = {
+        ...updatedChat,
+        messages: [...updatedChat.messages, botResponse],
+        updatedAt: new Date(),
+      };
+
+      setChats((prevChats) =>
+        prevChats.map((c) => (c.id === updatedChat.id ? updatedChatWithResponse : c))
+      );
+      setActiveChat(updatedChatWithResponse);
+      
+      // Registrar conclusão no terminal
+      if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
+        setTerminalLines(prev => [
+          ...prev,
+          {
+            id: uuidv4(),
+            content: "Resposta gerada com sucesso",
+            type: "success",
+            timestamp: new Date()
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error("Error generating response:", error);
+      
+      // Registrar erro no terminal
+      if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
+        setTerminalLines(prev => [
+          ...prev,
+          {
+            id: uuidv4(),
+            content: `Erro ao gerar resposta: ${error}`,
+            type: "error",
+            timestamp: new Date()
+          }
+        ]);
+      }
+      
+      const errorMessage = createBotMessage(
+        `Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente mais tarde.
+Error: ${String(error)}`
+      );
+
+      const updatedChatWithError: Chat = {
+        ...updatedChat,
+        messages: [...updatedChat.messages, errorMessage],
+        updatedAt: new Date(),
+      };
+
+      setChats((prevChats) =>
+        prevChats.map((c) => (c.id === updatedChat.id ? updatedChatWithError : c))
+      );
+      setActiveChat(updatedChatWithError);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const toggleTerminal = () => {
+    if (terminalOpen && !terminalMinimized) {
+      setTerminalMinimized(true);
+    } else {
+      setTerminalOpen(true);
+      setTerminalMinimized(false);
+    }
+  };
+
+  return (
+    <ChatContext.Provider
+      value={{
+        activeChat,
+        chats,
+        createNewChat,
+        loadChat,
+        sendMessage,
+        isProcessing,
+        // Terminal related
+        terminalOpen,
+        terminalMinimized,
+        terminalLines,
+        toggleTerminal,
+        setTerminalMinimized
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
+  );
 };
