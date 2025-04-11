@@ -176,9 +176,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         addTerminalLine(`Erro ao gerar resposta: ${error}`, "error");
       }
       
+      // Corrigindo o problema aqui: createBotMessage precisa do modelo e opcionalmente tools
       const errorMessage = createBotMessage(
         `Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente mais tarde.
-Error: ${String(error)}`
+Error: ${String(error)}`,
+        "error" // Passando o segundo argumento necessário (modelUsed)
       );
 
       const updatedChatWithError: Chat = {

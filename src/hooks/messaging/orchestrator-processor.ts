@@ -4,7 +4,7 @@ import { generateDynamicResponse } from "./utils/response-generator";
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * Process a user message using the orchestrator agent
+ * Processa uma mensagem do usuário usando o agente orquestrador
  */
 export const orchestrateAgentResponse = async (
   userMessage: string,
@@ -15,7 +15,7 @@ export const orchestrateAgentResponse = async (
 ): Promise<string> => {
   const startTime = Date.now();
   
-  // Terminal event emitter
+  // Emissor de eventos do terminal
   const emitTerminalEvent = (content: string, type: 'command' | 'output' | 'error' | 'info' | 'success') => {
     const event = new CustomEvent('terminal-update', { 
       detail: { content, type } 
@@ -27,14 +27,16 @@ export const orchestrateAgentResponse = async (
     console.log("Orchestrating response using agent:", agent?.name || "Virtual Orchestrator");
     emitTerminalEvent(`Orquestrando resposta com ${agent?.name || "Orquestrador Neural"}`, 'info');
     
-    // Register user message in conversation history
-    addToConversationHistory?.({
-      role: "user",
-      content: userMessage,
-      timestamp: new Date()
-    });
+    // Registrar mensagem do usuário no histórico de conversas
+    if (addToConversationHistory) {
+      addToConversationHistory({
+        role: "user",
+        content: userMessage,
+        timestamp: new Date()
+      });
+    }
     
-    // Try to parse agent configuration
+    // Tentar analisar a configuração do agente
     let agentConfig: any = {};
     try {
       agentConfig = JSON.parse(agent.configJson || "{}");
@@ -43,24 +45,24 @@ export const orchestrateAgentResponse = async (
       console.error("Error parsing agent configuration:", e);
     }
     
-    // Use orchestrator settings if this agent is the main orchestrator
+    // Usar configurações do orquestrador se este agente for o orquestrador principal
     const isMainOrchestrator = agent.id === "virtual-orchestrator";
     
-    // Check orchestrator capabilities - with validation to avoid errors
-    const orchestratorSettings = isMainOrchestrator ? JSON.parse(agent.configJson) : (agentConfig.orchestrator || {});
+    // Verificar capacidades do orquestrador - com validação para evitar erros
+    const orchestratorSettings = isMainOrchestrator ? JSON.parse(agent.configJson || "{}") : (agentConfig.orchestrator || {});
     const memory = orchestratorSettings.memory || { enabled: false };
     const reasoning = orchestratorSettings.reasoning || { enabled: false };
     const planning = orchestratorSettings.planning || { enabled: false };
     const monitoring = orchestratorSettings.monitoring || { enabled: false };
     
-    // Show memory access in terminal
+    // Mostrar acesso à memória no terminal
     if (memory.enabled) {
       emitTerminalEvent("Acessando memória de contexto...", 'info');
       await new Promise(resolve => setTimeout(resolve, 500));
       emitTerminalEvent("Memória carregada com sucesso", 'success');
     }
     
-    // Show reasoning process in terminal
+    // Mostrar processo de raciocínio no terminal
     if (reasoning.enabled) {
       emitTerminalEvent("Iniciando processo de raciocínio...", 'info');
       await new Promise(resolve => setTimeout(resolve, 700));
@@ -69,7 +71,7 @@ export const orchestrateAgentResponse = async (
       emitTerminalEvent("Raciocínio concluído", 'success');
     }
     
-    // Build response based on capabilities and message content
+    // Construir resposta com base nas capacidades e conteúdo da mensagem
     emitTerminalEvent("Gerando resposta para o usuário...", 'info');
     const responseContent = generateDynamicResponse(userMessage, {
       memory,
@@ -78,53 +80,63 @@ export const orchestrateAgentResponse = async (
       monitoring
     });
     
-    // Planning process if enabled
+    // Processo de planejamento, se ativado
     if (planning.enabled) {
-      // Create unique task ID
+      // Criar ID de tarefa único
       const taskId = `task-${Date.now()}`;
       emitTerminalEvent("Planejando execução da tarefa...", 'info');
       
-      // Simplified task decomposition example
+      // Exemplo simplificado de decomposição de tarefas
       const subtasks = [
         `Understand the query: "${userMessage.substring(0, 30)}..."`,
         "Retrieve relevant information from context",
         "Formulate response based on available information"
       ];
       
-      // Show subtasks in terminal
+      // Mostrar subtarefas no terminal
       emitTerminalEvent(`Decompondo tarefa em ${subtasks.length} subtarefas:`, 'output');
       for (let i = 0; i < subtasks.length; i++) {
         await new Promise(resolve => setTimeout(resolve, 300));
         emitTerminalEvent(`Subtarefa ${i+1}: ${subtasks[i]}`, 'output');
       }
       
-      // Register task decomposition
-      decomposeTask?.(taskId, userMessage, subtasks);
+      // Registrar decomposição de tarefas
+      if (decomposeTask) {
+        decomposeTask(taskId, userMessage, subtasks);
+      }
       emitTerminalEvent("Planejamento concluído", 'success');
     }
     
-    // Register response time for performance analysis
+    // Registrar tempo de resposta para análise de desempenho
     const responseTime = Date.now() - startTime;
-    recordPerformanceMetric?.("responseTime", responseTime);
+    if (recordPerformanceMetric) {
+      recordPerformanceMetric("responseTime", responseTime);
+    }
     emitTerminalEvent(`Tempo de resposta: ${responseTime}ms`, 'output');
     
-    // Estimate and register token usage (simplified)
+    // Estimar e registrar uso de tokens (simplificado)
     const estimatedTokens = Math.ceil(userMessage.length / 4) + Math.ceil(responseContent.length / 4);
-    recordPerformanceMetric?.("tokenUsage", estimatedTokens);
+    if (recordPerformanceMetric) {
+      recordPerformanceMetric("tokenUsage", estimatedTokens);
+    }
     emitTerminalEvent(`Tokens utilizados (estimado): ${estimatedTokens}`, 'output');
     
-    // Register agent response in conversation history
-    addToConversationHistory?.({
-      role: "assistant",
-      content: responseContent,
-      timestamp: new Date()
-    });
+    // Registrar resposta do agente no histórico de conversas
+    if (addToConversationHistory) {
+      addToConversationHistory({
+        role: "assistant",
+        content: responseContent,
+        timestamp: new Date()
+      });
+    }
     
     emitTerminalEvent("Processamento concluído com sucesso", 'success');
+    console.log("Resposta gerada pelo orquestrador:", responseContent);
     return responseContent;
   } catch (error) {
-    console.error("Error in agent orchestration:", error);
-    emitTerminalEvent(`Erro: ${error.message}`, 'error');
-    return `Error processing with agent: ${error.message}`;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error in agent orchestration:", errorMessage);
+    emitTerminalEvent(`Erro: ${errorMessage}`, 'error');
+    return `Erro ao processar com o agente: ${errorMessage}`;
   }
 };

@@ -6,7 +6,7 @@ import { findAgentByModel, getOrchestratorAgent } from "./agent-finder";
 import { orchestrateAgentResponse } from "./orchestrator-processor";
 
 /**
- * Hook for handling orchestrator responses and memory management
+ * Hook para lidar com respostas do orquestrador e gerenciamento de memória
  */
 export const useOrchestratorResponse = () => {
   const { 
@@ -18,10 +18,10 @@ export const useOrchestratorResponse = () => {
     decomposeTask 
   } = useAgent();
   
-  // State to control memory confirmation pending status
+  // State para controlar status pendente de confirmação de memória
   const [pendingMemoryConfirmation, setPendingMemoryConfirmation] = useState<MemoryConfirmation | null>(null);
   
-  // Monitor pending confirmations
+  // Monitorar confirmações pendentes
   useEffect(() => {
     const pendingConfirmations = orchestratorState?.memory?.pendingConfirmations || [];
     if (pendingConfirmations.length > 0 && !pendingMemoryConfirmation) {
@@ -29,26 +29,26 @@ export const useOrchestratorResponse = () => {
         id: pendingConfirmations[0].id || 0,
         userId: pendingConfirmations[0].userId,
         entry: pendingConfirmations[0].entry,
-        timestamp: pendingConfirmations[0].timestamp || new Date() // Adiciona um timestamp padrão se não existir
+        timestamp: pendingConfirmations[0].timestamp || new Date()
       });
     } else if (pendingConfirmations.length === 0 && pendingMemoryConfirmation) {
       setPendingMemoryConfirmation(null);
     }
   }, [orchestratorState?.memory?.pendingConfirmations, pendingMemoryConfirmation]);
 
-  // Function for finding the agent by model ID
+  // Função para encontrar o agente pelo ID do modelo
   const findAgentByModelId = (modelId: string) => {
     return findAgentByModel(agents, modelId);
   };
 
-  // Get the orchestrator agent
+  // Obter o agente orquestrador
   const getOrchAgent = () => {
     return getOrchestratorAgent(agents, orchestratorConfig);
   };
 
-  // Orchestrate agent response with terminal events
+  // Orquestrar resposta do agente com eventos do terminal
   const orchestrateResponse = async (userMessage: string, agent: any) => {
-    // Find any terminal event handlers registered
+    // Encontrar manipuladores de eventos do terminal registrados
     const terminalEvent = (content: string, type: string) => {
       const event = new CustomEvent('terminal-update', { 
         detail: { content, type } 
@@ -56,10 +56,10 @@ export const useOrchestratorResponse = () => {
       document.dispatchEvent(event);
     };
     
-    // Emit initial events
+    // Emitir eventos iniciais
     terminalEvent("Iniciando processamento do Orquestrador Neural", "command");
     
-    // If agent has capabilities, emit events for them
+    // Se o agente tem capacidades, emitir eventos para elas
     if (agent.configJson) {
       try {
         const config = JSON.parse(agent.configJson);
@@ -76,20 +76,20 @@ export const useOrchestratorResponse = () => {
           terminalEvent("Ativando planejamento para tarefas complexas", "info");
         }
       } catch (e) {
-        console.error("Error parsing agent config:", e);
+        console.error("Erro ao analisar configuração do agente:", e);
       }
     }
     
-    // Track processing time
+    // Rastrear tempo de processamento
     const startTime = Date.now();
     
-    // Emit key events during processing
+    // Emitir eventos-chave durante o processamento
     terminalEvent("Analisando mensagem do usuário", "info");
     await new Promise(r => setTimeout(r, 300));
     terminalEvent("Interpretando solicitação", "info");
     await new Promise(r => setTimeout(r, 500));
     
-    // Execute the actual orchestration
+    // Executar a orquestração real
     const response = await orchestrateAgentResponse(
       userMessage,
       agent,
@@ -98,7 +98,7 @@ export const useOrchestratorResponse = () => {
       recordPerformanceMetric
     );
     
-    // Final events
+    // Eventos finais
     const processingTime = ((Date.now() - startTime) / 1000).toFixed(2);
     terminalEvent(`Processamento concluído em ${processingTime}s`, "success");
     
