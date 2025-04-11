@@ -9,7 +9,9 @@ export interface MemoryConfirmation {
     key: string;
     value: any;
     source: string;
+    label?: string;
   };
+  timestamp: Date;
 }
 
 // Agent information interface

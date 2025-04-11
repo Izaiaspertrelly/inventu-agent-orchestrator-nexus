@@ -51,9 +51,16 @@ const OrchestratorResourcesTab: React.FC = () => {
       // Update orchestrator configuration
       updateOrchestratorConfig(updatedConfig);
       
-      // Configure optimization strategy
+      // Map strategy values to those expected by the API
+      const strategyMapping: Record<string, 'balanced' | 'performance' | 'economy'> = {
+        'conservative': 'economy',
+        'balanced': 'balanced',
+        'aggressive': 'performance'
+      };
+      
+      // Configure optimization strategy with the mapped value
       configureOptimization({
-        strategy: optimizationStrategy as 'conservative' | 'balanced' | 'aggressive',
+        strategy: strategyMapping[optimizationStrategy] as 'balanced' | 'performance' | 'economy',
         autoOptimize: optimizeResources
       });
       

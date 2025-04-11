@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, StopCircle, Brain, Bot, Network, Command, Send } from "lucide-react";
-import { OrchestratorTerminal, TerminalLine } from "@/components/terminal/OrchestratorTerminal";
+import OrchestratorTerminal, { TerminalLine } from "@/components/terminal/OrchestratorTerminal";
 import { useAgent } from "@/contexts/AgentContext";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
