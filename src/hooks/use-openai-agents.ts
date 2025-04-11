@@ -17,7 +17,7 @@ export const useOpenAIAgents = () => {
   useEffect(() => {
     setAgents(service.getAgents());
     setTeams(service.getTeams());
-    setActiveRuns(service.getRuns ? service.getRuns() : []);
+    setActiveRuns(service.getAllRuns());
     setIsLoading(false);
     
     // Escutar atualizações nos runs

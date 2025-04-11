@@ -37,7 +37,7 @@ const ChatSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { chats, activeChat, setActiveChat } = useChat();
+  const { chats, activeChat, loadChat } = useChat();
   const { toast } = useToast();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   
@@ -173,7 +173,7 @@ const ChatSidebar: React.FC = () => {
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
                         : "text-sidebar-foreground"
                     )}
-                    onClick={() => setActiveChat(chat.id)}
+                    onClick={() => loadChat(chat.id)}
                   >
                     <div className="flex items-start">
                       <div className="h-8 w-8 rounded-xl bg-primary/10 mr-3 flex items-center justify-center text-primary">
@@ -275,7 +275,7 @@ const ChatSidebar: React.FC = () => {
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
                         : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                     )}
-                    onClick={() => setActiveChat(chat.id)}
+                    onClick={() => loadChat(chat.id)}
                     title={chat.title || "Nova conversa"}
                   >
                     <div className="flex items-center justify-center text-primary">

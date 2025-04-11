@@ -10,7 +10,7 @@ import { TerminalLine } from "@/components/terminal/OrchestratorTerminal";
 interface ChatContextType {
   activeChat: Chat | null;
   chats: Chat[];
-  createNewChat: () => void;
+  createNewChat: () => Chat;
   loadChat: (id: string) => void;
   sendMessage: (content: string, file?: File | null) => Promise<void>;
   isProcessing: boolean;
@@ -20,6 +20,9 @@ interface ChatContextType {
   terminalLines: TerminalLine[];
   toggleTerminal: () => void;
   setTerminalMinimized: (minimized: boolean) => void;
+  closeTerminal: () => void;
+  addTerminalLine: (content: string, type: 'command' | 'output' | 'error' | 'info' | 'success') => void;
+  clearTerminal: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -78,7 +81,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const createNewChat = () => {
     const newChat: Chat = {
       id: uuidv4(),
-      name: "Nova conversa",
+      title: "Nova conversa",
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -87,6 +90,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     setChats((prevChats) => [...prevChats, newChat]);
     setActiveChat(newChat);
     console.log("Nova conversa criada com ID:", newChat.id);
+    return newChat;
   };
 
   const loadChat = (id: string) => {
@@ -131,21 +135,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       setTerminalMinimized(false);
       
       // Adicionar eventos iniciais do terminal
-      setTerminalLines(prev => [
-        ...prev,
-        {
-          id: uuidv4(),
-          content: "Enviando mensagem para processamento",
-          type: "command",
-          timestamp: new Date()
-        },
-        {
-          id: uuidv4(),
-          content: `Prompt do usuário: "${content}"`,
-          type: "info",
-          timestamp: new Date()
-        }
-      ]);
+      addTerminalLine("Enviando mensagem para processamento", "command");
+      addTerminalLine(`Prompt do usuário: "${content}"`, "info");
     }
     
     try {
@@ -157,15 +148,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("Using model:", selectedModel);
       
       if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
-        setTerminalLines(prev => [
-          ...prev,
-          {
-            id: uuidv4(),
-            content: `Usando modelo do orquestrador: ${selectedModel}`,
-            type: "info",
-            timestamp: new Date()
-          }
-        ]);
+        addTerminalLine(`Usando modelo do orquestrador: ${selectedModel}`, "info");
       }
 
       const botResponse = await generateBotResponse(content, selectedModel, file);
@@ -183,30 +166,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       
       // Registrar conclusão no terminal
       if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
-        setTerminalLines(prev => [
-          ...prev,
-          {
-            id: uuidv4(),
-            content: "Resposta gerada com sucesso",
-            type: "success",
-            timestamp: new Date()
-          }
-        ]);
+        addTerminalLine("Resposta gerada com sucesso", "success");
       }
     } catch (error) {
       console.error("Error generating response:", error);
       
       // Registrar erro no terminal
       if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
-        setTerminalLines(prev => [
-          ...prev,
-          {
-            id: uuidv4(),
-            content: `Erro ao gerar resposta: ${error}`,
-            type: "error",
-            timestamp: new Date()
-          }
-        ]);
+        addTerminalLine(`Erro ao gerar resposta: ${error}`, "error");
       }
       
       const errorMessage = createBotMessage(
@@ -227,6 +194,27 @@ Error: ${String(error)}`
     } finally {
       setIsProcessing(false);
     }
+  };
+  
+  // Add terminal helper functions
+  const addTerminalLine = (content: string, type: TerminalLine['type']) => {
+    setTerminalLines(prev => [
+      ...prev,
+      {
+        id: uuidv4(),
+        content,
+        type,
+        timestamp: new Date()
+      }
+    ]);
+  };
+  
+  const clearTerminal = () => {
+    setTerminalLines([]);
+  };
+  
+  const closeTerminal = () => {
+    setTerminalOpen(false);
   };
   
   const toggleTerminal = () => {
@@ -252,7 +240,10 @@ Error: ${String(error)}`
         terminalMinimized,
         terminalLines,
         toggleTerminal,
-        setTerminalMinimized
+        setTerminalMinimized,
+        closeTerminal,
+        addTerminalLine,
+        clearTerminal
       }}
     >
       {children}

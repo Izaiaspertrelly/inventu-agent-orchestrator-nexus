@@ -172,6 +172,11 @@ export class OpenAIAgentService {
     return this.runs.filter(r => r.teamId === teamId);
   }
   
+  // Added method to get all runs
+  public getAllRuns(): OpenAIRunStatus[] {
+    return this.runs;
+  }
+  
   // Funções privadas de apoio
   private saveAgents(): void {
     localStorage.setItem('openai_agents', JSON.stringify(this.agents));
