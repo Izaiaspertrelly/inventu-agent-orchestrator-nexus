@@ -26,8 +26,10 @@ export const useOrchestratorResponse = () => {
     const pendingConfirmations = orchestratorState?.memory?.pendingConfirmations || [];
     if (pendingConfirmations.length > 0 && !pendingMemoryConfirmation) {
       setPendingMemoryConfirmation({
-        id: 0,
-        ...pendingConfirmations[0]
+        id: pendingConfirmations[0].id || 0,
+        userId: pendingConfirmations[0].userId,
+        entry: pendingConfirmations[0].entry,
+        timestamp: pendingConfirmations[0].timestamp || new Date() // Adiciona um timestamp padrão se não existir
       });
     } else if (pendingConfirmations.length === 0 && pendingMemoryConfirmation) {
       setPendingMemoryConfirmation(null);
