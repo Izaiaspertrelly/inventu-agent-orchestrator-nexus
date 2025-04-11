@@ -61,7 +61,7 @@ const OrchestratorResourcesTab: React.FC = () => {
       // Configure optimization strategy with the mapped value
       configureOptimization({
         strategy: strategyMapping[optimizationStrategy] as 'balanced' | 'performance' | 'economy',
-        enabled: optimizeResources  // Changed from autoOptimize to enabled
+        enabled: optimizeResources  // Using enabled property instead of autoOptimize
       });
       
       toast({
