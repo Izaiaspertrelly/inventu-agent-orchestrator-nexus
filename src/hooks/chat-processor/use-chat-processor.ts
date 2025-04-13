@@ -1,63 +1,30 @@
 
 import { useState } from "react";
-import { Message } from "../types";
-import { createBotMessage } from "../utils/chatUtils";
+import { Message } from "../../types";
 import { useToast } from "@/hooks/use-toast";
-import { useAgent } from "../contexts/AgentContext";
-import { useOrchestratorResponse } from "./messaging/use-orchestrator-response";
-import { useToolExecutor } from "./messaging/use-tool-executor";
-import { useModelResponse } from "./messaging/use-model-response";
-import { v4 as uuidv4 } from 'uuid';
+import { useAgent } from "../../contexts/AgentContext";
+import { useOrchestratorResponse } from "../messaging/use-orchestrator-response";
+import { useToolExecutor } from "../messaging/use-tool-executor";
+import { useModelResponse } from "../messaging/use-model-response";
+import { useChatProcessorUtils } from "./use-chat-processor-utils";
+import { useChatTerminalEmitter } from "./use-chat-terminal-emitter";
+import { useInformationDetector } from "./use-information-detector";
 
 export const useChatMessageProcessor = () => {
   const { toast } = useToast();
   const { selectModelForTask, optimizeResources, orchestratorConfig, createUserDatabase, requestMemoryConfirmation } = useAgent();
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Importar hooks para funcionalidades específicas
+  // Import hooks for specific functionalities
   const { findAgentByModel, getOrchestratorAgent, orchestrateAgentResponse } = useOrchestratorResponse();
   const { executeToolsFromMessage, processFileUpload } = useToolExecutor();
   const { generateModelBasedResponse } = useModelResponse();
   
-  // Emissor de eventos para atualizações do terminal
-  const emitTerminalEvent = (content: string, type: 'command' | 'output' | 'error' | 'info' | 'success') => {
-    const event = new CustomEvent('terminal-update', { 
-      detail: { content, type } 
-    });
-    document.dispatchEvent(event);
-  };
+  // Import utility hooks
+  const { emitTerminalEvent } = useChatTerminalEmitter();
+  const { detectImportantInformation } = useInformationDetector();
   
-  // Detectar informações potencialmente importantes para a memória
-  const detectImportantInformation = (userMessage: string) => {
-    emitTerminalEvent("Analisando informações importantes na mensagem...", 'info');
-    
-    // Exemplo de padrões para detectar informações importantes
-    const patterns = [
-      { regex: /minha\s+api\s+[é:]?\s+([^\s.,]+)/i, key: 'api_key', label: 'API Key' },
-      { regex: /uso\s+(o\s+)?([^\s.,]+)\s+para/i, key: 'tool_usage', label: 'Ferramenta utilizada' },
-      { regex: /meu\s+(?:nome|usuário)\s+[é:]?\s+([^\s.,]+)/i, key: 'username', label: 'Nome de usuário' },
-      { regex: /(?:trabalho|empresa)\s+[é:]?\s+([^\s.,]+)/i, key: 'company', label: 'Empresa' }
-    ];
-    
-    const detectedInfo = [];
-    
-    for (const pattern of patterns) {
-      const match = userMessage.match(pattern.regex);
-      if (match && match[1]) {
-        detectedInfo.push({
-          key: pattern.key,
-          value: match[1],
-          label: pattern.label,
-          source: 'message_analysis'
-        });
-        emitTerminalEvent(`Detectado ${pattern.label}: ${match[1]}`, 'success');
-      }
-    }
-    
-    return detectedInfo;
-  };
-  
-  // Processar a resposta do bot
+  // Process the response from the bot
   const generateBotResponse = async (userMessage: string, selectedModelId: string, file?: File | null): Promise<Message> => {
     setIsProcessing(true);
     
@@ -65,22 +32,24 @@ export const useChatMessageProcessor = () => {
       console.log(`Generating response using model: ${selectedModelId}`);
       emitTerminalEvent(`Iniciando processamento com modelo: ${selectedModelId}`, 'command');
       
-      // 1. Configurar informações do usuário e banco de dados
+      // 1. Configure user information and database
       console.log("Step 1: Setting up user context");
       emitTerminalEvent("Configurando contexto do usuário...", 'info');
-      const userId = localStorage.getItem('temp_user_id') || uuidv4();
+      
+      // Setup user context using utility function from useChatProcessorUtils
+      const userId = localStorage.getItem('temp_user_id') || crypto.randomUUID();
       localStorage.setItem('temp_user_id', userId);
       createUserDatabase(userId);
       
       let responseContent = "";
       let toolsUsed: string[] = [];
       
-      // Verificar se o orquestrador está configurado e deve ser usado
+      // Check if orchestrator is configured and should be used
       if (orchestratorConfig && Object.keys(orchestratorConfig).length > 0) {
         console.log("Orchestrator is configured, using orchestrated response flow");
         emitTerminalEvent("Orquestrador Neural detectado, utilizando fluxo orquestrado", 'info');
         
-        // Processar arquivo se enviado
+        // Process file if uploaded
         if (file) {
           emitTerminalEvent(`Processando arquivo: ${file.name} (${Math.round(file.size / 1024)} KB)`, 'info');
           const fileResponse = processFileUpload(file);
@@ -88,7 +57,7 @@ export const useChatMessageProcessor = () => {
           emitTerminalEvent("Arquivo processado com sucesso", 'success');
         }
         
-        // Executar ferramentas com base no conteúdo da mensagem
+        // Execute tools based on message content
         emitTerminalEvent("Verificando ferramentas necessárias...", 'info');
         const toolResult = await executeToolsFromMessage(userMessage);
         toolsUsed = toolResult.toolsUsed;
@@ -101,7 +70,7 @@ export const useChatMessageProcessor = () => {
           }
         }
         
-        // Obter agente do orquestrador
+        // Get orchestrator agent
         emitTerminalEvent("Obtendo agente do orquestrador...", 'info');
         const orchestratorAgent = getOrchestratorAgent();
         
@@ -109,14 +78,14 @@ export const useChatMessageProcessor = () => {
           console.log("Using orchestrator agent:", orchestratorAgent.name);
           emitTerminalEvent(`Agente selecionado: ${orchestratorAgent.name}`, 'success');
           
-          // Usar orquestrador para gerar resposta
+          // Use orchestrator to generate response
           emitTerminalEvent("Gerando resposta orquestrada...", 'info');
           const orchestratedResponse = await orchestrateAgentResponse(userMessage, orchestratorAgent);
           responseContent += orchestratedResponse;
           console.log("Resposta orquestrada gerada:", responseContent);
           emitTerminalEvent("Resposta gerada com sucesso", 'success');
           
-          // Processar aspectos de memória se habilitados
+          // Process memory aspects if enabled
           if (orchestratorConfig.memory?.enabled) {
             emitTerminalEvent("Processando aspectos de memória...", 'info');
             const importantInfo = detectImportantInformation(userMessage);
@@ -134,7 +103,7 @@ export const useChatMessageProcessor = () => {
           emitTerminalEvent("Agente do orquestrador não encontrado, usando processamento padrão", 'error');
           responseContent += "O orquestrador está configurado, mas não conseguiu processar sua mensagem. Usando processamento padrão. ";
           
-          // Fallback para resposta básica do modelo
+          // Fallback to basic model response
           emitTerminalEvent("Gerando resposta padrão...", 'info');
           const modelResponse = generateModelBasedResponse(userMessage, selectedModelId, null);
           responseContent += modelResponse;
@@ -144,7 +113,7 @@ export const useChatMessageProcessor = () => {
         console.log("Orchestrator not configured, using standard processing flow");
         emitTerminalEvent("Orquestrador não configurado, usando fluxo de processamento padrão", 'info');
         
-        // Executar ferramentas
+        // Execute tools
         emitTerminalEvent("Verificando ferramentas...", 'info');
         const toolResult = await executeToolsFromMessage(userMessage);
         toolsUsed = toolResult.toolsUsed;
@@ -154,7 +123,7 @@ export const useChatMessageProcessor = () => {
           emitTerminalEvent(`Ferramentas executadas: ${toolsUsed.join(", ")}`, 'success');
         }
         
-        // Processar arquivo
+        // Process file
         if (file) {
           emitTerminalEvent(`Processando arquivo: ${file.name}`, 'info');
           const fileResponse = processFileUpload(file);
@@ -162,14 +131,14 @@ export const useChatMessageProcessor = () => {
           emitTerminalEvent("Arquivo processado", 'success');
         }
         
-        // Encontrar agente para o modelo e gerar resposta
+        // Find agent for the model and generate response
         emitTerminalEvent("Gerando resposta baseada no modelo...", 'info');
         const agent = findAgentByModel(selectedModelId);
         responseContent += generateModelBasedResponse(userMessage, selectedModelId, agent);
         emitTerminalEvent("Resposta gerada com sucesso", 'success');
       }
       
-      // Otimizar uso de recursos, se habilitado
+      // Optimize resource usage, if enabled
       if (orchestratorConfig?.resources?.optimizeUsage) {
         emitTerminalEvent("Otimizando uso de recursos...", 'info');
         const savedPercentage = optimizeResources();
@@ -179,22 +148,31 @@ export const useChatMessageProcessor = () => {
       emitTerminalEvent("Processamento concluído com sucesso", 'success');
       setIsProcessing(false);
       
-      // Garantir que temos conteúdo na resposta
+      // Ensure we have content in the response
       if (!responseContent.trim()) {
         responseContent = "Não foi possível gerar uma resposta. Por favor, tente novamente.";
       }
       
-      console.log("Resposta final gerada:", responseContent);
-      return createBotMessage(responseContent, selectedModelId, toolsUsed.length > 0 ? toolsUsed : undefined);
+      console.log("Final response generated:", responseContent);
+      return { 
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: responseContent,
+        createdAt: new Date(),
+        modelUsed: selectedModelId,
+        toolsUsed: toolsUsed.length > 0 ? toolsUsed : undefined
+      };
     } catch (error) {
       setIsProcessing(false);
       console.error("Error generating response:", error);
       emitTerminalEvent(`Erro: ${error instanceof Error ? error.message : String(error)}`, 'error');
-      return createBotMessage(
-        "Desculpe, houve um erro ao processar sua mensagem. Por favor, tente novamente.",
-        "error", // Model ID como "error"
-        undefined // Sem ferramentas
-      );
+      return { 
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: `Desculpe, houve um erro ao processar sua mensagem. Por favor, tente novamente.\nError: ${String(error)}`,
+        createdAt: new Date(),
+        modelUsed: "error"
+      };
     }
   };
 

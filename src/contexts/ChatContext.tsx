@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Message, Chat } from "../types";
 import { createUserMessage, createBotMessage } from "../utils/chatUtils";
-import { useChatMessageProcessor } from "@/hooks/use-chat-message-processor";
+import { useChatMessageProcessor } from "@/hooks/chat-processor";  // Updated import path
 import { useAgent } from "./AgentContext";
 import { TerminalLine } from "@/components/terminal/OrchestratorTerminal";
 
